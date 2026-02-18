@@ -1,0 +1,200 @@
+---
+// Featured projects showcasing technical depth and systems thinking
+const projects = [
+  {
+    title: "CNC Machine Build",
+    description: "Designed and built a CNC machine based on the OpenBuilds Sphinx platform for hardware prototyping and device fabrication. Now using it for rapid prototyping of physical products and custom mechanical parts.",
+    tech: ["CNC/CAM", "Mechanical Design", "G-code", "Hardware Integration"],
+    context: "Purpose-built for device prototyping and hardware development"
+  },
+  {
+    title: "icebergify",
+    description: "Spotify visualizer that reached 15M+ users. Built to handle massive traffic spikes.",
+    tech: ["Python", "Flask", "NGINX", "Gunicorn", "Spotify API"],
+    demo: "https://icebergify.com",
+    context: "Featured on CNET and Lifehacker"
+  },
+  {
+    title: "YAVS",
+    description: "Full-stack video platform with ML-powered insights. Built end-to-end: video processing pipeline, async task queue, wordcloud generation, and automatic categorization using NLP. Handles concurrent uploads, transcoding, and serves thousands of videos.",
+    tech: ["Python", "Django", "Spacy", "NGINX", "PostgreSQL", "Redis", "Docker"],
+    github: "https://github.com/ajayraj/yavs",
+    context: "Production-ready architecture with Docker orchestration"
+  },
+  {
+    title: "hive-fs",
+    description: "Peer-to-peer distributed filesystem using DHT and FUSE. Designed the networking layer, consensus protocol, and filesystem interface. Every node shares storage—files automatically replicate and remain accessible even as nodes join/leave.",
+    tech: ["C++", "OpenDHT", "FUSE", "Distributed Systems"],
+    github: "https://github.com/ajayraj/hive-fs",
+    context: "Deep dive into distributed systems and low-level networking for senior design"
+  },
+  {
+    title: "Wireless Plant Research System",
+    description: "Custom embedded hardware for botanical research. Integrated GPS, thermal imaging, IR spectrometry, and resistivity sensors into a handheld device. Designed data pipeline: sensor → Arduino → real-time display → geotagged CSV export to research servers.",
+    tech: ["C", "Arduino", "Embedded Systems", "Hardware Integration"],
+    context: "Built for UC Riverside research lab"
+  }
+];
+---
+
+<section id="projects" class="py-24 projects-block">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-4xl font-bold mb-12 text-center text-pink-200">Work</h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {projects.map((project) => (
+        <div class="project-card flex flex-col fade-in-on-scroll">
+          <!-- Content -->
+          <div class="card-block flex-1 p-6">
+            <h3 class="text-2xl font-bold mb-3">
+              {project.demo ? (
+                <a href={project.demo} target="_blank" rel="noopener noreferrer" class="card-title-link">
+                  {project.title}
+                </a>
+              ) : (
+                <span class="card-title-text">{project.title}</span>
+              )}
+            </h3>
+            
+            {project.context && (
+              <p class="project-context text-sm mb-3 italic">
+                {project.context}
+              </p>
+            )}
+            
+            <p class="text-white leading-relaxed mb-4">
+              {project.description}
+            </p>
+            
+            {project.github && (
+              <p class="mt-auto">
+                <a href={project.github} target="_blank" rel="noopener noreferrer" class="card-link text-sm">
+                  View Source →
+                </a>
+              </p>
+            )}
+          </div>
+          
+          <!-- Tech footer -->
+          <div class="card-footer p-4">
+            <small class="text-gray-600 text-sm">
+              {project.tech.join(' • ')}
+            </small>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mt-12 text-center fade-in-on-scroll">
+      <a href="https://github.com/ajayraj" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-pink-200 hover:text-orange-300 transition-colors text-lg">
+        More projects on GitHub
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .projects-block {
+    background: linear-gradient(to bottom, rgba(180, 120, 90, 0.4) 0%, rgba(250, 144, 45, 0.35) 25%, #6a5a5a 60%, #5a5a5a 100%);
+    border-top: 1px solid rgba(190, 156, 212, 0.15);
+  }
+
+  .project-card {
+    background-color: transparent;
+    border: 0;
+  }
+
+  .card-block {
+    background-color: #4d4d4d;
+    border-radius: 1.25rem 1.25rem 0 0;
+    transition: all 0.3s ease;
+    box-shadow: 8px 8px rgba(114, 114, 114, 0.6);
+  }
+
+  .card-block:hover {
+    background-color: rgba(255, 160, 122, 0.15) !important;
+    color: #ffffff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .card-block h3 {
+    letter-spacing: 0.015em;
+  }
+
+  .card-block p {
+    line-height: 1.7;
+  }
+
+  .card-title-link {
+    color: #7dd4aa;
+    font-family: verdana, sans-serif;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .card-title-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #7dd4aa;
+    transition: width 0.3s ease;
+  }
+
+  .card-title-link:hover::after {
+    width: 100%;
+  }
+
+  .card-title-text {
+    color: #d8a5e8;
+    font-family: verdana, sans-serif;
+  }
+
+  .card-link {
+    color: #ebc9d0;
+    font-weight: 500;
+    text-decoration: none;
+    position: relative;
+  }
+
+  .card-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -1px;
+    left: 0;
+    background-color: #ffa07a;
+    transition: width 0.3s ease;
+  }
+
+  .card-link:hover {
+    color: #ffa07a;
+  }
+
+  .card-link:hover::after {
+    width: 100%;
+  }
+
+  .project-context {
+    color: #ffb88c;
+    font-weight: 500;
+  }
+
+  .card-text-grey {
+    color: #e9c9d0;
+  }
+
+  .card-footer {
+    border-top: 1px solid lightgrey;
+    background-color: lightgrey;
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: 8px 8px rgba(114, 114, 114, 0.6);
+  }
+</style>

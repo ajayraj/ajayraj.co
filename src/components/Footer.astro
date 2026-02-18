@@ -1,0 +1,66 @@
+---
+// Footer component
+---
+
+<footer class="footer-block">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+      <a 
+        href="https://github.com/ajayraj/ajayraj.co"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="footer-link"
+      >
+        No templates here!<br />
+        <span class="copyleft">&copy;</span> Ajay Raj
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-block {
+    width: 100%;
+    min-height: 150px;
+    background-color: #595959;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid rgba(190, 156, 212, 0.2);
+  }
+
+  .footer-link {
+    color: rgba(223, 165, 238, 0.726);
+    font-size: 1.25rem;
+    font-weight: 400;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    position: relative;
+    display: inline-block;
+  }
+
+  .footer-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(223, 165, 238, 0.9);
+    transition: width 0.3s ease;
+  }
+
+  .footer-link:hover {
+    color: rgba(223, 165, 238, 0.9);
+  }
+
+  .footer-link:hover::after {
+    width: 80%;
+  }
+
+  .copyleft {
+    display: inline-block;
+    transform: rotate(180deg) translateY(-4px);
+    font-size: 1.875rem;
+  }
+</style>

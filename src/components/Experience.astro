@@ -1,0 +1,212 @@
+---
+// Professional experience section
+const experiences = [
+  {
+    company: "Philips",
+    division: "Image Guided Therapy Devices",
+    title: "Senior Software Engineer",
+    location: "Del Mar, CA",
+    tech: ["C/C++", "Python", "FPGA", "Verilog", "FreeRTOS"],
+    highlights: [
+      "Develop Class II Medical Device software (IEC 62304, ISO 13485, FDA compliant)",
+      "Write embedded code for Xilinx FPGA platforms (Artix 7, Virtex 6, MicroBlaze RISC)",
+      "Develop device drivers and communication protocol implementations",
+      "Integrate Verilog IP cores and make HDL changes to add hardware features"
+    ],
+    additional: [
+      "Modernized embedded software from proprietary OS to FreeRTOS",
+      "Designed and implemented UDP-based internal communication protocol",
+      "Performed board bring-up on new hardware PCBA revisions",
+      "Conducted EMC/EMI testing to ensure FDA compliance",
+      "Created requirement, design, and test documentation for medical device lifecycle",
+      "Managed Advanced Development lab systems and participated in pre-clinical animal studies",
+      "Facilitated physician visits and product demonstrations"
+    ]
+  },
+  {
+    company: "General Atomics",
+    division: "Aeronautical Systems, Inc.",
+    title: "Software Engineer",
+    location: "Poway, CA",
+    tech: ["C/C++", "Python", "Docker", "Avionics"],
+    highlights: [
+      "Developed avionics flight simulation software for military UAV platforms",
+      "Contributed to terrain avoidance system and led development of the simulation",
+      "Coordinated with government/private customers on product requirements",
+      "Managed Hardware-In-the-Loop Lab for embedded development and testing"
+    ],
+    additional: [
+      "Reviewed all code for Embedded Trainer simulator product before merge",
+      "Implemented nav sensor, servo, and datalink simulations",
+      "Developed solutions for 1553 bus communication simulations",
+      "Led system investigations based on customer feedback and accreditation testing",
+      "Allocated engineering tasks and budgeted hours based on contract scope",
+      "Restructured development documentation for simulation group's internal wiki"
+    ]
+  }
+];
+---
+
+<section id="experience" class="py-24 experience-block">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-4xl font-bold mb-12 text-center text-pink-200">Experience</h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 fade-in-on-scroll items-start">
+      {experiences.map((exp) => (
+        <div class="experience-card">
+          <div class="experience-header">
+            <div class="mb-3">
+              <h3 class="text-xl font-bold text-orange-300">{exp.company}</h3>
+              {exp.division && (
+                <p class="text-sm text-pink-200 mt-1">{exp.division}</p>
+              )}
+              <p class="text-lg font-semibold text-white mt-2">{exp.title}</p>
+              <p class="text-sm text-white/70">{exp.location}</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 my-4">
+            {exp.tech.map((tech) => (
+              <span class="tech-badge">
+                {tech}
+              </span>
+            ))}
+          </div>
+
+          <ul class="experience-highlights">
+            {exp.highlights.map((highlight) => (
+              <li class="text-white/90 leading-relaxed">{highlight}</li>
+            ))}
+          </ul>
+
+          {exp.additional && exp.additional.length > 0 && (
+            <details class="additional-work">
+              <summary class="text-orange-300 cursor-pointer hover:text-orange-200 text-sm font-semibold mt-4">
+                + Additional Contributions
+              </summary>
+              <ul class="experience-highlights mt-3">
+                {exp.additional.map((item) => (
+                  <li class="text-white/80 leading-relaxed">{item}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .experience-block {
+    background: linear-gradient(to bottom, rgba(122, 102, 133, 0.8) 0%, #7a6685 30%, rgba(100, 87, 120, 0.7) 100%);
+  }
+
+  .experience-card {
+    background: rgba(77, 77, 77, 0.7);
+    border: 1px solid rgba(190, 156, 212, 0.3);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .experience-card:hover {
+    background: rgba(77, 77, 77, 0.85);
+    border-color: rgba(255, 160, 122, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .experience-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .experience-header h3 {
+    letter-spacing: 0.02em;
+  }
+
+  .experience-header p {
+    line-height: 1.6;
+  }
+
+  .tech-badge {
+    background: rgba(190, 156, 212, 0.3);
+    color: #e9c9d0;
+    border: 1px solid rgba(190, 156, 212, 0.4);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    cursor: default;
+  }
+
+  .tech-badge:hover {
+    background: rgba(255, 160, 122, 0.25);
+    border-color: rgba(255, 160, 122, 0.5);
+    transform: translateY(-1px);
+    color: #ffa07a;
+  }
+
+  .experience-highlights {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .experience-highlights li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .experience-highlights li:before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #ffa07a;
+    font-weight: bold;
+  }
+
+  .additional-work {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed rgba(190, 156, 212, 0.3);
+  }
+
+  .additional-work summary {
+    list-style: none;
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+
+  .additional-work summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .additional-work[open] summary {
+    color: #ffa07a;
+    margin-bottom: 0.5rem;
+  }
+
+  .additional-work summary:hover {
+    transform: translateX(2px);
+  }
+
+  /* Section divider */
+  .experience-block {
+    border-top: 1px solid rgba(190, 156, 212, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    .experience-header {
+      flex-direction: column;
+    }
+
+    .experience-header > div:last-child {
+      text-align: left;
+    }
+  }
+</style>

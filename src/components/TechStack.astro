@@ -1,0 +1,76 @@
+---
+// Tech stack section showcasing technical depth
+const skillCategories = [
+  {
+    title: "Systems & Infrastructure",
+    skills: ["C++", "Python", "Distributed Systems", "P2P Networks", "Docker", "NGINX"]
+  },
+  {
+    title: "Backend & Data",
+    skills: ["Django", "Flask", "PostgreSQL", "Redis", "APIs", "Machine Learning"]
+  },
+  {
+    title: "Hardware & Integration",
+    skills: ["Embedded Systems", "CNC/CAM", "Hardware Design", "Arduino", "Mechanical Integration"]
+  }
+];
+---
+
+<section id="tech-stack" class="py-20 tech-stack-section">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-3xl sm:text-4xl font-bold mb-12 text-center text-pink-200">Tools & Tech</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in-on-scroll">
+      {skillCategories.map((category) => (
+        <div class="skill-card p-6 rounded-lg">
+          <h3 class="text-xl font-semibold mb-4 text-orange-300">{category.title}</h3>
+          <div class="flex flex-wrap gap-2">
+            {category.skills.map((skill) => (
+              <span class="skill-tag px-3 py-1 text-sm rounded-md">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .tech-stack-section {
+    background: linear-gradient(to bottom, rgba(100, 87, 120, 0.7) 0%, rgba(122, 102, 133, 0.6) 50%, rgba(180, 120, 90, 0.4) 100%);
+  }
+
+  .skill-card {
+    background: rgba(77, 77, 77, 0.6);
+    border: 1px solid rgba(190, 156, 212, 0.25);
+    transition: all 0.3s ease;
+  }
+
+  .skill-card:hover {
+    background: rgba(77, 77, 77, 0.8);
+    border-color: rgba(255, 160, 122, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .skill-card h3 {
+    letter-spacing: 0.02em;
+  }
+
+  .skill-tag {
+    background: rgba(190, 156, 212, 0.3);
+    color: #e9c9d0;
+    border: 1px solid rgba(190, 156, 212, 0.4);
+    transition: all 0.2s ease;
+    cursor: default;
+  }
+
+  .skill-tag:hover {
+    background: rgba(255, 160, 122, 0.25);
+    border-color: rgba(255, 160, 122, 0.5);
+    transform: translateY(-1px);
+    color: #ffa07a;
+  }
+</style>

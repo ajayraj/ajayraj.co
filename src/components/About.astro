@@ -1,0 +1,104 @@
+---
+// About section with original purple/orange gradient design
+---
+
+<section id="about" class="pt-16 pb-24 bio-block">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bio-container rounded-lg p-8">
+      <h2 class="text-4xl font-bold mb-12 text-center text-pink-200">About</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto items-start">
+      <!-- What Drives Me -->
+      <div class="bio-card fade-in-on-scroll">
+        <p class="text-white leading-relaxed">
+          Hardware excites me, especially in unusual target environments. <br /> <br />I'm privileged to have designed and engineered systems that operate in many contexts, including inside <span class="text-orange-300">the human body</span>, <span class="text-orange-300">30,000 feet in the air</span>, and across millions of phones, computers, and servers.
+          <br /><br />
+          Computational biology and healthcare applications. The perfect pairing of software and hardware is bliss.
+        </p>
+
+        <details class="additional-info">
+          <summary class="text-orange-300 cursor-pointer hover:text-orange-200 text-sm font-semibold mt-4">
+            + Design Philosophy & Working Style
+          </summary>
+          <div class="mt-3 text-white/90 text-sm space-y-2 leading-relaxed">
+            <p><strong class="text-pink-200">Design Philosophy:</strong> </p>
+            <p><strong class="text-pink-200">Stack Preference:</stong> </p>
+            <p><strong class="text-pink-200">Working Style:</strong> Look around corners. Pre-empt pain. Comfortable in labs and with hardware. Value clear documentation and thoughtful code review.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Currently -->
+      <div class="bio-card fade-in-on-scroll">
+        <p class="text-white leading-relaxed mb-3">
+          Currently working on:
+        </p>
+        <ul class="list-disc list-inside text-white space-y-2">
+          <li>Making devices and prototyping on my CNC machine</li>
+        </ul>
+        <p class="text-white leading-relaxed mt-4 mb-2">
+          Recent reads:
+        </p>
+        <ul class="list-disc list-inside text-white/80 space-y-1 text-sm">
+          <li>Meditations - Marcus Aurelius</li>
+          <li>Infinite Jest - David Foster Wallace</li>
+          <li>A Crack in Creation - Jennifer Doudna</li>
+        </ul>
+      </div>
+    </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bio-block {
+    background: linear-gradient(to bottom, #5a5a5a 0%, #5a5a5a 5%, #6b5b7b 30%, #7a6685 60%, rgba(122, 102, 133, 0.8) 100%);
+  }
+
+  .bio-container {
+    background-color: rgba(164, 73, 206, 0.28);
+    backdrop-filter: blur(4px);
+  }
+
+  .bio-card {
+    border: 2px dashed rgba(190, 156, 212, 0.41);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .bio-card:hover {
+    background-color: rgba(190, 156, 212, 0.15);
+    border-color: rgba(190, 156, 212, 0.6);
+  }
+
+  .bio-card p {
+    line-height: 1.7;
+  }
+
+  .additional-info {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed rgba(190, 156, 212, 0.3);
+  }
+
+  .additional-info summary {
+    list-style: none;
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+
+  .additional-info summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .additional-info[open] summary {
+    color: #ffa07a;
+    margin-bottom: 0.5rem;
+  }
+
+  .additional-info summary:hover {
+    transform: translateX(2px);
+  }
+</style>
