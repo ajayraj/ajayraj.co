@@ -1,34 +1,43 @@
 ---
-// Tech stack section showcasing technical depth
-const skillCategories = [
+// Three-pillar approach to engineering
+const pillars = [
   {
-    title: "Systems & Infrastructure",
-    skills: ["C++", "Python", "Distributed Systems", "P2P Networks", "Docker", "NGINX"]
+    title: "Systems Architecture",
+    points: [
+      "I approach engineering from the product outward — starting with intent and working down through architecture, constraints, and implementation.",
+      "Most comfortable operating across abstraction layers, especially where systems become complex or ambiguous."
+    ]
   },
   {
-    title: "Backend & Data",
-    skills: ["Django", "Flask", "PostgreSQL", "Redis", "APIs", "Machine Learning"]
+    title: "Hardware & Physical Systems",
+    points: [
+      "Working with physical systems shapes how I think about reliability, performance, and tradeoffs.",
+      "Embedded systems, prototyping, and fabrication give me a grounded perspective on engineering decisions and real-world behavior."
+    ]
   },
   {
-    title: "Hardware & Integration",
-    skills: ["Embedded Systems", "CNC/CAM", "Hardware Design", "Arduino", "Mechanical Integration"]
+    title: "Intelligent Systems",
+    points: [
+      "Increasingly interested in systems that learn, adapt, or reason under uncertainty.",
+      "My focus is less on specific frameworks and more on integrating intelligent behavior into larger architectures."
+    ]
   }
 ];
 ---
 
-<section id="tech-stack" class="pt-20 pb-20 tech-stack-section">
+<section id="approach" class="pt-20 pb-20 approach-section">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center text-pink-200">Tools & Tech</h2>
+    <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center text-pink-200">How I Think</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in-on-scroll">
-      {skillCategories.map((category) => (
-        <div class="skill-card p-6 rounded-lg">
-          <h3 class="text-xl font-semibold mb-4 text-orange-300">{category.title}</h3>
-          <div class="flex flex-wrap gap-2">
-            {category.skills.map((skill) => (
-              <span class="skill-tag px-3 py-1 text-sm rounded-md">
-                {skill}
-              </span>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 fade-in-on-scroll">
+      {pillars.map((pillar) => (
+        <div class="pillar-card rounded-lg p-6">
+          <h3 class="text-xl font-bold text-orange-300 mb-4">{pillar.title}</h3>
+          <div class="space-y-4">
+            {pillar.points.map((point) => (
+              <p class="text-white/90 text-sm leading-relaxed">
+                {point}
+              </p>
             ))}
           </div>
         </div>
@@ -38,39 +47,26 @@ const skillCategories = [
 </section>
 
 <style>
-  .tech-stack-section {
+  .approach-section {
     background: linear-gradient(to bottom, rgba(100, 87, 120, 0.7) 0%, rgba(122, 102, 133, 0.6) 50%, rgba(180, 120, 90, 0.4) 100%);
   }
 
-  .skill-card {
+  .pillar-card {
     background: rgba(77, 77, 77, 0.6);
     border: 1px solid rgba(190, 156, 212, 0.25);
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
   }
 
-  .skill-card:hover {
+  .pillar-card:hover {
     background: rgba(77, 77, 77, 0.8);
     border-color: rgba(255, 160, 122, 0.4);
     transform: scale(1.02);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   }
 
-  .skill-card h3 {
+  .pillar-card h3 {
     letter-spacing: 0.02em;
-  }
-
-  .skill-tag {
-    background: rgba(190, 156, 212, 0.3);
-    color: #e9c9d0;
-    border: 1px solid rgba(190, 156, 212, 0.4);
-    transition: all 0.2s ease;
-    cursor: default;
-  }
-
-  .skill-tag:hover {
-    background: rgba(255, 160, 122, 0.25);
-    border-color: rgba(255, 160, 122, 0.5);
-    transform: translateY(-1px);
-    color: #ffa07a;
   }
 </style>

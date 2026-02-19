@@ -10,11 +10,14 @@
 
   <!-- Content over parallax - split by diagonal -->
   <div class="relative z-10 min-h-screen flex flex-col justify-between px-4 sm:px-12 lg:px-16">
-    <!-- Top left: Name -->
-    <div class="mt-[30vh]">
-      <h1 class="welcome-text text-5xl sm:text-6xl lg:text-7xl font-light">
-        Hey!<br />I'm <span class="styled-name">Ajay.</span>
+    <!-- Top left: Name and tagline -->
+    <div class="mt-[25vh] max-w-xl">
+      <h1 class="welcome-text text-4xl sm:text-5xl lg:text-6xl font-light mb-6">
+        <span class="styled-name">Ajay Raj</span>
       </h1>
+      <p class="hero-subtitle text-lg sm:text-xl lg:text-2xl font-light text-white/90 leading-relaxed">
+        Let's talk <span class="rotating-text"></span>
+      </p>
     </div>
 
     <!-- Bottom center: Social buttons -->
@@ -30,7 +33,7 @@
       </a>
       
       <a 
-        href="https://linkedin.com/in/ajayraj" 
+        href="https://linkedin.com/in/ajayjonathanraj" 
         target="_blank"
         rel="noopener noreferrer"
         class="social-button social-button-2"
@@ -50,6 +53,42 @@
   </div>
   <!-- Subtle color transition overlay for the solid background area (bottom-right) -->
   <div class="color-transition-overlay"></div>
+  
+  <!-- Scroll indicator arrow -->
+  <div class="scroll-indicator">
+    <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Minimal geometric chevrons -->
+      <path d="M 8 8 L 15 15 L 22 8" 
+            stroke="#ff9966" 
+            stroke-width="1.5" 
+            fill="none" 
+            stroke-linecap="square"
+            filter="url(#glow)"
+            opacity="0.6"/>
+      <path d="M 8 18 L 15 25 L 22 18" 
+            stroke="#ff9966" 
+            stroke-width="1.5" 
+            fill="none" 
+            stroke-linecap="square"
+            filter="url(#glow)"
+            opacity="0.8"/>
+      <path d="M 8 28 L 15 35 L 22 28" 
+            stroke="#ff9966" 
+            stroke-width="2" 
+            fill="none" 
+            stroke-linecap="square"
+            filter="url(#glow)"/>
+    </svg>
+  </div>
 </section>
 
 <style>
@@ -77,12 +116,21 @@
   }
 
   .styled-name {
-    font-size: 0.85em;
     font-weight: 400;
-    background: linear-gradient(135deg, #ff8c42, #ffa07a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: white;
+    text-shadow: 0 0 20px rgba(255, 160, 122, 0.25), 0 0 40px rgba(255, 140, 66, 0.15);
+  }
+
+  .hero-subtitle {
+    letter-spacing: 0.01em;
+  }
+
+  .rotating-text {
+    color: #ff9966;
+    display: inline-block;
+    min-width: 250px;
+    font-family: monospace;
+    letter-spacing: 0.02em;
   }
 
   .social-buttons-container {
@@ -151,4 +199,103 @@
     clip-path: polygon(100% 0, 0% 100%, 100% 100%);
     pointer-events: none;
   }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 8vh;
+    left: 2%;
+    opacity: 0.7;
+    animation: floatArrow 3s ease-in-out infinite;
+    cursor: pointer;
+    z-index: 20;
+    transition: opacity 0.3s ease;
+  }
+
+  .scroll-indicator:hover {
+    opacity: 1;
+  }
+
+  @keyframes floatArrow {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(10px);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .scroll-indicator {
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 8vh;
+    }
+  }
 </style>
+
+<script>
+  const phrases = [
+    'local compute',
+    'hardware-software co-design',
+    'computational biology',
+    'self-sustaining systems',
+    'prototyping at scale',
+    'system reliability',
+    'medical devices',
+    'embedded intelligence',
+    'tokenization hacks'
+  ];
+
+  const chars = 'abcdefghijklmnopqrstuvwxyz-';
+  let currentIndex = 0;
+  const rotatingText = document.querySelector('.rotating-text');
+
+  function scrambleText(finalText) {
+    const length = finalText.length;
+    let iterations = 0;
+    const maxIterations = length;
+
+    const interval = setInterval(() => {
+      rotatingText.textContent = finalText
+        .split('')
+        .map((char, index) => {
+          if (index < iterations) {
+            return finalText[index];
+          }
+          if (char === ' ' || char === '-') return char;
+          return chars[Math.floor(Math.random() * chars.length)];
+        })
+        .join('');
+
+      iterations += 1;
+
+      if (iterations > maxIterations) {
+        clearInterval(interval);
+        rotatingText.textContent = finalText;
+      }
+    }, 30);
+  }
+
+  function updateText() {
+    currentIndex = (currentIndex + 1) % phrases.length;
+    scrambleText(phrases[currentIndex]);
+  }
+
+  // Initialize with first phrase
+  scrambleText(phrases[0]);
+
+  // Rotate every 4.5 seconds
+  setInterval(updateText, 4500);
+
+  // Scroll indicator click handler
+  document.querySelector('.scroll-indicator')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const aboutSection = document.querySelector('#about');
+    if (aboutSection) {
+      aboutSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  });
+</script>
