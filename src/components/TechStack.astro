@@ -16,9 +16,9 @@ const skillCategories = [
 ];
 ---
 
-<section id="tech-stack" class="py-20 tech-stack-section">
+<section id="tech-stack" class="pt-20 pb-20 tech-stack-section">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-3xl sm:text-4xl font-bold mb-12 text-center text-pink-200">Tools & Tech</h2>
+    <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center text-pink-200">Tools & Tech</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 fade-in-on-scroll">
       {skillCategories.map((category) => (
@@ -51,8 +51,8 @@ const skillCategories = [
   .skill-card:hover {
     background: rgba(77, 77, 77, 0.8);
     border-color: rgba(255, 160, 122, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   }
 
   .skill-card h3 {

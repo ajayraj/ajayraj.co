@@ -6,21 +6,21 @@ const experiences = [
     division: "Image Guided Therapy Devices",
     title: "Senior Software Engineer",
     location: "Del Mar, CA",
-    tech: ["C/C++", "Python", "FPGA", "Verilog", "FreeRTOS"],
+    years: "2019-2024",
+    tech: ["C/C++", "Python", "FreeRTOS", "FPGA"],
     highlights: [
-      "Develop Class II Medical Device software (IEC 62304, ISO 13485, FDA compliant)",
-      "Write embedded code for Xilinx FPGA platforms (Artix 7, Virtex 6, MicroBlaze RISC)",
-      "Develop device drivers and communication protocol implementations",
-      "Integrate Verilog IP cores and make HDL changes to add hardware features"
+      "Owned embedded software architecture for patient interface module and managed all releases for embedded and driver software in Class II IVUS imaging device for cardiovascular and peripheral vascular applications",
+      "Designed and owned end-to-end integration and testing across software, hardware, and mechanical subsystems",
+      "Participated in animal studies, EMC/EMI validation, and mechanical usage studies",
+      "Developed compliant medical device software and documentation (IEC 62304, ISO 13485, FDA)"
     ],
     additional: [
-      "Modernized embedded software from proprietary OS to FreeRTOS",
-      "Designed and implemented UDP-based internal communication protocol",
-      "Performed board bring-up on new hardware PCBA revisions",
-      "Conducted EMC/EMI testing to ensure FDA compliance",
-      "Created requirement, design, and test documentation for medical device lifecycle",
-      "Managed Advanced Development lab systems and participated in pre-clinical animal studies",
-      "Facilitated physician visits and product demonstrations"
+      "Refactored and rebased legacy embedded project into FreeRTOS with event-driven communication architecture for predictable real-time behavior",
+      "Built diagnostic software and tooling for networking protocol debugging, EEPROM data specification validation, and signal channel matching",
+      "Updated driver software and optimized device thermals and power consumption",
+      "Implemented flash filesystem, created recovery builds, and developed memory/CPU profiling functionality",
+      "Optimized high-voltage control algorithms and safety thresholds for critical patient-facing systems",
+      "Developed embedded code for Xilinx FPGA platforms (Artix 7, Virtex 6, MicroBlaze RISC) and integrated Verilog IP cores"
     ]
   },
   {
@@ -28,6 +28,7 @@ const experiences = [
     division: "Aeronautical Systems, Inc.",
     title: "Software Engineer",
     location: "Poway, CA",
+    years: "2017-2019",
     tech: ["C/C++", "Python", "Docker", "Avionics"],
     highlights: [
       "Developed avionics flight simulation software for military UAV platforms",
@@ -47,9 +48,9 @@ const experiences = [
 ];
 ---
 
-<section id="experience" class="py-24 experience-block">
+<section id="experience" class="pt-20 pb-20 experience-block">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-4xl font-bold mb-12 text-center text-pink-200">Experience</h2>
+    <h2 class="text-4xl font-bold mb-10 text-center text-pink-200">Experience</h2>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 fade-in-on-scroll items-start">
       {experiences.map((exp) => (
@@ -82,13 +83,15 @@ const experiences = [
           {exp.additional && exp.additional.length > 0 && (
             <details class="additional-work">
               <summary class="text-orange-300 cursor-pointer hover:text-orange-200 text-sm font-semibold mt-4">
-                + Additional Contributions
+                <span class="expand-icon">+</span> Context
               </summary>
-              <ul class="experience-highlights mt-3">
-                {exp.additional.map((item) => (
-                  <li class="text-white/80 leading-relaxed">{item}</li>
-                ))}
-              </ul>
+              <div class="details-content">
+                <ul class="experience-highlights mt-3">
+                  {exp.additional.map((item) => (
+                    <li class="text-white/80 leading-relaxed">{item}</li>
+                  ))}
+                </ul>
+              </div>
             </details>
           )}
         </div>
@@ -96,6 +99,21 @@ const experiences = [
     </div>
   </div>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const detailsElements = document.querySelectorAll('.additional-work');
+    
+    detailsElements.forEach(details => {
+      details.addEventListener('toggle', () => {
+        const icon = details.querySelector('.expand-icon');
+        if (icon) {
+          icon.textContent = details.open ? '−' : '+';
+        }
+      });
+    });
+  });
+</script>
 
 <style>
   .experience-block {
@@ -115,8 +133,8 @@ const experiences = [
   .experience-card:hover {
     background: rgba(77, 77, 77, 0.85);
     border-color: rgba(255, 160, 122, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: scale(1.01);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
   }
 
   .experience-header {
@@ -180,6 +198,9 @@ const experiences = [
     list-style: none;
     user-select: none;
     transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .additional-work summary::-webkit-details-marker {
@@ -188,11 +209,39 @@ const experiences = [
 
   .additional-work[open] summary {
     color: #ffa07a;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
   }
 
   .additional-work summary:hover {
     transform: translateX(2px);
+  }
+
+  .expand-icon {
+    display: inline-block;
+    width: 1.2rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    line-height: 1;
+  }
+
+  .additional-work .details-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s ease-out;
+    overflow: hidden;
+  }
+
+  .additional-work[open] .details-content {
+    grid-template-rows: 1fr;
+  }
+
+  .additional-work .details-content > * {
+    overflow: hidden;
+  }
+
+  .additional-work .experience-highlights {
+    padding-left: 0.25rem;
   }
 
   /* Section divider */

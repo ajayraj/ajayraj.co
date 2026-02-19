@@ -11,43 +11,41 @@
   <!-- Content over parallax - split by diagonal -->
   <div class="relative z-10 min-h-screen flex flex-col justify-between px-4 sm:px-12 lg:px-16">
     <!-- Top left: Name -->
-    <div class="mt-[20vh]">
-      <h1 class="welcome-text text-6xl sm:text-7xl lg:text-8xl font-bold">
+    <div class="mt-[30vh]">
+      <h1 class="welcome-text text-5xl sm:text-6xl lg:text-7xl font-light">
         Hey!<br />I'm <span class="styled-name">Ajay.</span>
       </h1>
     </div>
 
-    <!-- Bottom right: Social buttons -->
-    <div class="social-wrapper">
-      <div class="social-buttons-container">
-        <a 
-          href="https://github.com/ajayraj" 
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-button"
-          aria-label="GitHub"
-        >
-          <img src="/img/GitHub-Mark-Light-64px.png" alt="GitHub" class="w-10 h-10" />
-        </a>
-        
-        <a 
-          href="mailto:ajay@ajayraj.co"
-          class="social-button"
-          aria-label="Email"
-        >
-          <img src="/img/at.svg" alt="Email" class="w-10 h-10 brightness-0 invert" />
-        </a>
-        
-        <a 
-          href="https://linkedin.com/in/ajayraj" 
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-button"
-          aria-label="LinkedIn"
-        >
-          <img src="/img/linkedin.svg" alt="LinkedIn" class="w-10 h-10 brightness-0 invert" />
-        </a>
-      </div>
+    <!-- Bottom center: Social buttons -->
+    <div class="social-buttons-container">
+      <a 
+        href="https://github.com/ajayraj" 
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-button social-button-1"
+        aria-label="GitHub"
+      >
+        <img src="/img/GitHub-Mark-Light-64px.png" alt="GitHub" class="w-10 h-10" />
+      </a>
+      
+      <a 
+        href="https://linkedin.com/in/ajayraj" 
+        target="_blank"
+        rel="noopener noreferrer"
+        class="social-button social-button-2"
+        aria-label="LinkedIn"
+      >
+        <img src="/img/linkedin.svg" alt="LinkedIn" class="w-10 h-10 brightness-0 invert" />
+      </a>
+      
+      <a 
+        href="mailto:ajay@ajayraj.co"
+        class="social-button social-button-3"
+        aria-label="Email"
+      >
+        <img src="/img/at.svg" alt="Email" class="w-10 h-10 brightness-0 invert" />
+      </a>
     </div>
   </div>
   <!-- Subtle color transition overlay for the solid background area (bottom-right) -->
@@ -74,26 +72,25 @@
 
   .welcome-text {
     color: white;
+    font-weight: 300;
+    letter-spacing: 0.02em;
   }
 
   .styled-name {
     font-size: 0.85em;
-    font-weight: bold;
+    font-weight: 400;
     background: linear-gradient(135deg, #ff8c42, #ffa07a);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .social-wrapper {
-    position: absolute;
-    bottom: 8vh;
-    right: 5vw;
-  }
-
   .social-buttons-container {
     display: flex;
-    gap: 1.25rem;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 3rem;
   }
 
   .social-button {
@@ -101,28 +98,29 @@
     border-radius: 50%;
     background: rgba(68, 221, 101, 0.5);
     filter: hue-rotate(190deg) saturate(100%) brightness(150%);
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    will-change: transform;
+    opacity: 0.85;
   }
 
   .social-button:hover {
     transform: scale(1.1);
     filter: hue-rotate(190deg) saturate(150%) brightness(180%);
-    box-shadow: 0 4px 12px rgba(190, 156, 212, 0.4);
+    box-shadow: 0 8px 24px rgba(190, 156, 212, 0.6);
+    opacity: 1;
+  }
+
+  .social-button:focus-visible {
+    outline: 2px solid rgba(255, 160, 122, 0.8);
+    outline-offset: 4px;
   }
 
   @media (max-width: 768px) {
-    .social-wrapper {
-      left: 50%;
-      transform: translateX(-50%);
-      right: auto;
-    }
-
     .social-buttons-container {
       gap: 1rem;
+      padding-bottom: 2rem;
     }
   }
 

@@ -9,10 +9,11 @@ const projects = [
   },
   {
     title: "icebergify",
-    description: "Spotify visualizer that reached 15M+ users. Built to handle massive traffic spikes.",
+    description: "Viral Spotify stats visualizer built to handle massive traffic spikes.",
     tech: ["Python", "Flask", "NGINX", "Gunicorn", "Spotify API"],
     demo: "https://icebergify.com",
-    context: "Featured on CNET and Lifehacker"
+    context: "Featured on CNET and Lifehacker",
+    impact: "15M+"
   },
   {
     title: "YAVS",
@@ -32,29 +33,37 @@ const projects = [
     title: "Wireless Plant Research System",
     description: "Custom embedded hardware for botanical research. Integrated GPS, thermal imaging, IR spectrometry, and resistivity sensors into a handheld device. Designed data pipeline: sensor → Arduino → real-time display → geotagged CSV export to research servers.",
     tech: ["C", "Arduino", "Embedded Systems", "Hardware Integration"],
-    context: "Built for UC Riverside research lab"
+    context: "Built for university research lab"
   }
 ];
 ---
 
-<section id="projects" class="py-24 projects-block">
+<section id="projects" class="pt-20 pb-20 projects-block">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-4xl font-bold mb-12 text-center text-pink-200">Work</h2>
+    <h2 class="text-4xl font-bold mb-10 text-center text-pink-200">Projects</h2>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {projects.map((project) => (
         <div class="project-card flex flex-col fade-in-on-scroll">
           <!-- Content -->
           <div class="card-block flex-1 p-6">
-            <h3 class="text-2xl font-bold mb-3">
-              {project.demo ? (
-                <a href={project.demo} target="_blank" rel="noopener noreferrer" class="card-title-link">
-                  {project.title}
-                </a>
-              ) : (
-                <span class="card-title-text">{project.title}</span>
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="text-2xl font-bold flex-1">
+                {project.demo ? (
+                  <a href={project.demo} target="_blank" rel="noopener noreferrer" class="card-title-link">
+                    {project.title}
+                  </a>
+                ) : (
+                  <span class="card-title-text">{project.title}</span>
+                )}
+              </h3>
+              {project.impact && (
+                <div class="impact-badge">
+                  {project.impact}
+                  <span class="impact-label">users</span>
+                </div>
               )}
-            </h3>
+            </div>
             
             {project.context && (
               <p class="project-context text-sm mb-3 italic">
@@ -99,7 +108,6 @@ const projects = [
 <style>
   .projects-block {
     background: linear-gradient(to bottom, rgba(180, 120, 90, 0.4) 0%, rgba(250, 144, 45, 0.35) 25%, #6a5a5a 60%, #5a5a5a 100%);
-    border-top: 1px solid rgba(190, 156, 212, 0.15);
   }
 
   .project-card {
@@ -115,14 +123,41 @@ const projects = [
   }
 
   .card-block:hover {
-    background-color: rgba(255, 160, 122, 0.15) !important;
+    background-color: rgba(90, 90, 90, 0.85) !important;
     color: #ffffff;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    transform: scale(1.02);
+    border: 1px solid rgba(255, 160, 122, 0.3);
   }
 
   .card-block h3 {
     letter-spacing: 0.015em;
+  }
+
+  .impact-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(255, 140, 66, 0.2), rgba(255, 160, 122, 0.2));
+    border: 1px solid rgba(255, 160, 122, 0.3);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #ffa07a;
+    line-height: 1;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 0.75rem;
+  }
+
+  .impact-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: rgba(255, 160, 122, 0.8);
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .card-block p {
