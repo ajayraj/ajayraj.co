@@ -48,7 +48,7 @@ const experiences = [
 ];
 ---
 
-<section id="experience" class="pt-20 pb-20 experience-block">
+<section id="experience" class="pt-20 pb-20 experience-block section-layer">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <h2 class="text-4xl font-bold mb-10 text-center text-pink-200">Experience</h2>
 
@@ -118,6 +118,7 @@ const experiences = [
 <style>
   .experience-block {
     background: linear-gradient(to bottom, rgba(122, 102, 133, 0.8) 0%, #7a6685 30%, rgba(100, 87, 120, 0.7) 100%);
+    border-top: 1px solid rgba(190, 156, 212, 0.15);
   }
 
   .experience-card {
@@ -244,18 +245,4 @@ const experiences = [
     padding-left: 0.25rem;
   }
 
-  /* Section divider */
-  .experience-block {
-    border-top: 1px solid rgba(190, 156, 212, 0.15);
-  }
-
-  @media (max-width: 768px) {
-    .experience-header {
-      flex-direction: column;
-    }
-
-    .experience-header > div:last-child {
-      text-align: left;
-    }
-  }
 </style>

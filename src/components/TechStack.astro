@@ -4,8 +4,8 @@ const pillars = [
   {
     title: "Systems Architecture",
     points: [
-      "I approach engineering from the product outward — starting with intent and working down through architecture, constraints, and implementation.",
-      "Most comfortable operating across abstraction layers, especially where systems become complex or ambiguous."
+      "I start with the <span class=\"highlight-text\">intent</span>, what the product is meant to do, and let that shape the architecture and constraints before focusing on implementation.",
+      "I gravitate toward problems that cross abstraction layers, especially when systems get messy and ambiguous."
     ]
   },
   {
@@ -25,7 +25,7 @@ const pillars = [
 ];
 ---
 
-<section id="approach" class="pt-20 pb-20 approach-section">
+<section id="approach" class="pt-20 pb-20 approach-section section-layer">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center text-pink-200">How I Think</h2>
 
@@ -35,9 +35,7 @@ const pillars = [
           <h3 class="text-xl font-bold text-orange-300 mb-4">{pillar.title}</h3>
           <div class="space-y-4">
             {pillar.points.map((point) => (
-              <p class="text-white/90 text-sm leading-relaxed">
-                {point}
-              </p>
+              <p class="text-white/90 text-sm leading-relaxed" set:html={point} />
             ))}
           </div>
         </div>
@@ -68,5 +66,11 @@ const pillars = [
 
   .pillar-card h3 {
     letter-spacing: 0.02em;
+  }
+
+  :global(.highlight-text) {
+    color: #ff9966;
+    font-weight: 500;
+    text-shadow: 0 0 8px rgba(255, 160, 122, 0.3);
   }
 </style>

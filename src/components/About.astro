@@ -2,7 +2,7 @@
 // About section with original purple/orange gradient design
 ---
 
-<section id="about" class="pt-20 pb-20 bio-block">
+<section id="about" class="pt-20 pb-20 bio-block section-layer">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="bio-container rounded-lg p-8">
       <h2 class="text-4xl font-bold mb-8 text-center text-pink-200">About</h2>
@@ -44,13 +44,20 @@
 
         <details class="additional-info">
           <summary class="text-orange-300 cursor-pointer hover:text-orange-200 text-sm font-semibold mt-4">
-            <span class="expand-icon">+</span> Design Philosophy & Working Style
+            <span class="expand-icon">+</span> Philosophy, stack & practice
           </summary>
           <div class="details-content">
-            <div class="mt-3 text-white/90 text-sm space-y-2 leading-relaxed">
-              <p><strong class="text-pink-200">Design Philosophy:</strong> </p>
-              <p><strong class="text-pink-200">Stack Preference:</stong> </p>
-              <p><strong class="text-pink-200">Working Style:</strong> Look around corners. Pre-empt pain. Comfortable in labs and with hardware. Value clear documentation and thoughtful code review.</p>
+            <div class="mt-3 text-white/90 text-sm space-y-4 leading-relaxed">
+              <p><strong class="text-pink-200">Design Philosophy:</strong> Start from first principles. Bias toward simplicity and correctness. Less is more but don't be cheap.</p>
+              <p><strong class="text-pink-200">Stack Preference:</strong> Whatever fits the problem. Most at home in C/C++, Python, and Linux.</p>
+              <p class="mb-1"><strong class="text-pink-200">Practice:</strong></p>
+              <ul class="details-bullets">
+                <li><span class="highlight-text">Look around corners.</span></li>
+                <li>Pre-empt pain.</li>
+                <li>Identify investment vs. sunk cost.</li>
+                <li>Write docs you wish you had.</li>
+                <li><span class="highlight-text">Get it done.</span></li>
+              </ul>
             </div>
           </div>
         </details>
@@ -85,23 +92,27 @@
           </rect>
         </svg>
         <div class="bio-card-content">
-          <p class="text-white leading-relaxed mb-3">
-          Currently working on:
-        </p>
-        <ul class="list-disc list-inside text-white space-y-2">
-          <li>Making devices and prototyping on my CNC machine</li>
-        </ul>
-        <p class="text-white leading-relaxed mt-4 mb-2">
-          Recent reads:
-        </p>
-        <ul class="list-disc list-inside text-white/80 space-y-1 text-sm">
-          <li>Meditations - Marcus Aurelius</li>
-          <li>Infinite Jest - David Foster Wallace</li>
-          <li>A Crack in Creation - Jennifer Doudna</li>
-        </ul>
+          <p class="text-white leading-relaxed mb-4">
+            Currently focusing on
+          </p>
+          <ul class="details-bullets">
+            <li>Intelligent systems under real-world constraints</li>
+            <li>Probabilistic reasoning and adaptive architectures</li>
+            <li>Prototyping physical devices and interfaces on my CNC machine</li>
+            <li>Designing <span class="highlight-text">systems that last</span>: anticipating failure modes and how systems evolve over time</li>
+          </ul>
+          <p class="text-white leading-relaxed mt-6 mb-4">
+          I’ve also been studying how models and representations shape system behavior especially when abstractions begin to influence reality more than the underlying system itself. A recent example I’ve been thinking about: <span class="highlight-text">sneckdowns</span>.
+          </p>
+          <p class="text-white leading-relaxed mt-4 mb-2">
+            Recent reads:
+          </p>
+          <ul class="list-disc list-inside text-white/80 space-y-1 text-sm">
+            <li>Gigantic Cinema: A Weather Anthology</li>
+            <li>Thinking In Systems - Donella Meadows</li>
+          </ul>
         </div>
       </div>
-    </div>
     </div>
     </div>
   </div>
@@ -113,8 +124,8 @@
   }
 
   .bio-container {
-    background-color: rgba(80, 70, 90, 0.35);
-    backdrop-filter: blur(4px);
+    background-color: rgba(80, 70, 90, 0.5);
+    backdrop-filter: blur(12px);
   }
 
   .bio-card {
@@ -206,6 +217,28 @@
 
   .details-content > * {
     overflow: hidden;
+  }
+
+  .details-bullets {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.25rem;
+  }
+
+  .details-bullets li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.35rem;
+    line-height: 1.5;
+  }
+
+  .details-bullets li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #ffa07a;
+    font-weight: bold;
+    font-size: 0.85em;
   }
 
   .highlight-text {

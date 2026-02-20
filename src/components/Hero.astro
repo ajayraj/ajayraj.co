@@ -2,60 +2,18 @@
 // Hero section with parallax SVG background
 ---
 
-<section class="relative min-h-screen overflow-hidden">
-  <!-- Parallax background with SVG and clip-path -->
-  <div class="parallax-container absolute inset-0">
-    <div class="parallax-bg"></div>
+<!-- Fixed hero overlay - clipped to the left triangle, above hero but below sections -->
+<div class="hero-text-fixed">
+  <div class="hero-text-content">
+    <h1 class="welcome-text text-4xl sm:text-5xl lg:text-6xl font-light mb-6">
+      <span class="styled-name">Ajay Raj</span>
+    </h1>
+    <p class="hero-subtitle text-lg sm:text-xl lg:text-2xl font-light text-white/90 leading-relaxed">
+      Let's talk <span class="rotating-text"></span>
+    </p>
   </div>
 
-  <!-- Content over parallax - split by diagonal -->
-  <div class="relative z-10 min-h-screen flex flex-col justify-between px-4 sm:px-12 lg:px-16">
-    <!-- Top left: Name and tagline -->
-    <div class="mt-[25vh] max-w-xl">
-      <h1 class="welcome-text text-4xl sm:text-5xl lg:text-6xl font-light mb-6">
-        <span class="styled-name">Ajay Raj</span>
-      </h1>
-      <p class="hero-subtitle text-lg sm:text-xl lg:text-2xl font-light text-white/90 leading-relaxed">
-        Let's talk <span class="rotating-text"></span>
-      </p>
-    </div>
-
-    <!-- Bottom center: Social buttons -->
-    <div class="social-buttons-container">
-      <a 
-        href="https://github.com/ajayraj" 
-        target="_blank"
-        rel="noopener noreferrer"
-        class="social-button social-button-1"
-        aria-label="GitHub"
-      >
-        <img src="/img/GitHub-Mark-Light-64px.png" alt="GitHub" class="w-10 h-10" />
-      </a>
-      
-      <a 
-        href="https://linkedin.com/in/ajayjonathanraj" 
-        target="_blank"
-        rel="noopener noreferrer"
-        class="social-button social-button-2"
-        aria-label="LinkedIn"
-      >
-        <img src="/img/linkedin.svg" alt="LinkedIn" class="w-10 h-10 brightness-0 invert" />
-      </a>
-      
-      <a 
-        href="mailto:ajay@ajayraj.co"
-        class="social-button social-button-3"
-        aria-label="Email"
-      >
-        <img src="/img/at.svg" alt="Email" class="w-10 h-10 brightness-0 invert" />
-      </a>
-    </div>
-  </div>
-  <!-- Subtle color transition overlay for the solid background area (bottom-right) -->
-  <div class="color-transition-overlay"></div>
-  
-  <!-- Scroll indicator arrow -->
-  <div class="scroll-indicator">
+  <div class="scroll-indicator-fixed">
     <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="glow">
@@ -66,29 +24,34 @@
           </feMerge>
         </filter>
       </defs>
-      <!-- Minimal geometric chevrons -->
-      <path d="M 8 8 L 15 15 L 22 8" 
-            stroke="#ff9966" 
-            stroke-width="1.5" 
-            fill="none" 
-            stroke-linecap="square"
-            filter="url(#glow)"
-            opacity="0.6"/>
-      <path d="M 8 18 L 15 25 L 22 18" 
-            stroke="#ff9966" 
-            stroke-width="1.5" 
-            fill="none" 
-            stroke-linecap="square"
-            filter="url(#glow)"
-            opacity="0.8"/>
-      <path d="M 8 28 L 15 35 L 22 28" 
-            stroke="#ff9966" 
-            stroke-width="2" 
-            fill="none" 
-            stroke-linecap="square"
-            filter="url(#glow)"/>
+      <path d="M 8 8 L 15 15 L 22 8" stroke="#ff9966" stroke-width="1.5" fill="none" stroke-linecap="square" filter="url(#glow)" opacity="0.6"/>
+      <path d="M 8 18 L 15 25 L 22 18" stroke="#ff9966" stroke-width="1.5" fill="none" stroke-linecap="square" filter="url(#glow)" opacity="0.8"/>
+      <path d="M 8 28 L 15 35 L 22 28" stroke="#ff9966" stroke-width="2" fill="none" stroke-linecap="square" filter="url(#glow)"/>
     </svg>
   </div>
+</div>
+
+<!-- Hero section - scrolls normally OVER the fixed text -->
+<section class="hero-section relative min-h-screen overflow-hidden">
+  <div class="parallax-container absolute inset-0">
+    <div class="parallax-bg"></div>
+  </div>
+
+  <div class="relative hero-spacer" style="z-index: 3;">
+    <div class="social-buttons-container">
+      <a href="https://github.com/ajayraj" target="_blank" rel="noopener noreferrer" class="social-button" aria-label="GitHub">
+        <svg class="w-10 h-10" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+      <a href="https://linkedin.com/in/ajayjonathanraj" target="_blank" rel="noopener noreferrer" class="social-button" aria-label="LinkedIn">
+        <img src="/img/linkedin.svg" alt="LinkedIn" class="w-10 h-10 brightness-0 invert" />
+      </a>
+      <a href="mailto:ajay@ajayraj.co" class="social-button" aria-label="Email">
+        <img src="/img/at.svg" alt="Email" class="w-10 h-10 brightness-0 invert" />
+      </a>
+    </div>
+  </div>
+
+  <div class="color-transition-overlay"></div>
 </section>
 
 <style>
@@ -107,6 +70,48 @@
     background-repeat: no-repeat;
     background-size: cover;
     clip-path: polygon(0 0, 0% 100%, 100% 0);
+  }
+
+  .hero-section {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-spacer {
+    min-height: 100vh;
+  }
+
+  .hero-text-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 5;
+    pointer-events: none;
+    clip-path: polygon(0 0, 0% 100%, 100% 0);
+  }
+
+  .hero-text-content {
+    position: absolute;
+    top: 25vh;
+    left: 4rem;
+    max-width: 40rem;
+  }
+
+  .scroll-indicator-fixed {
+    position: absolute;
+    bottom: 8vh;
+    left: 3%;
+    opacity: 0.7;
+    animation: floatArrow 3s ease-in-out infinite;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+  }
+
+  .scroll-indicator-fixed:hover {
+    opacity: 1;
   }
 
   .welcome-text {
@@ -134,11 +139,14 @@
   }
 
   .social-buttons-container {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: 2rem;
     justify-content: center;
     align-items: center;
-    padding-bottom: 3rem;
   }
 
   .social-button {
@@ -166,9 +174,13 @@
   }
 
   @media (max-width: 768px) {
+    .hero-text-content {
+      left: 1rem;
+      max-width: calc(100% - 2rem);
+    }
+
     .social-buttons-container {
       gap: 1rem;
-      padding-bottom: 2rem;
     }
   }
 
@@ -200,21 +212,6 @@
     pointer-events: none;
   }
 
-  .scroll-indicator {
-    position: absolute;
-    bottom: 8vh;
-    left: 2%;
-    opacity: 0.7;
-    animation: floatArrow 3s ease-in-out infinite;
-    cursor: pointer;
-    z-index: 20;
-    transition: opacity 0.3s ease;
-  }
-
-  .scroll-indicator:hover {
-    opacity: 1;
-  }
-
   @keyframes floatArrow {
     0%, 100% {
       transform: translateY(0px);
@@ -225,10 +222,9 @@
   }
 
   @media (max-width: 768px) {
-    .scroll-indicator {
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 8vh;
+    .scroll-indicator-fixed {
+      left: 5%;
+      bottom: 20vh;
     }
   }
 </style>
@@ -251,9 +247,8 @@
   const rotatingText = document.querySelector('.rotating-text');
 
   function scrambleText(finalText) {
-    const length = finalText.length;
     let iterations = 0;
-    const maxIterations = length;
+    const maxIterations = finalText.length;
 
     const interval = setInterval(() => {
       rotatingText.textContent = finalText
@@ -287,8 +282,28 @@
   // Rotate every 4.5 seconds
   setInterval(updateText, 4500);
 
+  const heroTextEl = document.querySelector('.hero-text-fixed') as HTMLElement;
+  let ticking = false;
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const p = Math.min(1, window.scrollY / window.innerHeight);
+      const size = Math.max(0, (1 - p) * 100);
+
+      heroTextEl.style.clipPath = `polygon(0 0, 0 ${size}%, ${size}% 0)`;
+      heroTextEl.style.opacity = p < 0.65 ? '1' : String(1 - Math.min(1, (p - 0.65) / 0.15));
+
+      ticking = false;
+    });
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
   // Scroll indicator click handler
-  document.querySelector('.scroll-indicator')?.addEventListener('click', (e) => {
+  document.querySelector('.scroll-indicator-fixed')?.addEventListener('click', (e) => {
     e.preventDefault();
     const aboutSection = document.querySelector('#about');
     if (aboutSection) {
