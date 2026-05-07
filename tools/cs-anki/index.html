@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atomic Cards — cs-anki</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+  <div class="app-shell">
+
+    <div class="header-row">
+      <a href="https://ajayraj.co" class="back-link">← ajayraj.co</a>
+      <button id="theme-btn" class="theme-btn" title="Toggle theme">☀︎</button>
+    </div>
+
+    <header>
+      <h1>Atomic Cards</h1>
+      <div class="subtitle">one card at a time.</div>
+      <div class="stats" id="stats"></div>
+    </header>
+
+    <nav class="mode-nav">
+      <button class="mode-btn active" data-mode="browse">Browse</button>
+      <button class="mode-btn" data-mode="drill">Drill</button>
+      <button class="mode-btn" data-mode="quiz">Quiz</button>
+      <button class="mode-btn" data-mode="workspace">Workspace</button>
+    </nav>
+
+    <!-- Browse mode -->
+    <div id="view-browse">
+      <div class="filters"></div>
+      <input type="text" class="search" id="search" placeholder="Search cards…" />
+      <div class="cat-filter" id="catFilter"></div>
+      <div class="legend"></div>
+      <div class="helper-text">tap to flip · expand for more · links jump to cards</div>
+      <div id="deck"><div class="loading">Loading cards…</div></div>
+    </div>
+
+    <!-- Drill mode -->
+    <div id="view-drill" class="hidden">
+      <div id="drill-container"></div>
+    </div>
+
+    <!-- Quiz mode -->
+    <div id="view-quiz" class="hidden">
+      <div id="quiz-container"></div>
+    </div>
+
+    <!-- Workspace mode -->
+    <div id="view-workspace" class="hidden">
+      <div id="workspace-container"></div>
+    </div>
+
+    <footer id="footer"></footer>
+
+  </div>
+
+  <!-- Scroll-to-top: same triple-chevron used on ajayraj.co, rotated 180° -->
+  <button class="scroll-to-top" id="scroll-to-top" aria-label="Scroll to top" type="button">
+    <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="scroll-glow">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <path d="M 8 32 L 15 25 L 22 32" stroke="#ff9966" stroke-width="1.5" fill="none" stroke-linecap="square" filter="url(#scroll-glow)" opacity="0.6"/>
+      <path d="M 8 22 L 15 15 L 22 22" stroke="#ff9966" stroke-width="1.5" fill="none" stroke-linecap="square" filter="url(#scroll-glow)" opacity="0.8"/>
+      <path d="M 8 12 L 15 5  L 22 12" stroke="#ff9966" stroke-width="2"   fill="none" stroke-linecap="square" filter="url(#scroll-glow)"/>
+    </svg>
+  </button>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

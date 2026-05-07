@@ -103,8 +103,21 @@ const projects = [
 </section>
 
 <style>
+  /* Top stop matches the *exact* end-of-previous-section colour (the
+     .approach-section gradient ends at rgba(180,120,90,0.4) over the html
+     bg), then ramps into solid warm orange and finally to gray. Picking up
+     the same colour the seam ends with makes the boundary disappear. */
   .projects-block {
-    background: linear-gradient(to bottom, rgba(180, 120, 90, 0.4) 0%, rgba(250, 144, 45, 0.35) 25%, #6a5a5a 60%, #5a5a5a 100%);
+    background: linear-gradient(
+      to bottom,
+      rgba(180, 120, 90, 0.4) 0%,
+      rgba(180, 120, 90, 0.7) 8%,
+      rgba(176, 119, 68, 0.95) 28%,
+      #b07744 42%,
+      #8c6360 65%,
+      #6a5a5a 85%,
+      #5a5a5a 100%
+    );
   }
 
   /* 3 on top, 2 centered on bottom — 6-col grid so bottom pair is symmetrical */

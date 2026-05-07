@@ -1,0 +1,61 @@
+/**
+ * Shared design tokens — dark theme is the default (matches ajayraj.co).
+ * Light mode (warm cream) activates via [data-theme="light"] on <html>.
+ */
+
+/* ── Dark theme (default, main site aesthetic) ── */
+:root {
+  --body-bg: linear-gradient(160deg, #1a1028 0%, #2a1f38 55%, #1e1e2e 100%);
+
+  --bg: #1a1028;
+  --paper: #241835;
+  --soft: #2e2245;
+  --softer: #1e1530;
+
+  --ink: #f0e8ff;
+  --ink-soft: #b8a8d4;
+  --ink-faint: #7a6a90;
+
+  --rule: rgba(180, 150, 255, 0.12);
+  --shadow: rgba(0, 0, 0, 0.45);
+
+  --accent-warm: #ff9966;
+  --accent-leaf: #7abf9e;
+  --accent-leaf-pale: #5a9e7e;
+  --accent-sky: #89b4d4;
+  --accent-rose: #d4a0c0;
+
+  --font-serif: 'Fraunces', Georgia, serif;
+  --font-sans: 'Poppins', 'Nunito', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+}
+
+/* ── Light theme (warm cream, toggle via button) ── */
+[data-theme="light"] {
+  --body-bg: #fdf8f0;
+
+  --bg: #fdf8f0;
+  --paper: #ffffff;
+  --soft: #f5ede0;
+  --softer: #faf3e7;
+
+  --ink: #2d2a26;
+  --ink-soft: #5d574e;
+  --ink-faint: #8a8278;
+
+  --rule: #e8dcc8;
+  --shadow: rgba(120, 90, 50, 0.08);
+
+  --accent-warm: #c97b5e;
+  --accent-leaf: #7a9471;
+  --accent-leaf-pale: #a3b89c;
+  --accent-sky: #6b8aa8;
+  --accent-rose: #b87d7d;
+
+  --font-sans: 'Nunito', -apple-system, sans-serif;
+}

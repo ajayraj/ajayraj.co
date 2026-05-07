@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Claude Code local settings & cache (per-developer, not shared)
+.claude/
+
+# vite cache
+.vite/
+tools/cs-anki/.vite/

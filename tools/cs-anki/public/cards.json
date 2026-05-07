@@ -1,0 +1,1813 @@
+{
+  "$comment": "Atomic Cards — canonical deck. Single source of truth. The web app, print template, and Anki export all read from this file.",
+  "version": "1.0.0-alpha",
+  "cards": [
+
+    {
+      "$comment": "===== TIER 1A — FOUNDATIONS (concepts, definitions, mental models) ====="
+    },
+
+    {
+      "id": "T0-ARR-001",
+      "tier": "0",
+      "category": "ARR",
+      "front": "What's an array?",
+      "frontStyle": "question",
+      "explanation": "An array (in Python, a `list`) is an ordered row of slots. Each slot holds one item. The slots have a fixed order, and you can reach into any slot directly if you know its number.",
+      "metaphor": "Like a row of numbered mailboxes. You can walk straight to mailbox 4 — you don't have to open 0, 1, 2, 3 to get there.",
+      "example": "arr = [10, 20, 30, 40]\n#       ↑   ↑   ↑   ↑\n#       0   1   2   3"
+    },
+    {
+      "id": "T0-ARR-002",
+      "tier": "0",
+      "category": "ARR",
+      "front": "What's an index?",
+      "frontStyle": "question",
+      "explanation": "An index is the number that says *which slot you mean*. The first slot is index 0, the next is 1, and so on.",
+      "insight": "Indexes count from zero — not because programmers are weird, but because an index is really an *offset*: 'how many steps from the start.' The first item is zero steps from the start.",
+      "example": "arr = [10, 20, 30]\narr[0]  # 10  (zero steps from the start)\narr[2]  # 30  (two steps from the start)"
+    },
+    {
+      "id": "T0-ARR-003",
+      "tier": "0",
+      "category": "ARR",
+      "front": "Length vs. last index",
+      "frontStyle": "term",
+      "explanation": "`len(arr)` tells you how many slots the array has. If `len(arr)` is 5, the valid indexes are 0, 1, 2, 3, 4 — five slots, but the highest index is 4.",
+      "insight": "There's always a one-off relationship: last index = length − 1. This is the source of an enormous number of bugs. Whenever you write something involving the end of an array, pause and ask: did I mean `len(arr)` or `len(arr) - 1`?",
+      "mnemonic": "Length counts. Index points."
+    },
+    {
+      "id": "T0-ARR-004",
+      "tier": "0",
+      "category": "ARR",
+      "front": "What does \"in place\" mean?",
+      "frontStyle": "question",
+      "explanation": "Modifying something \"in place\" means changing the original — not making a copy. Some operations modify in place (`arr.sort()`, `arr.append(x)`) and return nothing. Others return a new value and leave the original alone (`sorted(arr)`).",
+      "gotcha": "If a method returns `None`, it almost certainly modified in place. `x = arr.sort()` is a classic bug — `x` ends up as `None`, and `arr` is what got sorted.",
+      "example": "arr = [3, 1, 2]\narr.sort()         # arr is now [1, 2, 3]; the call returned None\n\narr = [3, 1, 2]\nnew = sorted(arr)  # new is [1, 2, 3]; arr is still [3, 1, 2]"
+    },
+
+    {
+      "id": "T0-STR-001",
+      "tier": "0",
+      "category": "STR",
+      "front": "What's a string, really?",
+      "frontStyle": "question",
+      "explanation": "A string is just an array of characters. Most things you can do to an array, you can do to a string: ask its length, look up a character by index, loop through it.",
+      "example": "s = \"hello\"\n#     ↑   ↑\n#     0   4\nlen(s)  # 5\ns[0]    # 'h'\ns[4]    # 'o'"
+    },
+    {
+      "id": "T0-STR-002",
+      "tier": "0",
+      "category": "STR",
+      "front": "Strings are immutable",
+      "frontStyle": "term",
+      "pythonSpecific": true,
+      "explanation": "Once a string exists, you cannot change its characters. `s[0] = 'H'` will fail. To \"change\" a string, you build a new one and reassign.",
+      "gotcha": "Building up a string character-by-character with `+=` is slow — each addition creates a brand new string. For long strings, collect characters in a list and `\"\".join(parts)` at the end.",
+      "example": "s = \"hello\"\ns[0] = 'H'  # ERROR — strings can't be edited in place\n\n# Make a new one instead:\ns = 'H' + s[1:]  # 'Hello'"
+    },
+    {
+      "id": "T0-STR-003",
+      "tier": "0",
+      "category": "STR",
+      "front": "What's slicing?",
+      "frontStyle": "question",
+      "explanation": "Slicing means grabbing a piece of an array or string. Write `arr[a:b]` to mean \"from index a, up to but not including index b.\"",
+      "mnemonic": "The second number is where you stop, not what you grab.",
+      "example": "s = \"hello\"\ns[0:3]  # 'hel'   — positions 0, 1, 2\ns[1:4]  # 'ell'   — positions 1, 2, 3\ns[2:]   # 'llo'   — from 2 to the end\ns[:3]   # 'hel'   — from the start to (not including) 3\ns[::-1] # 'olleh' — there's a third number too: the step. -1 reverses."
+    },
+
+    {
+      "id": "T0-LOOP-001",
+      "tier": "0",
+      "category": "LOOP",
+      "front": "What does a loop actually do?",
+      "frontStyle": "question",
+      "explanation": "A loop runs the same block of code many times. Each pass through the block is one *iteration*. Between iterations, things you set up (a counter, a running total) carry over — that's how the loop builds toward an answer.",
+      "metaphor": "Like checking every drawer in a dresser. You do the same action — open, look, close — but the drawer (and what's in it) is different each time."
+    },
+    {
+      "id": "T0-LOOP-002",
+      "tier": "0",
+      "category": "LOOP",
+      "front": "What does `i += 1` mean?",
+      "frontStyle": "question",
+      "explanation": "`i += 1` is shorthand for `i = i + 1`. Take the current value of `i`, add 1, store the result back in `i`.",
+      "insight": "Inside a `while` loop, this is how the index marches forward. Forget it and the loop runs forever on the same value.",
+      "example": "i = 0\ni += 1   # i is now 1\ni += 5   # i is now 6"
+    },
+    {
+      "id": "T0-LOOP-003",
+      "tier": "0",
+      "category": "LOOP",
+      "front": "`for` vs. `while`",
+      "frontStyle": "term",
+      "explanation": "A `while` loop keeps going as long as some condition is true — you control when to stop. A `for` loop walks through a known sequence of things (a list, a range of numbers) one at a time, then stops automatically.",
+      "insight": "Use `for` when you know what you're walking through. Use `while` when you don't know how many steps it'll take — just when to stop.",
+      "example": "# for: walk through known items\nfor x in [10, 20, 30]:\n    print(x)\n\n# while: stop when condition fails\ni = 0\nwhile i < 10:\n    i += 1"
+    },
+    {
+      "id": "T0-LOOP-004",
+      "tier": "0",
+      "category": "LOOP",
+      "front": "`break` vs. `continue`",
+      "frontStyle": "term",
+      "explanation": "`break` exits the loop entirely. `continue` skips the rest of *this* iteration and jumps to the next one.",
+      "insight": "`break` is for \"I found what I was looking for.\" `continue` is for \"this one doesn't count, move on.\"",
+      "example": "for x in arr:\n    if x < 0:\n        continue   # skip negatives\n    if x == target:\n        break      # found it, stop"
+    },
+
+    {
+      "id": "T0-NEST-001",
+      "tier": "0",
+      "category": "NEST",
+      "front": "What's a nested loop?",
+      "frontStyle": "question",
+      "explanation": "A loop inside another loop. For every step the outer loop takes, the inner loop runs all the way through.",
+      "metaphor": "Like a clock. The minute hand sweeps once for every single position of the hour hand. If the hour hand has 12 positions and the minute hand has 60, the minute hand has moved 12 × 60 = 720 times.",
+      "example": "for i in range(3):       # outer: 0, 1, 2\n    for j in range(2):   # inner: 0, 1 — runs fully each time\n        print(i, j)\n# prints: 0 0, 0 1, 1 0, 1 1, 2 0, 2 1"
+    },
+    {
+      "id": "T0-NEST-002",
+      "tier": "0",
+      "category": "NEST",
+      "front": "Why nested loops feel slow",
+      "frontStyle": "term",
+      "explanation": "If the outer loop runs n times and the inner loop runs n times for each, you've done n × n = n² steps. That's fine when n is 10 (100 steps). It's painful when n is 10,000 (100 million steps).",
+      "insight": "Nested loops aren't bad — they're sometimes exactly what you need. But noticing that you've written one is a cue to ask: 'is there a way to do this with one pass and a lookup table instead?' That question is the seed of most algorithmic improvements.",
+      "mnemonic": "One loop linear. Two loops quadratic. Three loops, time to think harder."
+    },
+    {
+      "id": "T0-NEST-003",
+      "tier": "0",
+      "category": "NEST",
+      "front": "When are nested loops the right tool?",
+      "frontStyle": "question",
+      "explanation": "When you genuinely need to consider every *combination* or every *position-pair*: comparing every item with every other item, walking a 2D grid (outer over rows, inner over columns), building an n × m table, or trying every starting and ending point of a substring.",
+      "insight": "If your problem really is about pairs, nested loops are honest. The question is whether the problem can be reframed so it's not about pairs anymore — that's when a hash map becomes the upgrade."
+    },
+
+    {
+      "id": "T0-BOOL-004",
+      "tier": "0",
+      "category": "BOOL",
+      "front": "Truthy vs. falsy",
+      "frontStyle": "term",
+      "explanation": "In an `if`, you don't have to pass a literal True/False. Many values count as truthy or falsy on their own. **Falsy** values: `0`, `0.0`, empty string `\"\"`, empty list `[]`, empty dict `{}`, `None`, `False`. Everything else is truthy.",
+      "insight": "This is why `if arr:` is the idiomatic way to ask 'is this list non-empty?' — an empty list is falsy.",
+      "example": "if arr:           # true when arr has items\n    ...\nif not s:         # true when s is empty\n    ...\nif name is None:  # explicit None check (preferred when 0/'' could be valid)\n    ..."
+    },
+
+    {
+      "id": "T0-VAR-001",
+      "tier": "0",
+      "category": "VAR",
+      "front": "What does `=` actually do?",
+      "frontStyle": "question",
+      "explanation": "`=` is *assignment* — it means \"give this name to this value.\" Read `x = 5` as 'the name x now refers to the value 5,' not as 'x equals 5.' (For 'equals,' use `==`.)",
+      "metaphor": "A name is a label you stick on a value, not a box you put a value into. The value lives on its own; the name just points at it.",
+      "example": "x = 5      # the name x now points to the value 5\nx = 10     # the name x now points to a different value, 10\ny = x      # the name y now points to whatever x points to (10)"
+    },
+    {
+      "id": "T0-VAR-002",
+      "tier": "0",
+      "category": "VAR",
+      "front": "What happens when I do `a = b` with a list?",
+      "frontStyle": "question",
+      "explanation": "Both names now point to the *same list* — not a copy. Modifying through one name changes what the other sees, because there's only one list.",
+      "example": "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)   # [1, 2, 3, 4] — a sees the change too",
+      "gotcha": "To get an actual copy: `b = a.copy()` or `b = a[:]` or `b = list(a)`. For nested structures, use `copy.deepcopy(a)`.",
+      "insight": "This applies to *mutable* things — lists, dicts, sets, custom objects. Immutable things like ints, strings, and tuples don't have this issue because you can't modify them in the first place."
+    },
+    {
+      "id": "T0-VAR-003",
+      "tier": "0",
+      "category": "VAR",
+      "front": "What is `None`?",
+      "frontStyle": "question",
+      "explanation": "`None` is Python's way of saying 'no value' or 'nothing here.' It's an actual value (the only value of its type), not a missing thing.",
+      "insight": "Functions that don't explicitly return anything return `None` by default. Methods that modify in place (like `arr.sort()`) typically return `None`.",
+      "example": "def greet():\n    print(\"hi\")\n\nresult = greet()    # prints \"hi\"\nprint(result)       # None"
+    },
+    {
+      "id": "T0-VAR-004",
+      "tier": "0",
+      "category": "VAR",
+      "front": "Variable scope",
+      "frontStyle": "term",
+      "explanation": "Scope is the region of code where a name is visible. A variable defined inside a function exists only inside that function. The function can see names from outside, but the outside can't see names from inside.",
+      "example": "x = 10           # outer scope\n\ndef f():\n    y = 20       # only exists inside f\n    print(x)     # 10 — can see x from outside\n\nf()\nprint(y)         # ERROR — y doesn't exist out here",
+      "insight": "If you want to *change* an outer variable from inside a function, return the new value and re-assign — don't reach for `global`, which is almost always a smell."
+    },
+
+    {
+      "id": "T0-FN-001",
+      "tier": "0",
+      "category": "FN",
+      "front": "What's a function?",
+      "frontStyle": "question",
+      "explanation": "A reusable piece of code with a name. You give it inputs (arguments), it does some work, it (usually) gives back an output.",
+      "metaphor": "Like a recipe. The recipe has a name, takes ingredients, and produces a dish. You can follow the same recipe many times with different ingredients.",
+      "example": "def double(x):\n    return x * 2\n\ndouble(5)    # 10\ndouble(7)    # 14"
+    },
+    {
+      "id": "T0-FN-002",
+      "tier": "0",
+      "category": "FN",
+      "front": "What does `return` actually do?",
+      "frontStyle": "question",
+      "explanation": "`return` ends the function and sends a value back to whoever called it. The caller can then store, use, or ignore that value.",
+      "insight": "`return` and `print` are *not* the same. `print` displays something on the screen. `return` hands a value back to the caller. A function can do both, neither, or one of them.",
+      "example": "def add(a, b):\n    return a + b\n\nresult = add(3, 4)   # result is 7\nprint(result)        # NOW it gets displayed"
+    },
+    {
+      "id": "T0-FN-003",
+      "tier": "0",
+      "category": "FN",
+      "front": "Arguments vs. parameters",
+      "frontStyle": "term",
+      "explanation": "**Parameters** are the names in the function's definition. **Arguments** are the actual values you pass in when calling it.",
+      "example": "def greet(name):       # name is a parameter\n    print(\"hi\", name)\n\ngreet(\"Ajay\")          # \"Ajay\" is an argument",
+      "mnemonic": "Parameters are placeholders. Arguments are actuals."
+    },
+    {
+      "id": "T0-FN-004",
+      "tier": "0",
+      "category": "FN",
+      "pythonSpecific": true,
+      "front": "Never use a list (or dict) as a default argument",
+      "frontStyle": "term",
+      "explanation": "Default arguments are evaluated *once*, when the function is defined — not each time the function is called. If the default is a mutable thing (list, dict, set), it's shared across every call that uses the default.",
+      "example": "def add_item(item, bag=[]):     # ⚠️ trap\n    bag.append(item)\n    return bag\n\nadd_item(\"apple\")    # ['apple']\nadd_item(\"bread\")    # ['apple', 'bread']  ← surprise!",
+      "gotcha": "The fix is to use `None` as the default and create a fresh list inside:\n\n```python\ndef add_item(item, bag=None):\n    if bag is None:\n        bag = []\n    bag.append(item)\n    return bag\n```",
+      "insight": "This is one of the most-cited Python gotchas. Every interviewer knows it. Every senior engineer has been bitten by it once."
+    },
+
+    {
+      "id": "T0-EQ-001",
+      "tier": "0",
+      "category": "EQ",
+      "front": "`==` vs. `is`",
+      "frontStyle": "term",
+      "explanation": "`==` asks 'do these have the same value?' `is` asks 'are these literally the exact same object in memory?' These are usually the same answer — but not always.",
+      "example": "a = [1, 2, 3]\nb = [1, 2, 3]\na == b   # True — same contents\na is b   # False — two different lists that happen to match\n\nc = a\na is c   # True — same object",
+      "insight": "Use `==` for almost everything. Reserve `is` for comparing to `None`, `True`, or `False` — these are singletons (only one of each exists)."
+    },
+    {
+      "id": "T0-EQ-002",
+      "tier": "0",
+      "category": "EQ",
+      "pythonSpecific": true,
+      "front": "Why `is None` (not `== None`)",
+      "frontStyle": "term",
+      "explanation": "Both technically work, but `is None` is the convention. Linters flag `== None`. The reason: `==` can be overridden by custom classes to do weird things, while `is` is a direct identity check that can't be fooled.",
+      "example": "if x is None:        # ✓ idiomatic\n    ...\nif x is not None:    # ✓\n    ...\nif x == None:        # works, but linters complain"
+    },
+    {
+      "id": "T0-EQ-003",
+      "tier": "0",
+      "category": "EQ",
+      "front": "Why you can't trust `==` with floats",
+      "frontStyle": "term",
+      "explanation": "Floating-point numbers are stored in binary, and most decimal fractions can't be represented exactly. So `0.1 + 0.2 == 0.3` is `False` — the actual sum is `0.30000000000000004`.",
+      "example": "0.1 + 0.2 == 0.3        # False\n\n# Compare with a tolerance instead:\nimport math\nmath.isclose(0.1 + 0.2, 0.3)    # True",
+      "insight": "This isn't a Python bug — it's how floats work in basically every language. Whenever floats are involved, ask whether you should be using a tolerance or switching to integers (e.g., money in cents)."
+    },
+
+    {
+      "id": "T0-BOOL-001",
+      "tier": "0",
+      "category": "BOOL",
+      "front": "What do `and` / `or` actually return?",
+      "frontStyle": "question",
+      "explanation": "Not just `True` or `False` — they return one of the actual operands. `and` returns the first falsy value, or the last value if all are truthy. `or` returns the first truthy value, or the last value if all are falsy.",
+      "example": "1 and 2          # 2  (both truthy → returns last)\n0 and 2          # 0  (first falsy → returns it)\n\n1 or 2           # 1  (first truthy → returns it)\nNone or \"hi\"     # \"hi\"  (first truthy)\n0 or \"\" or []    # []  (all falsy → returns last)",
+      "insight": "This is what makes `name = name or \"default\"` work — if `name` is falsy (None, empty string), it falls through to the default."
+    },
+    {
+      "id": "T0-BOOL-002",
+      "tier": "0",
+      "category": "BOOL",
+      "front": "Short-circuit evaluation",
+      "frontStyle": "term",
+      "explanation": "`and` and `or` stop as soon as the answer is decided. In `a and b`, if `a` is falsy, `b` is never evaluated. In `a or b`, if `a` is truthy, `b` is never evaluated.",
+      "insight": "This is what lets you safely write things like `if x is not None and x.length > 0`. If `x` is None, the second part never runs, so it can't crash.",
+      "example": "def expensive():\n    print(\"called!\")\n    return True\n\nFalse and expensive()   # prints nothing\nTrue or expensive()     # prints nothing"
+    },
+    {
+      "id": "T0-BOOL-003",
+      "tier": "0",
+      "category": "BOOL",
+      "front": "Flipping a condition cleanly (De Morgan's)",
+      "frontStyle": "term",
+      "explanation": "Use `not` for simple inversions. For combined conditions, apply De Morgan's laws: `not (A and B)` becomes `(not A) or (not B)`. `not (A or B)` becomes `(not A) and (not B)`.",
+      "mnemonic": "Distribute the not, flip the connector.",
+      "example": "# Original:\nif x > 0 and y > 0:\n    ...\n\n# Negated:\nif x <= 0 or y <= 0:\n    ..."
+    },
+
+    {
+      "id": "T0-NUM-001",
+      "tier": "0",
+      "category": "NUM",
+      "front": "`/` vs. `//`",
+      "frontStyle": "term",
+      "explanation": "`/` always returns a float, even when the result is whole. `//` divides and rounds *down* to an integer (toward negative infinity).",
+      "example": "7 / 2     # 3.5\n7 // 2    # 3\n8 / 2     # 4.0   (still a float!)\n8 // 2    # 4\n\n# Watch out with negatives:\n-7 // 2   # -4    (rounds DOWN, not toward zero)",
+      "insight": "`//` is what you want for things like 'how many full groups of size k fit in n.'"
+    },
+    {
+      "id": "T0-NUM-002",
+      "tier": "0",
+      "category": "NUM",
+      "front": "Modulo (`%`) — what's it for?",
+      "frontStyle": "term",
+      "explanation": "`a % b` gives the remainder when `a` is divided by `b`. Useful for: checking divisibility (`n % 2 == 0` means even), wrapping in a cycle (`i % len(arr)`), extracting the last digit (`n % 10`), and hashing.",
+      "example": "10 % 3    # 1   (10 = 3*3 + 1)\n12 % 4    # 0   (clean divide)\nn % 2     # 0 if even, 1 if odd\n\n# Cycle through a list:\nfor i in range(10):\n    print(arr[i % len(arr)])"
+    },
+    {
+      "id": "T0-NUM-003",
+      "tier": "0",
+      "category": "NUM",
+      "front": "Exponents (`**`)",
+      "frontStyle": "term",
+      "explanation": "`**` is exponentiation. `a ** b` means 'a to the power of b.' Works for integers, floats, and even non-integer exponents.",
+      "example": "2 ** 10     # 1024\n2 ** 0.5    # 1.4142...  (square root)\n10 ** -1    # 0.1"
+    },
+    {
+      "id": "T0-NUM-004",
+      "tier": "0",
+      "category": "NUM",
+      "pythonSpecific": true,
+      "front": "Python integers don't overflow",
+      "frontStyle": "term",
+      "explanation": "Unlike C, Java, or most languages, Python integers can grow as large as your memory allows. There's no `int` max value — no need to worry about overflow when doing big multiplications or factorials.",
+      "example": "2 ** 1000   # works fine, returns the full giant number",
+      "insight": "This makes Python convenient but means LeetCode solutions you write in Python may need extra thought when ported to Java/C++. Many problems explicitly mention things like 'answer fits in a 32-bit integer' precisely because most languages would overflow."
+    },
+
+    {
+      "id": "T0-BIG-001",
+      "tier": "0",
+      "category": "BIG",
+      "front": "What does O(n) actually mean?",
+      "frontStyle": "question",
+      "explanation": "Big O describes how the work scales as the input grows. `O(n)` means: if you double the input, you roughly double the work. It's about the *shape* of the growth, not the exact time.",
+      "metaphor": "Like a job estimate: 'this'll take about an hour per box of stuff.' We don't care exactly how long one box takes; we care that ten boxes is ten hours and a hundred is a hundred.",
+      "insight": "We deliberately ignore constants and low-order terms. `3n + 50` and `n` are both O(n) — they grow at the same rate even though one is faster on small inputs."
+    },
+    {
+      "id": "T0-BIG-002",
+      "tier": "0",
+      "category": "BIG",
+      "front": "The complexities you'll meet most",
+      "frontStyle": "term",
+      "explanation": "From fastest to slowest, for input size `n`:\n\n- **O(1)** constant — same work no matter the input. Hash map lookup, array index access.\n- **O(log n)** log — halving each step. Binary search, balanced tree operations.\n- **O(n)** linear — one pass. Walking through a list once.\n- **O(n log n)** — sorting (the good kind). Mergesort, Timsort, heapsort.\n- **O(n²)** quadratic — every pair. Nested loops over the same list. Bubble sort.\n- **O(2ⁿ)** exponential — every subset. Naive recursion on subsets. Trouble for n > ~25.\n- **O(n!)** factorial — every ordering. Permutations. Trouble for n > ~10."
+    },
+    {
+      "id": "T0-BIG-003",
+      "tier": "0",
+      "category": "BIG",
+      "front": "How do I count Big-O when reading code?",
+      "frontStyle": "question",
+      "explanation": "Count the loops over the input. One loop over n items: O(n). Two nested loops over n items: O(n²). A loop over n items where each iteration does a binary search: O(n log n).",
+      "insight": "Things that look like work but aren't: arithmetic, comparisons, single-array accesses — all O(1). Things that secretly are work: `x in some_list` is O(n), `x in some_set` is O(1). The data structure matters as much as the loop.",
+      "example": "# O(n)\nfor x in arr:\n    process(x)\n\n# O(n²)\nfor i in arr:\n    for j in arr:\n        ...\n\n# O(n log n)\nfor x in arr:\n    binary_search(sorted_list, x)\n\n# O(n) — even with two loops, they're sequential, not nested\nfor x in arr: ...\nfor x in arr: ..."
+    },
+    {
+      "id": "T0-BIG-004",
+      "tier": "0",
+      "category": "BIG",
+      "front": "When O(n²) is actually fine",
+      "frontStyle": "term",
+      "explanation": "When n is small. The asymptotic story is about behavior as n grows — but most real code runs on small n. If your input is bounded at 100, O(n²) is 10,000 operations, which a computer does in microseconds.",
+      "insight": "Premature optimization is real. Write the clear nested-loop version first. Profile. Optimize only what's slow. The brute force that ships beats the hash-map trick that doesn't.",
+      "mnemonic": "Big O is about the future. Profilers are about the present."
+    },
+
+    {
+      "id": "T0-ERR-001",
+      "tier": "0",
+      "category": "ERR",
+      "front": "What's an exception?",
+      "frontStyle": "question",
+      "explanation": "An exception is what happens when code can't continue normally — file not found, divide by zero, index out of bounds, key missing from a dict. Python raises an exception, which travels up through your call stack until something catches it (or until the program crashes).",
+      "metaphor": "Like an alarm going off mid-task. The current work stops, and the alarm bubbles up until someone responds to it. If nobody does, the building gets evacuated (your program crashes)."
+    },
+    {
+      "id": "T0-ERR-002",
+      "tier": "0",
+      "category": "ERR",
+      "front": "`try` / `except` — the basic shape",
+      "frontStyle": "term",
+      "explanation": "`try` a block that might fail. `except` catches a specific kind of failure and lets you handle it. If the code in `try` succeeds, the `except` block is skipped.",
+      "example": "try:\n    value = int(user_input)\nexcept ValueError:\n    value = 0   # fall back if input wasn't a number"
+    },
+    {
+      "id": "T0-ERR-003",
+      "tier": "0",
+      "category": "ERR",
+      "front": "Why bare `except:` is almost always wrong",
+      "frontStyle": "term",
+      "explanation": "`except:` with no exception type catches *everything* — including KeyboardInterrupt (Ctrl+C) and SystemExit. It hides bugs by swallowing the actual error.",
+      "example": "# ⚠️ bad — hides everything\ntry:\n    do_something()\nexcept:\n    pass\n\n# ✓ catch only what you can handle\ntry:\n    do_something()\nexcept ValueError as e:\n    log.warning(f\"bad value: {e}\")",
+      "mnemonic": "Errors should never pass silently. (Unless explicitly silenced.)"
+    },
+
+    {
+      "id": "T0-PY-001",
+      "tier": "0",
+      "category": "PY",
+      "pythonSpecific": true,
+      "front": "List comprehensions — the shortcut, with a warning",
+      "frontStyle": "term",
+      "explanation": "A list comprehension is a one-liner that builds a list from another iterable. Shape: `[expression for item in iterable if condition]`.",
+      "example": "# Long form:\nresult = []\nfor x in arr:\n    if x > 0:\n        result.append(x * 2)\n\n# Comprehension:\nresult = [x * 2 for x in arr if x > 0]",
+      "insight": "Beautiful in Python. Doesn't exist in most other languages. When learning algorithms, write the long form first — it shows what's actually happening and translates anywhere. Use comprehensions only after the long form is second nature."
+    },
+    {
+      "id": "T0-PY-002",
+      "tier": "0",
+      "category": "PY",
+      "pythonSpecific": true,
+      "front": "Tuples — immutable cousin of lists",
+      "frontStyle": "term",
+      "explanation": "A tuple is like a list, but you can't change it after creation. Written with parentheses: `(1, 2, 3)`. Used for fixed-size groupings (a coordinate pair, a return of multiple values).",
+      "example": "point = (3, 4)\npoint[0]   # 3 — same access as a list\npoint[0] = 5   # ERROR — tuples are immutable\n\n# Common: returning multiple values\ndef divmod(a, b):\n    return a // b, a % b   # actually returns a tuple",
+      "insight": "Because tuples are immutable, they can be used as dict keys or set members. Lists cannot."
+    },
+
+    {
+      "$comment": "===== TIER 1A — NEW: stacks, queues, heaps, recursion, trees, graphs ====="
+    },
+
+    {
+      "id": "T0-STK-001",
+      "tier": "0",
+      "category": "STK",
+      "front": "What's a stack?",
+      "frontStyle": "question",
+      "explanation": "A stack is a collection where you only add to and remove from one end (called the *top*). The last thing in is the first thing out — *LIFO*.",
+      "metaphor": "Like a stack of plates at a cafeteria. You put new plates on top. You take from the top. You can't grab the bottom plate without removing everything above it.",
+      "insight": "The two operations are usually called `push` (add to top) and `pop` (remove from top). Sometimes `peek` (look at top without removing). Each is O(1).",
+      "example": "# Stacks are great for: undo history, function call frames,\n# matched-pair problems (parentheses), depth-first traversal,\n# anything where you want \"go deeper, then come back\""
+    },
+    {
+      "id": "T0-Q-001",
+      "tier": "0",
+      "category": "Q",
+      "front": "What's a queue?",
+      "frontStyle": "question",
+      "explanation": "A queue is a collection where you add to one end and remove from the other. The first thing in is the first thing out — *FIFO*.",
+      "metaphor": "Like a line at a coffee shop. New people join the back. The barista serves from the front.",
+      "insight": "Queues are the right tool whenever you need to process things in arrival order — most importantly, when doing breadth-first search.",
+      "example": "# Queues are great for: BFS, level-order traversal,\n# task scheduling, anything where you want \"process in order\""
+    },
+    {
+      "id": "T0-Q-002",
+      "tier": "0",
+      "category": "Q",
+      "front": "Why not just use a list as a queue?",
+      "frontStyle": "question",
+      "pythonSpecific": true,
+      "explanation": "You *can*, but `list.pop(0)` is O(n) — every other item has to shift left to fill the gap. For a queue, use `collections.deque`, which is O(1) at both ends.",
+      "example": "from collections import deque\nq = deque()\nq.append(x)      # add to right (back)  — O(1)\nq.popleft()      # remove from left (front) — O(1)\n\n# vs.\nlist_queue = []\nlist_queue.append(x)\nlist_queue.pop(0)   # ⚠️ O(n) — slow for big queues"
+    },
+    {
+      "id": "T0-HEAP-001",
+      "tier": "0",
+      "category": "HEAP",
+      "front": "What's a heap?",
+      "frontStyle": "question",
+      "explanation": "A heap is a collection where you can always quickly grab the smallest (or largest) item. Adding and removing the top item are both O(log n). It does *not* keep things fully sorted — just the top is always the smallest.",
+      "metaphor": "Think of an emergency room triage list. You don't sort all patients perfectly — you just keep the most urgent one at the top, ready to be seen next.",
+      "insight": "Heaps are the right tool for: top-K problems, priority queues, repeatedly merging sorted things. Python's `heapq` module gives you a min-heap (smallest on top). For a max-heap, negate the values.",
+      "example": "# heapq is a min-heap by default\nimport heapq\n\n# For a max-heap, push -x and pop -x\nheapq.heappush(h, -value)"
+    },
+
+    {
+      "id": "T0-REC-001",
+      "tier": "0",
+      "category": "REC",
+      "front": "What's recursion?",
+      "frontStyle": "question",
+      "explanation": "Recursion is when a function calls itself. Each call works on a smaller version of the original problem. The function either solves a tiny version directly (the *base case*) or breaks the problem down and calls itself on the smaller piece (the *recursive case*).",
+      "metaphor": "Like Russian nesting dolls. You open one, find a smaller one inside, open that, find an even smaller one. Eventually you hit the smallest — that's the base case. Then you put them all back together.",
+      "example": "def factorial(n):\n    if n == 0:        # base case\n        return 1\n    return n * factorial(n - 1)   # recursive case"
+    },
+    {
+      "id": "T0-REC-002",
+      "tier": "0",
+      "category": "REC",
+      "front": "Base case and recursive case",
+      "frontStyle": "term",
+      "explanation": "Every recursive function has two parts. The **base case** is the simplest version of the problem, where you can return an answer directly. The **recursive case** breaks the problem into a smaller version and calls the function on that.",
+      "insight": "If you forget the base case, the function calls itself forever and crashes with a stack overflow. The base case is the loop's stopping condition.",
+      "mnemonic": "First write the base case. Then trust the recursion.",
+      "example": "def count_down(n):\n    if n == 0:                # base case — stop here\n        print(\"done\")\n        return\n    print(n)                  # recursive case\n    count_down(n - 1)         # smaller version of the problem"
+    },
+    {
+      "id": "T0-REC-003",
+      "tier": "0",
+      "category": "REC",
+      "front": "What's the call stack?",
+      "frontStyle": "question",
+      "explanation": "When a function calls another function (or itself), Python remembers where to come back to. Each call adds a frame to the *call stack*. When a function returns, its frame is popped off.",
+      "insight": "Recursion uses the call stack as its memory. Each recursive call adds a frame — this is why deep recursion can crash with a `RecursionError`. Python's default limit is about 1000 frames.",
+      "example": "factorial(3)\n  → calls factorial(2)\n      → calls factorial(1)\n          → calls factorial(0)\n              → returns 1\n          → returns 1 * 1 = 1\n      → returns 2 * 1 = 2\n  → returns 3 * 2 = 6\n\n# At the deepest point, 4 frames are on the stack."
+    },
+
+    {
+      "id": "T0-LL-001",
+      "tier": "0",
+      "category": "LL",
+      "front": "What's a linked list?",
+      "frontStyle": "question",
+      "explanation": "A linked list is a chain of nodes. Each node holds a value and a *pointer* to the next node. Unlike an array, the nodes aren't stored side-by-side in memory — each one knows where the next one lives.",
+      "metaphor": "Like a treasure hunt. Each clue tells you where to find the next clue. You can't jump ahead — you have to follow the chain.",
+      "insight": "The trade-off: inserting/removing is O(1) once you have the right node (just rewire pointers). But accessing the i-th item is O(n) because you have to walk from the head. Arrays are the opposite — O(1) access, O(n) insert in the middle.",
+      "example": "class Node:\n    def __init__(self, val):\n        self.val = val\n        self.next = None\n\n# 1 -> 2 -> 3 -> None\nhead = Node(1)\nhead.next = Node(2)\nhead.next.next = Node(3)"
+    },
+    {
+      "id": "T0-LL-002",
+      "tier": "0",
+      "category": "LL",
+      "front": "Why a \"dummy node\" is so useful",
+      "frontStyle": "term",
+      "explanation": "When building a linked list, the head is special — there's no node before it. This means \"add to the front\" is different code from \"add anywhere else.\" A *dummy node* is a fake node placed before the real head, so every real node has a predecessor. The actual list is `dummy.next`.",
+      "insight": "This eliminates an entire class of edge cases. Every operation looks the same regardless of position. At the end, return `dummy.next` to skip the fake.",
+      "example": "dummy = Node(0)         # value doesn't matter\ntail = dummy            # tail tracks the last real node\n\nwhile work_to_do:\n    tail.next = Node(value)\n    tail = tail.next\n\nresult = dummy.next     # skip the dummy"
+    },
+
+    {
+      "id": "T0-TREE-001",
+      "tier": "0",
+      "category": "TREE",
+      "front": "What's a binary tree?",
+      "frontStyle": "question",
+      "explanation": "A binary tree is a structure where each node has up to two children — usually called `left` and `right`. There's one starting node called the *root*. Nodes with no children are called *leaves*.",
+      "metaphor": "Like a family tree, but each person has at most two children. Or like a decision tree, where each node branches into 'yes' and 'no' paths.",
+      "example": "class TreeNode:\n    def __init__(self, val):\n        self.val = val\n        self.left = None\n        self.right = None\n\n#       1\n#      / \\\n#     2   3\n#    / \\\n#   4   5"
+    },
+    {
+      "id": "T0-TREE-002",
+      "tier": "0",
+      "category": "TREE",
+      "front": "Why most tree problems are recursive",
+      "frontStyle": "term",
+      "explanation": "A binary tree is built from smaller binary trees: the left subtree and the right subtree. Each subtree has the same shape as the whole tree. So most tree problems naturally fit recursion: solve the left subtree, solve the right subtree, combine.",
+      "insight": "The base case is almost always 'the node is None.' That's an empty subtree — return whatever the empty answer is (0, an empty list, True, etc.).",
+      "example": "def tree_size(node):\n    if node is None:               # base case: empty tree\n        return 0\n    return 1 + tree_size(node.left) + tree_size(node.right)\n#         this   left subtree         right subtree"
+    },
+    {
+      "id": "T0-TREE-003",
+      "tier": "0",
+      "category": "TREE",
+      "front": "What's a binary search tree (BST)?",
+      "frontStyle": "question",
+      "explanation": "A binary search tree is a binary tree with a rule: for every node, all values in its left subtree are *less* than its value, and all values in its right subtree are *greater*. This rule lets you find values in O(log n) time on a balanced tree.",
+      "insight": "An *in-order* traversal of a BST visits values in sorted order. This is one of the most useful properties in algorithm problems."
+    },
+
+    {
+      "id": "T0-GRPH-001",
+      "tier": "0",
+      "category": "GRPH",
+      "front": "What's a graph?",
+      "frontStyle": "question",
+      "explanation": "A graph is a set of *nodes* (also called *vertices*) connected by *edges*. Unlike a tree, there's no root, and a node can have any number of connections — including back to itself or to nodes deeper in the graph (creating cycles).",
+      "insight": "A tree is just a special kind of graph: connected, no cycles, with a root. So tree algorithms are often a simpler form of graph algorithms.",
+      "example": "# Most common representation: an adjacency list\n# (a dict mapping each node to its neighbors)\ngraph = {\n    \"A\": [\"B\", \"C\"],\n    \"B\": [\"A\", \"D\"],\n    \"C\": [\"A\"],\n    \"D\": [\"B\"]\n}"
+    },
+    {
+      "id": "T0-GRPH-002",
+      "tier": "0",
+      "category": "GRPH",
+      "front": "Why graphs need a `visited` set",
+      "frontStyle": "term",
+      "explanation": "Unlike trees, graphs can have cycles. If you blindly follow edges, you can revisit a node forever. Every graph traversal needs to track which nodes have been seen.",
+      "example": "visited = set()\n\ndef dfs(node):\n    if node in visited:\n        return\n    visited.add(node)\n    for neighbor in graph[node]:\n        dfs(neighbor)",
+      "insight": "Trees don't need this because they have no cycles. But the moment you suspect cycles — or you're working on a real graph — `visited` is mandatory."
+    },
+    {
+      "id": "T0-GRPH-003",
+      "tier": "0",
+      "category": "GRPH",
+      "front": "A 2D grid is a graph",
+      "frontStyle": "term",
+      "explanation": "Many \"grid\" problems are graph problems in disguise. Each cell is a node. The neighbors of cell `(r, c)` are the cells above, below, left, and right — `(r-1, c)`, `(r+1, c)`, `(r, c-1)`, `(r, c+1)`. Sometimes diagonals too.",
+      "insight": "Once you see this, problems like \"count islands\" or \"shortest path in a maze\" become standard BFS/DFS problems.",
+      "example": "directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]\n\nfor dr, dc in directions:\n    nr, nc = r + dr, c + dc\n    if 0 <= nr < rows and 0 <= nc < cols:\n        # explore (nr, nc)"
+    },
+
+    {
+      "id": "T0-DP-001",
+      "tier": "0",
+      "category": "DP",
+      "front": "What's dynamic programming?",
+      "frontStyle": "question",
+      "explanation": "Dynamic programming is a way of solving problems by solving smaller versions of the same problem first, *remembering* the answers, and reusing them. Two ingredients: (1) overlapping subproblems — the same small question comes up many times, (2) optimal substructure — the answer to the big problem is built from answers to small ones.",
+      "metaphor": "Like keeping a notebook while you work. Every time you solve a sub-question, you write the answer down. Next time the same sub-question appears, you don't re-solve it — you just check your notes.",
+      "insight": "Without memoization, naive recursion on these problems re-solves the same subproblem millions of times — O(2ⁿ). With memoization, each subproblem is solved once — usually O(n) or O(n²)."
+    },
+    {
+      "id": "T0-DP-002",
+      "tier": "0",
+      "category": "DP",
+      "front": "Memoization vs. tabulation",
+      "frontStyle": "term",
+      "explanation": "Two ways to do DP. **Memoization** (top-down): write the recursion naturally, and add a cache so each subproblem is solved once. **Tabulation** (bottom-up): build a table starting from the smallest subproblem and work up.",
+      "insight": "They produce the same answers. Memoization is closer to how you'd describe the problem. Tabulation can be more efficient (no recursion overhead, easier to optimize space).",
+      "example": "# Memoization (top-down)\nfrom functools import lru_cache\n@lru_cache\ndef fib(n):\n    if n < 2: return n\n    return fib(n-1) + fib(n-2)\n\n# Tabulation (bottom-up)\ndef fib(n):\n    if n < 2: return n\n    table = [0, 1]\n    for i in range(2, n + 1):\n        table.append(table[i-1] + table[i-2])\n    return table[n]"
+    },
+
+    {
+      "$comment": "===== TIER 1B — FLUENCIES (the code your fingers should know) ====="
+    },
+
+    {
+      "id": "T1-ARR-001",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Make an empty list",
+      "frontStyle": "imperative",
+      "code": "arr = []"
+    },
+    {
+      "id": "T1-ARR-002",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Read an item by position",
+      "frontStyle": "imperative",
+      "code": "x = arr[i]"
+    },
+    {
+      "id": "T1-ARR-003",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Change an item at a position",
+      "frontStyle": "imperative",
+      "code": "arr[i] = new_value"
+    },
+    {
+      "id": "T1-ARR-004",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Add to the end of a list",
+      "frontStyle": "imperative",
+      "code": "arr.append(x)",
+      "insight": "Modifies in place. Returns nothing useful (don't write `x = arr.append(...)`)."
+    },
+    {
+      "id": "T1-ARR-005",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Remove the last item (and get it)",
+      "frontStyle": "imperative",
+      "code": "x = arr.pop()    # removes and returns the last item",
+      "insight": "Pop with no argument is O(1). `arr.pop(0)` removes from the front but is O(n) because every other item shifts left."
+    },
+    {
+      "id": "T1-ARR-006",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Get the length",
+      "frontStyle": "imperative",
+      "code": "n = len(arr)"
+    },
+    {
+      "id": "T1-ARR-007",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Reach the last item",
+      "frontStyle": "imperative",
+      "code": "last = arr[-1]",
+      "insight": "Negative indexes count from the end. `arr[-1]` is the last, `arr[-2]` is the second-to-last."
+    },
+    {
+      "id": "T1-ARR-008",
+      "tier": "1",
+      "category": "ARR",
+      "front": "Swap two items in a list",
+      "frontStyle": "imperative",
+      "code": "arr[i], arr[j] = arr[j], arr[i]",
+      "insight": "Python's tuple assignment makes the temp-variable dance unnecessary. This is one of the language's nicer fluencies."
+    },
+
+    {
+      "id": "T1-STR-001",
+      "tier": "1",
+      "category": "STR",
+      "front": "Get one character from a string",
+      "frontStyle": "imperative",
+      "code": "ch = s[i]"
+    },
+    {
+      "id": "T1-STR-002",
+      "tier": "1",
+      "category": "STR",
+      "front": "Slice a piece of a string",
+      "frontStyle": "imperative",
+      "code": "piece = s[a:b]   # from a, up to (not including) b"
+    },
+    {
+      "id": "T1-STR-003",
+      "tier": "1",
+      "category": "STR",
+      "front": "Stick two strings together",
+      "frontStyle": "imperative",
+      "code": "combined = a + b"
+    },
+    {
+      "id": "T1-STR-004",
+      "tier": "1",
+      "category": "STR",
+      "front": "Check if one string contains another",
+      "frontStyle": "imperative",
+      "code": "if \"cat\" in s:\n    # yes",
+      "insight": "`in` works for substring search on strings, and for membership on lists, sets, and dicts (where it checks keys)."
+    },
+    {
+      "id": "T1-STR-005",
+      "tier": "1",
+      "category": "STR",
+      "front": "Split a string into pieces by a separator",
+      "frontStyle": "imperative",
+      "code": "parts = s.split(\",\")   # \"a,b,c\" -> ['a', 'b', 'c']"
+    },
+    {
+      "id": "T1-STR-006",
+      "tier": "1",
+      "category": "STR",
+      "front": "Join a list of strings into one",
+      "frontStyle": "imperative",
+      "code": "s = \",\".join(parts)    # ['a','b','c'] -> 'a,b,c'",
+      "insight": "Backwards from what you might expect: the *separator* is the thing you call `.join()` on."
+    },
+    {
+      "id": "T1-STR-007",
+      "tier": "1",
+      "category": "STR",
+      "front": "Reverse a string",
+      "frontStyle": "imperative",
+      "code": "reversed_s = s[::-1]",
+      "insight": "Slicing with step -1 walks the string backwards. Same trick works for lists."
+    },
+
+    {
+      "id": "T1-DS-001",
+      "tier": "1",
+      "category": "HASH",
+      "front": "Make an empty hash map (dict)",
+      "frontStyle": "imperative",
+      "code": "seen = {}"
+    },
+    {
+      "id": "T1-DS-002",
+      "tier": "1",
+      "category": "HASH",
+      "front": "Check if a key is in a dict",
+      "frontStyle": "imperative",
+      "code": "if key in seen:\n    # yes"
+    },
+    {
+      "id": "T1-DS-003",
+      "tier": "1",
+      "category": "HASH",
+      "front": "Look up a value by key",
+      "frontStyle": "imperative",
+      "code": "value = seen[key]\n# Or, with a default if missing:\nvalue = seen.get(key, 0)"
+    },
+    {
+      "id": "T1-DS-004",
+      "tier": "1",
+      "category": "HASH",
+      "front": "Store a value under a key",
+      "frontStyle": "imperative",
+      "code": "seen[key] = value"
+    },
+    {
+      "id": "T1-DS-005",
+      "tier": "1",
+      "category": "SET",
+      "front": "Make an empty set",
+      "frontStyle": "imperative",
+      "code": "seen = set()",
+      "insight": "`{}` is a dict, not a set. Use `set()` for an empty set."
+    },
+    {
+      "id": "T1-DS-006",
+      "tier": "1",
+      "category": "SET",
+      "front": "Add to / remove from a set",
+      "frontStyle": "imperative",
+      "code": "seen.add(x)\nseen.remove(x)    # raises if x isn't there\nseen.discard(x)   # silent if x isn't there"
+    },
+    {
+      "id": "T1-DS-007",
+      "tier": "1",
+      "category": "HASH",
+      "front": "Count how many times each thing appears",
+      "frontStyle": "imperative",
+      "code": "counts = {}\nfor x in arr:\n    if x in counts:\n        counts[x] += 1\n    else:\n        counts[x] = 1",
+      "pythonic": {
+        "note": "Python has a built-in counter:",
+        "code": "from collections import Counter\ncounts = Counter(arr)"
+      }
+    },
+
+    {
+      "id": "T1-PTR-001",
+      "tier": "1",
+      "category": "PTR",
+      "front": "Two pointers, one at each end",
+      "frontStyle": "imperative",
+      "code": "left, right = 0, len(arr) - 1"
+    },
+    {
+      "id": "T1-PTR-002",
+      "tier": "1",
+      "category": "PTR",
+      "front": "Two pointers, walking from the start",
+      "frontStyle": "imperative",
+      "code": "left = right = 0",
+      "insight": "Use this when one marker tracks the start of a window and the other its end."
+    },
+
+    {
+      "id": "T1-MATH-001",
+      "tier": "1",
+      "category": "MATH",
+      "front": "Track a running maximum",
+      "frontStyle": "imperative",
+      "code": "if candidate > best:\n    best = candidate",
+      "pythonic": {
+        "note": "Python one-liner:",
+        "code": "best = max(best, candidate)"
+      }
+    },
+    {
+      "id": "T1-MATH-002",
+      "tier": "1",
+      "category": "MATH",
+      "front": "Add up every number in a list",
+      "frontStyle": "imperative",
+      "code": "total = 0\nfor x in arr:\n    total += x",
+      "pythonic": {
+        "note": "Python has a built-in:",
+        "code": "total = sum(arr)"
+      }
+    },
+    {
+      "id": "T1-SRT-001",
+      "tier": "1",
+      "category": "SRT",
+      "front": "Sort a list",
+      "frontStyle": "imperative",
+      "code": "arr.sort()                  # changes arr in place\nsorted_arr = sorted(arr)    # leaves arr alone, returns new"
+    },
+    {
+      "id": "T1-SRT-002",
+      "tier": "1",
+      "category": "SRT",
+      "front": "Sort by a custom rule",
+      "frontStyle": "imperative",
+      "code": "# Sort strings by length\narr.sort(key=len)\n\n# Sort tuples by their second item\narr.sort(key=lambda x: x[1])\n\n# Sort descending\narr.sort(reverse=True)"
+    },
+
+    {
+      "id": "T1-LOOP-001",
+      "tier": "1",
+      "category": "LOOP",
+      "front": "Loop through a list, item by item",
+      "frontStyle": "imperative",
+      "code": "for x in arr:\n    # use x"
+    },
+    {
+      "id": "T1-LOOP-002",
+      "tier": "1",
+      "category": "LOOP",
+      "front": "Loop through a list, with index and item",
+      "frontStyle": "imperative",
+      "code": "for i, x in enumerate(arr):\n    # use i and x",
+      "insight": "`enumerate` is the right way. Don't write `for i in range(len(arr)): x = arr[i]` — that's a code smell in Python."
+    },
+    {
+      "id": "T1-LOOP-003",
+      "tier": "1",
+      "category": "LOOP",
+      "front": "Loop a fixed number of times",
+      "frontStyle": "imperative",
+      "code": "for i in range(n):\n    # i goes 0, 1, 2, ..., n-1"
+    },
+    {
+      "id": "T1-LOOP-004",
+      "tier": "1",
+      "category": "LOOP",
+      "front": "Loop backwards through a list",
+      "frontStyle": "imperative",
+      "code": "for x in reversed(arr):\n    # use x\n\n# or with index:\nfor i in range(len(arr) - 1, -1, -1):\n    # i counts down to 0"
+    },
+    {
+      "id": "T1-LOOP-005",
+      "tier": "1",
+      "category": "LOOP",
+      "front": "Loop two lists together, item by item",
+      "frontStyle": "imperative",
+      "code": "for x, y in zip(a, b):\n    # x is from a, y is from b\n    # zip stops at the shorter list"
+    },
+
+    {
+      "id": "T1-NEST-001",
+      "tier": "1",
+      "category": "NEST",
+      "front": "Visit every pair of positions in a list (i before j)",
+      "frontStyle": "imperative",
+      "code": "for i in range(len(arr)):\n    for j in range(i + 1, len(arr)):\n        # arr[i] and arr[j] are a pair",
+      "insight": "Starting `j` at `i + 1` avoids comparing items to themselves and avoids checking the same pair twice."
+    },
+    {
+      "id": "T1-NEST-002",
+      "tier": "1",
+      "category": "NEST",
+      "front": "Visit every cell of a 2D grid",
+      "frontStyle": "imperative",
+      "code": "for r in range(rows):\n    for c in range(cols):\n        # grid[r][c]"
+    },
+
+    {
+      "id": "T1-BLD-001",
+      "tier": "1",
+      "category": "BLD",
+      "front": "Build a list as you go",
+      "frontStyle": "imperative",
+      "code": "result = []\nfor x in arr:\n    if some_condition(x):\n        result.append(x)"
+    },
+    {
+      "id": "T1-BLD-002",
+      "tier": "1",
+      "category": "BLD",
+      "front": "Track a running total",
+      "frontStyle": "imperative",
+      "code": "total = 0\nfor x in arr:\n    total += x"
+    },
+    {
+      "id": "T1-BLD-003",
+      "tier": "1",
+      "category": "BLD",
+      "front": "Track a running max (or min)",
+      "frontStyle": "imperative",
+      "code": "best = arr[0]\nfor x in arr:\n    if x > best:\n        best = x",
+      "insight": "Initialize `best` to the first element, not to 0 — what if all your numbers are negative? Starting from `arr[0]` works for any data."
+    },
+
+    {
+      "$comment": "===== TIER 1B — NEW: stacks, queues, heaps, linked lists, trees, binary search ====="
+    },
+
+    {
+      "id": "T1-STK-001",
+      "tier": "1",
+      "category": "STK",
+      "front": "Use a list as a stack",
+      "frontStyle": "imperative",
+      "code": "stack = []\nstack.append(x)    # push (add to top)\nx = stack.pop()    # pop (remove from top)\ntop = stack[-1]    # peek (look at top)",
+      "insight": "Python's list does both ends well, but `pop()` (no argument) is O(1) — the right end. `pop(0)` is O(n). For stacks, always use the right end."
+    },
+    {
+      "id": "T1-Q-001",
+      "tier": "1",
+      "category": "Q",
+      "front": "Make a queue (deque)",
+      "frontStyle": "imperative",
+      "code": "from collections import deque\nq = deque()\nq.append(x)        # enqueue (add to right)\nx = q.popleft()    # dequeue (remove from left)"
+    },
+    {
+      "id": "T1-Q-002",
+      "tier": "1",
+      "category": "Q",
+      "front": "Initialize a queue with starting items",
+      "frontStyle": "imperative",
+      "code": "from collections import deque\nq = deque([start])              # one item\nq = deque([root])               # for BFS, start with the root\nq = deque(initial_list)         # any iterable"
+    },
+
+    {
+      "id": "T1-HEAP-001",
+      "tier": "1",
+      "category": "HEAP",
+      "front": "Push and pop from a min-heap",
+      "frontStyle": "imperative",
+      "code": "import heapq\nheap = []\nheapq.heappush(heap, x)         # add x\nsmallest = heapq.heappop(heap)  # remove and return smallest\nsmallest = heap[0]              # peek, don't remove",
+      "insight": "Python only has a min-heap. For a max-heap, push `-x` and remember to negate again on pop."
+    },
+    {
+      "id": "T1-HEAP-002",
+      "tier": "1",
+      "category": "HEAP",
+      "front": "Build a heap from an existing list (fast)",
+      "frontStyle": "imperative",
+      "code": "import heapq\nheapq.heapify(arr)    # turns arr into a heap, in place — O(n)",
+      "insight": "Faster than pushing items one by one (which would be O(n log n))."
+    },
+
+    {
+      "id": "T1-LL-001",
+      "tier": "1",
+      "category": "LL",
+      "front": "Walk through a linked list",
+      "frontStyle": "imperative",
+      "code": "current = head\nwhile current is not None:\n    # use current.val\n    current = current.next"
+    },
+    {
+      "id": "T1-LL-002",
+      "tier": "1",
+      "category": "LL",
+      "front": "Build a linked list with a dummy node",
+      "frontStyle": "imperative",
+      "code": "dummy = ListNode(0)\ntail = dummy\n\nfor val in values:\n    tail.next = ListNode(val)\n    tail = tail.next\n\nresult = dummy.next   # skip the dummy"
+    },
+
+    {
+      "id": "T1-TREE-001",
+      "tier": "1",
+      "category": "TREE",
+      "front": "Recursive tree traversal scaffold",
+      "frontStyle": "imperative",
+      "code": "def visit(node):\n    if node is None:\n        return\n    # do something with node.val\n    visit(node.left)\n    visit(node.right)",
+      "insight": "Where you put the 'do something' line determines the order: before recursive calls = pre-order, between them = in-order, after them = post-order."
+    },
+
+    {
+      "id": "T1-BS-001",
+      "tier": "1",
+      "category": "BS",
+      "front": "Calculate the midpoint safely",
+      "frontStyle": "imperative",
+      "code": "mid = low + (high - low) // 2",
+      "insight": "In languages with fixed-size integers (Java, C++), `(low + high) / 2` can overflow when both are large. Python integers don't overflow, but the safe form is still good practice — and it's the form you'll see in solutions."
+    },
+
+    {
+      "id": "T1-DIR-001",
+      "tier": "1",
+      "category": "DIR",
+      "front": "The four-direction array (for grids)",
+      "frontStyle": "imperative",
+      "code": "directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]\n#              up      down    left     right\n\nfor dr, dc in directions:\n    nr, nc = r + dr, c + dc\n    if 0 <= nr < rows and 0 <= nc < cols:\n        # explore (nr, nc)",
+      "insight": "Memorize this. It appears in every grid problem. Some problems also need diagonals: add `(-1,-1), (-1,1), (1,-1), (1,1)`."
+    },
+
+    {
+      "$comment": "===== TIER 2 — PATTERNS ====="
+    },
+
+    {
+      "id": "T2-LIN-001",
+      "tier": "2",
+      "category": "LIN",
+      "front": "Walk through a list and find the first item that matches a rule.",
+      "frontStyle": "scenario",
+      "techniqueName": "Linear search",
+      "techniqueGist": "Walk through one by one. Return as soon as you find a match. If you reach the end without finding one, the answer is 'not there.'",
+      "skeleton": "for i, x in enumerate(arr):\n    if matches(x):\n        return i\nreturn -1",
+      "insight": "`return -1` for 'not found' is a convention. Some problems want `None`, some want a boolean. Read carefully.",
+      "composes": ["T1-LOOP-002"]
+    },
+    {
+      "id": "T2-NEST-001",
+      "tier": "2",
+      "category": "NEST",
+      "front": "Check every pair of items in a list to see if any pair fits a rule.",
+      "frontStyle": "scenario",
+      "techniqueName": "Brute-force pair check",
+      "techniqueGist": "For each item, check it against every later item. Visits every unique pair exactly once.",
+      "skeleton": "for i in range(len(arr)):\n    for j in range(i + 1, len(arr)):\n        if pair_matches(arr[i], arr[j]):\n            return [i, j]",
+      "insight": "This is O(n²). Fine for small inputs. When you write it, ask: can a hash map turn this into one pass?",
+      "composes": ["T1-NEST-001"]
+    },
+    {
+      "id": "T2-HASH-001",
+      "tier": "2",
+      "category": "HASH",
+      "front": "Walk through a list and ask: have I seen the matching half before?",
+      "frontStyle": "scenario",
+      "techniqueName": "Complement lookup with a hash map",
+      "techniqueGist": "For each item, check if its match is already in the table. If yes, you found the pair. If no, write this item down so future items can find it.",
+      "skeleton": "seen = {}\nfor i, x in enumerate(arr):\n    needed = target - x\n    if needed in seen:\n        return [seen[needed], i]\n    seen[x] = i",
+      "insight": "Check before you store. Otherwise an item might match itself.",
+      "composes": ["T1-DS-001", "T1-LOOP-002", "T1-DS-002", "T1-DS-004"]
+    },
+    {
+      "id": "T2-HASH-002",
+      "tier": "2",
+      "category": "HASH",
+      "front": "Detect a duplicate in a list using a set.",
+      "frontStyle": "scenario",
+      "techniqueName": "Duplicate detection with a set",
+      "techniqueGist": "Walk through. Add each item to a set. If it's already there, you've found a duplicate.",
+      "skeleton": "seen = set()\nfor x in arr:\n    if x in seen:\n        return True\n    seen.add(x)\nreturn False",
+      "composes": ["T1-DS-005", "T1-DS-006", "T1-LOOP-001"]
+    },
+    {
+      "id": "T2-HASH-003",
+      "tier": "2",
+      "category": "HASH",
+      "front": "Group items by some shared key.",
+      "frontStyle": "scenario",
+      "techniqueName": "Dictionary of lists (grouping)",
+      "techniqueGist": "Pick a key that captures what makes items 'go together.' Use a dict where each key maps to a list. Append each item to its group.",
+      "skeleton": "from collections import defaultdict\ngroups = defaultdict(list)\nfor x in arr:\n    key = canonical_form(x)\n    groups[key].append(x)\nreturn list(groups.values())",
+      "insight": "For anagrams, the canonical form is the sorted string: `\"\".join(sorted(s))`. For 'numbers with the same set of digits,' it's the sorted digits. The key is the *signature* of the group.",
+      "composes": ["T1-DS-001", "T1-LOOP-001"]
+    },
+    {
+      "id": "T2-HASH-004",
+      "tier": "2",
+      "category": "HASH",
+      "front": "Compare two collections by their character counts.",
+      "frontStyle": "scenario",
+      "techniqueName": "Frequency map comparison",
+      "techniqueGist": "Build a count of each character (or item) in both. Compare the counts. If they match, the collections have the same multiset of items.",
+      "skeleton": "from collections import Counter\nreturn Counter(s) == Counter(t)",
+      "insight": "This is the standard way to check anagrams. For very long strings or limited alphabets, a fixed-size array of counts is faster than a dict.",
+      "composes": ["T1-DS-007"]
+    },
+
+    {
+      "id": "T2-PTR-001",
+      "tier": "2",
+      "category": "PTR",
+      "front": "Two markers at each end, moving toward each other based on what they find.",
+      "frontStyle": "scenario",
+      "techniqueName": "Converging two pointers (sorted)",
+      "techniqueGist": "Start at the ends. If their pair is too small, move the left marker right. If too big, move the right marker left. Stop when they meet.",
+      "skeleton": "left, right = 0, len(arr) - 1\nwhile left < right:\n    s = arr[left] + arr[right]\n    if s == target:\n        return [left, right]\n    elif s < target:\n        left += 1\n    else:\n        right -= 1",
+      "insight": "Only works if the array is sorted — the comparison tells you which side to move.",
+      "composes": ["T1-PTR-001"]
+    },
+    {
+      "id": "T2-PTR-002",
+      "tier": "2",
+      "category": "PTR",
+      "front": "Walk from both ends checking a property as you go.",
+      "frontStyle": "scenario",
+      "techniqueName": "Converging pointers verifying a property",
+      "techniqueGist": "Same converge-from-both-ends shape, but instead of summing, you compare. Used for palindromes and 'is it symmetric?' problems.",
+      "skeleton": "left, right = 0, len(s) - 1\nwhile left < right:\n    if s[left] != s[right]:\n        return False\n    left += 1\n    right -= 1\nreturn True",
+      "composes": ["T1-PTR-001"]
+    },
+
+    {
+      "id": "T2-WIN-001",
+      "tier": "2",
+      "category": "WIN",
+      "front": "A window over a list that grows on the right and shrinks on the left when something breaks.",
+      "frontStyle": "scenario",
+      "techniqueName": "Sliding window (variable size)",
+      "techniqueGist": "Push the right edge forward. If a rule breaks, pull the left edge in until the rule holds again. Track the best size as you go.",
+      "skeleton": "window = set()\nleft = 0\nbest = 0\nfor right in range(len(s)):\n    while s[right] in window:\n        window.remove(s[left])\n        left += 1\n    window.add(s[right])\n    best = max(best, right - left + 1)",
+      "insight": "By the end of each step, the window is valid again. Window size is `right - left + 1`.",
+      "composes": ["T1-DS-005", "T1-DS-006", "T1-PTR-002"]
+    },
+    {
+      "id": "T2-WIN-002",
+      "tier": "2",
+      "category": "WIN",
+      "front": "Single pass tracking the best result so far against a running minimum.",
+      "frontStyle": "scenario",
+      "techniqueName": "Sweep with running min and best",
+      "techniqueGist": "Walk forward. Track the smallest value seen so far. At each step, ask: 'if I sold today, what would my profit be?' Track the best answer.",
+      "skeleton": "min_so_far = prices[0]\nbest = 0\nfor price in prices:\n    if price < min_so_far:\n        min_so_far = price\n    else:\n        best = max(best, price - min_so_far)",
+      "insight": "Lighter than full sliding window — just two variables that update as you sweep. Good for problems framed as 'find the best decision over time.'",
+      "composes": ["T1-LOOP-001", "T1-MATH-001"]
+    },
+    {
+      "id": "T2-WIN-003",
+      "tier": "2",
+      "category": "WIN",
+      "front": "Sliding window where you need to satisfy a multi-character requirement.",
+      "frontStyle": "scenario",
+      "techniqueName": "Sliding window with frequency requirement",
+      "techniqueGist": "Track how many required characters are still 'missing.' Expand right, decreasing the missing count when you cover a new requirement. Once nothing is missing, shrink from the left while still valid, recording the best window. Re-add the requirement when shrinking past it.",
+      "skeleton": "from collections import Counter\nneed = Counter(t)\nmissing = len(t)\nleft = 0\nresult = (0, float('inf'))\n\nfor right, ch in enumerate(s):\n    if need[ch] > 0:\n        missing -= 1\n    need[ch] -= 1\n\n    while missing == 0:\n        if right - left < result[1] - result[0]:\n            result = (left, right)\n        need[s[left]] += 1\n        if need[s[left]] > 0:\n            missing += 1\n        left += 1\n\nreturn s[result[0]:result[1]+1] if result[1] != float('inf') else \"\"",
+      "insight": "The trick: `need[ch]` can go negative, meaning 'we have more of this char than required.' Only when it goes back above 0 (during shrinking) does the requirement re-activate.",
+      "composes": ["T1-DS-007", "T1-PTR-002"]
+    },
+
+    {
+      "id": "T2-MRG-001",
+      "tier": "2",
+      "category": "MRG",
+      "front": "Merge two sorted lists into one sorted list.",
+      "frontStyle": "scenario",
+      "techniqueName": "Two-pointer merge",
+      "techniqueGist": "One pointer in each input. At each step, take the smaller front item and advance that pointer. When one input is exhausted, copy the rest of the other.",
+      "skeleton": "result = []\ni = j = 0\nwhile i < len(a) and j < len(b):\n    if a[i] <= b[j]:\n        result.append(a[i])\n        i += 1\n    else:\n        result.append(b[j])\n        j += 1\nresult.extend(a[i:])\nresult.extend(b[j:])\nreturn result",
+      "insight": "This is the merge step of mergesort. The same shape works for merging linked lists, merging sorted streams, and many other problems.",
+      "composes": ["T1-PTR-002"]
+    },
+
+    {
+      "id": "T2-STR-001",
+      "tier": "2",
+      "category": "STR",
+      "front": "Walk a string and count something about each character.",
+      "frontStyle": "scenario",
+      "techniqueName": "Character pass",
+      "techniqueGist": "Loop through the string once. For each character, update whatever you're tracking — a counter, a flag, a running result.",
+      "skeleton": "count = 0\nfor ch in s:\n    if ch == target:\n        count += 1",
+      "composes": ["T1-LOOP-001"]
+    },
+    {
+      "id": "T2-REV-001",
+      "tier": "2",
+      "category": "STR",
+      "front": "Reverse a list (or string) in place.",
+      "frontStyle": "scenario",
+      "techniqueName": "In-place reversal with two pointers",
+      "techniqueGist": "One marker at the start, one at the end. Swap them, move both inward. Stop when they meet.",
+      "skeleton": "left, right = 0, len(arr) - 1\nwhile left < right:\n    arr[left], arr[right] = arr[right], arr[left]\n    left += 1\n    right -= 1",
+      "insight": "Strings are immutable in Python — to reverse one, convert to a list first, or use the slice trick `s[::-1]`.",
+      "composes": ["T1-PTR-001", "T1-ARR-008"]
+    },
+
+    {
+      "id": "T2-STK-001",
+      "tier": "2",
+      "category": "STK",
+      "front": "Match opening and closing pairs (parentheses, brackets, tags).",
+      "frontStyle": "scenario",
+      "techniqueName": "Push opens, pop on close, mismatch fails",
+      "techniqueGist": "Walk through. When you see an open, push it on a stack. When you see a close, pop and check it matches. If anything's left on the stack at the end, you have unclosed opens.",
+      "skeleton": "pairs = {')': '(', ']': '[', '}': '{'}\nstack = []\nfor ch in s:\n    if ch in '([{':\n        stack.append(ch)\n    else:\n        if not stack or stack.pop() != pairs[ch]:\n            return False\nreturn len(stack) == 0",
+      "composes": ["T1-STK-001", "T1-LOOP-001"]
+    },
+    {
+      "id": "T2-STK-002",
+      "tier": "2",
+      "category": "STK",
+      "front": "For each item, find the next greater (or smaller) item to its right.",
+      "frontStyle": "scenario",
+      "techniqueName": "Monotonic stack",
+      "techniqueGist": "Walk through. Keep a stack of items waiting for an answer. When you find an item bigger than the top of the stack, that item is the answer for everyone smaller — pop them, recording the answer. Push the current item.",
+      "skeleton": "result = [0] * len(arr)\nstack = []   # stack of indices waiting for their answer\n\nfor i, x in enumerate(arr):\n    while stack and arr[stack[-1]] < x:\n        prev = stack.pop()\n        result[prev] = i - prev   # or whatever the answer is\n    stack.append(i)\n\nreturn result",
+      "insight": "*Decreasing* stack finds the next greater element. *Increasing* stack finds the next smaller element. Each item is pushed and popped at most once, so the whole thing is O(n) despite the inner while loop.",
+      "composes": ["T1-STK-001", "T1-LOOP-002"]
+    },
+
+    {
+      "id": "T2-LL-001",
+      "tier": "2",
+      "category": "LL",
+      "front": "Reverse a linked list with three pointers.",
+      "frontStyle": "scenario",
+      "techniqueName": "Three-pointer reversal",
+      "techniqueGist": "Walk through with `prev`, `current`, and `next_node`. At each step: save the next node, flip the current node's pointer to point backward, then move both prev and current forward.",
+      "skeleton": "prev = None\ncurrent = head\nwhile current is not None:\n    next_node = current.next   # save where we were going\n    current.next = prev        # flip the arrow\n    prev = current             # advance prev\n    current = next_node        # advance current\nreturn prev   # prev is the new head",
+      "insight": "Without saving `next_node` first, you'd lose the rest of the list when you flipped the arrow.",
+      "composes": ["T1-LL-001"]
+    },
+    {
+      "id": "T2-LL-002",
+      "tier": "2",
+      "category": "LL",
+      "front": "Build a new linked list one node at a time.",
+      "frontStyle": "scenario",
+      "techniqueName": "Dummy node + tail pointer",
+      "techniqueGist": "Start with a dummy node before the real head. Keep a `tail` pointer at the end. To add a node, attach it to `tail.next` and advance `tail`. Return `dummy.next`.",
+      "skeleton": "dummy = ListNode(0)\ntail = dummy\n\nwhile work_to_do:\n    tail.next = ListNode(value)\n    tail = tail.next\n\nreturn dummy.next",
+      "insight": "Eliminates the special-case-for-the-first-node code. Used in: merge two sorted lists, list construction, partition list, etc.",
+      "composes": ["T1-LL-002"]
+    },
+    {
+      "id": "T2-LL-003",
+      "tier": "2",
+      "category": "LL",
+      "front": "Two pointers moving at different speeds through a linked list.",
+      "frontStyle": "scenario",
+      "techniqueName": "Fast and slow pointers (Floyd's)",
+      "techniqueGist": "Slow pointer moves one step per iteration. Fast pointer moves two. If there's a cycle, fast eventually laps slow and they meet. If there's no cycle, fast hits the end first.",
+      "skeleton": "slow = fast = head\nwhile fast is not None and fast.next is not None:\n    slow = slow.next\n    fast = fast.next.next\n    if slow == fast:\n        return True   # cycle detected\nreturn False",
+      "insight": "The same setup also finds the *middle* of a list (when fast hits the end, slow is at the middle) and is the basis for many linked-list algorithms.",
+      "composes": ["T1-LL-001"]
+    },
+
+    {
+      "id": "T2-TREE-001",
+      "tier": "2",
+      "category": "TREE",
+      "front": "Visit every node of a tree using recursion.",
+      "frontStyle": "scenario",
+      "techniqueName": "Recursive tree traversal",
+      "techniqueGist": "Define a function that takes a node. If the node is None, return. Otherwise, do something with the node, then recurse on its left child, then on its right child.",
+      "skeleton": "def visit(node):\n    if node is None:\n        return\n    # work with node.val (pre-order)\n    visit(node.left)\n    # work with node.val (in-order)\n    visit(node.right)\n    # work with node.val (post-order)",
+      "insight": "Where you put the 'work' line determines the order: before recursing = pre-order, between left and right = in-order, after = post-order.",
+      "composes": ["T0-TREE-002", "T1-TREE-001"]
+    },
+    {
+      "id": "T2-TREE-002",
+      "tier": "2",
+      "category": "TREE",
+      "front": "Compute something at each node by combining its children's values.",
+      "frontStyle": "scenario",
+      "techniqueName": "Recursive aggregation",
+      "techniqueGist": "Recurse into left and right. Each returns its subtree's answer. Combine those with the current node's value to produce this node's answer. The base case (None) returns the empty answer.",
+      "skeleton": "def depth(node):\n    if node is None:\n        return 0\n    left = depth(node.left)\n    right = depth(node.right)\n    return 1 + max(left, right)",
+      "insight": "The pattern works for any 'compute X about a tree' question — sum, depth, count, max path. The key is identifying what the empty-tree answer is, and how to combine two subtree answers.",
+      "composes": ["T2-TREE-001"]
+    },
+
+    {
+      "id": "T2-BFS-001",
+      "tier": "2",
+      "category": "BFS",
+      "front": "Visit nodes level by level, starting from a root.",
+      "frontStyle": "scenario",
+      "techniqueName": "BFS with a queue",
+      "techniqueGist": "Use a queue. Start by enqueuing the root. While the queue isn't empty, dequeue a node, process it, and enqueue its neighbors (or children).",
+      "skeleton": "from collections import deque\nq = deque([root])\nvisited = {root}\n\nwhile q:\n    node = q.popleft()\n    # process node\n    for neighbor in node.neighbors:\n        if neighbor not in visited:\n            visited.add(neighbor)\n            q.append(neighbor)",
+      "insight": "For trees, you don't need `visited` — there are no cycles. For graphs (including grids), you must track visited or you'll loop forever.",
+      "composes": ["T1-Q-001", "T1-Q-002", "T1-DS-005", "T1-DS-006"]
+    },
+    {
+      "id": "T2-BFS-002",
+      "tier": "2",
+      "category": "BFS",
+      "front": "BFS but you need to know which level each node is on.",
+      "frontStyle": "scenario",
+      "techniqueName": "Level-by-level BFS",
+      "techniqueGist": "Same as BFS, but at the start of each iteration, snapshot the queue's current size — that's how many nodes are on the current level. Process exactly that many before moving on.",
+      "skeleton": "from collections import deque\nq = deque([root])\nresult = []\n\nwhile q:\n    level = []\n    for _ in range(len(q)):    # number of nodes at this level\n        node = q.popleft()\n        level.append(node.val)\n        if node.left:\n            q.append(node.left)\n        if node.right:\n            q.append(node.right)\n    result.append(level)\n\nreturn result",
+      "composes": ["T2-BFS-001"]
+    },
+
+    {
+      "id": "T2-DFS-001",
+      "tier": "2",
+      "category": "DFS",
+      "front": "Explore a graph by going as deep as possible before backing up.",
+      "frontStyle": "scenario",
+      "techniqueName": "DFS (recursive)",
+      "techniqueGist": "Visit a node. Mark it as visited. For each neighbor, if not visited, recurse on it.",
+      "skeleton": "visited = set()\n\ndef dfs(node):\n    if node in visited:\n        return\n    visited.add(node)\n    # process node\n    for neighbor in graph[node]:\n        dfs(neighbor)",
+      "insight": "On grids, 'neighbors' means the four (or eight) adjacent cells. The visited check is what prevents infinite loops on cyclic graphs.",
+      "composes": ["T0-GRPH-002", "T1-DS-005", "T1-DS-006"]
+    },
+
+    {
+      "id": "T2-BS-001",
+      "tier": "2",
+      "category": "BS",
+      "front": "Find a target in a sorted list by halving the search range each step.",
+      "frontStyle": "scenario",
+      "techniqueName": "Binary search",
+      "techniqueGist": "Look at the middle. If it's the target, done. If the target is smaller, search the left half. If larger, search the right half. Halve the range each step until you find it or the range is empty.",
+      "skeleton": "low, high = 0, len(arr) - 1\nwhile low <= high:\n    mid = low + (high - low) // 2\n    if arr[mid] == target:\n        return mid\n    elif arr[mid] < target:\n        low = mid + 1\n    else:\n        high = mid - 1\nreturn -1",
+      "insight": "Two main forms exist: `low <= high` with `high = mid - 1` (canonical), or `low < high` with `high = mid` (used for 'find leftmost'). Pick one and stick with it until it's automatic.",
+      "composes": ["T1-BS-001"]
+    },
+
+    {
+      "id": "T2-BT-001",
+      "tier": "2",
+      "category": "BT",
+      "front": "Generate all combinations / subsets / arrangements by trying each choice and undoing it.",
+      "frontStyle": "scenario",
+      "techniqueName": "Backtracking scaffold",
+      "techniqueGist": "At each step, try each possible choice. Add the choice to your current path, recurse, then *remove* the choice (backtrack) before trying the next one. Save the current path when you reach a complete solution.",
+      "skeleton": "def backtrack(path, remaining):\n    if is_complete(path):\n        result.append(path[:])   # copy! path will keep changing\n        return\n    for choice in remaining:\n        path.append(choice)\n        backtrack(path, remaining - {choice})\n        path.pop()              # undo the choice",
+      "insight": "Backtracking is DFS with state-rewinding. The key is that you `append`, recurse, then `pop` — leaving the path the same as it was before this call.",
+      "gotcha": "When saving the path to results, copy it (`path[:]` or `list(path)`). Otherwise every saved entry points to the same path that keeps changing.",
+      "composes": ["T0-REC-001", "T0-REC-002"]
+    },
+
+    {
+      "$comment": "===== TIER 3 — TECHNIQUES (problem recognition cards) ====="
+    },
+
+    {
+      "id": "T3-LIN-001",
+      "tier": "3",
+      "category": "LIN",
+      "front": "Find a specific value (or its position) in an unsorted list.",
+      "frontStyle": "scenario",
+      "techniqueName": "Linear search",
+      "techniqueGist": "If the list isn't sorted, walking through it once is the most you can do — no shortcut exists. Return as soon as you find the match.",
+      "skeletonRef": "T2-LIN-001",
+      "hints": [
+        "If the list IS sorted, binary search beats linear search (O(log n) vs. O(n))",
+        "If you'll search the same list many times, build a hash map once and look up in O(1) after"
+      ],
+      "siblings": ["T3-BS-001", "T3-HASH-002"],
+      "problems": [
+        {"name": "Find the Index of the First Occurrence", "lc": 28, "slug": "find-the-index-of-the-first-occurrence-in-a-string"}
+      ]
+    },
+    {
+      "id": "T3-HASH-001",
+      "tier": "3",
+      "category": "HASH",
+      "front": "Given an unsorted list of numbers, find two that add up to a target.",
+      "frontStyle": "scenario",
+      "techniqueName": "Hash map complement lookup",
+      "techniqueGist": "As you go through the list, ask: 'have I already seen what I'd need to pair with this?' A lookup table answers that in one step.",
+      "skeletonRef": "T2-HASH-001",
+      "hints": [
+        "If the list IS sorted, converging two pointers is simpler and uses no extra space",
+        "For three numbers summing to a target: sort first, then for each item turn the rest into a two-number search",
+        "If you need ALL pairs (allowing duplicates), sort and use two pointers"
+      ],
+      "siblings": ["T3-PTR-001"],
+      "problems": [
+        {"name": "Two Sum", "lc": 1, "slug": "two-sum"},
+        {"name": "3Sum", "lc": 15, "slug": "3sum"}
+      ]
+    },
+    {
+      "id": "T3-HASH-002",
+      "tier": "3",
+      "category": "HASH",
+      "front": "Quickly tell whether something has appeared before, or how often.",
+      "frontStyle": "scenario",
+      "techniqueName": "Hash map for membership or counting",
+      "techniqueGist": "Walk through once. A set answers 'have I seen this?' A counter answers 'how many times?' Both are one-step lookups.",
+      "skeletonRef": "T2-HASH-002",
+      "hints": [
+        "Just need yes/no? A set is enough — lighter than a counter",
+        "Two strings being anagrams is just 'do their counters match?'",
+        "Watch for problems that ask about 'first unique' or 'majority element' — both are counter problems in disguise"
+      ],
+      "siblings": ["T3-HASH-001", "T3-HASH-003"],
+      "problems": [
+        {"name": "Contains Duplicate", "lc": 217, "slug": "contains-duplicate"},
+        {"name": "Valid Anagram", "lc": 242, "slug": "valid-anagram"},
+        {"name": "First Unique Character in a String", "lc": 387, "slug": "first-unique-character-in-a-string"}
+      ]
+    },
+    {
+      "id": "T3-HASH-003",
+      "tier": "3",
+      "category": "HASH",
+      "front": "Group items together by some shared property.",
+      "frontStyle": "scenario",
+      "techniqueName": "Group-by-canonical-key",
+      "techniqueGist": "Find the *signature* that items in a group share — sorted characters for anagrams, sorted digits for digit-permutations, the prime-factor signature for shared factors. Use that as a dict key, append items to the matching list.",
+      "skeletonRef": "T2-HASH-003",
+      "hints": [
+        "The hardest part is identifying the right signature — sort-based, hash-based, or feature-based",
+        "If the signature is expensive, cache it",
+        "For anagrams specifically, sorted-string is canonical and easy"
+      ],
+      "siblings": ["T3-HASH-002"],
+      "problems": [
+        {"name": "Group Anagrams", "lc": 49, "slug": "group-anagrams"}
+      ]
+    },
+
+    {
+      "id": "T3-PTR-001",
+      "tier": "3",
+      "category": "PTR",
+      "front": "Given a sorted list, find two items that fit a target relationship.",
+      "frontStyle": "scenario",
+      "techniqueName": "Converging two pointers",
+      "techniqueGist": "Start with one marker at each end. The comparison between their pair and the target tells you which side to move. They meet in the middle.",
+      "skeletonRef": "T2-PTR-001",
+      "hints": [
+        "Only works on sorted data — the move direction depends on knowing which side is too small",
+        "If unsorted and you need original positions, use a hash map instead",
+        "For 'biggest area' / 'most water' problems, always move the shorter side — the limit is the smaller wall, so moving the taller side cannot help"
+      ],
+      "siblings": ["T3-HASH-001", "T3-PTR-002"],
+      "problems": [
+        {"name": "Two Sum II (Sorted)", "lc": 167, "slug": "two-sum-ii-input-array-is-sorted"},
+        {"name": "3Sum", "lc": 15, "slug": "3sum"},
+        {"name": "Container With Most Water", "lc": 11, "slug": "container-with-most-water"}
+      ]
+    },
+    {
+      "id": "T3-PTR-002",
+      "tier": "3",
+      "category": "PTR",
+      "front": "Check whether something reads the same forward and backward, or symmetrically.",
+      "frontStyle": "scenario",
+      "techniqueName": "Converging pointers checking a property",
+      "techniqueGist": "Same converge-from-both-ends shape. Compare what's at each end. If they don't match, the answer is no. If they match, move inward and continue.",
+      "skeletonRef": "T2-PTR-002",
+      "hints": [
+        "For palindromes with non-letter characters, skip them when advancing the pointers",
+        "For case-insensitive checks, lowercase as you go"
+      ],
+      "siblings": ["T3-PTR-001"],
+      "problems": [
+        {"name": "Valid Palindrome", "lc": 125, "slug": "valid-palindrome"}
+      ]
+    },
+
+    {
+      "id": "T3-WIN-001",
+      "tier": "3",
+      "category": "WIN",
+      "front": "Find the longest (or shortest) stretch of consecutive items that follows some rule.",
+      "frontStyle": "scenario",
+      "techniqueName": "Sliding window",
+      "techniqueGist": "Imagine a window over the data. Push the right edge forward. When the rule breaks, pull the left edge in until it holds again.",
+      "skeletonRef": "T2-WIN-001",
+      "hints": [
+        "Watch the wording: 'subarray' / 'substring' means consecutive. 'Subsequence' does NOT — sliding window won't work",
+        "If the rule is 'exactly K of something,' compute (at-most-K) minus (at-most-K-1)",
+        "If you need to know what's IN the window (not just whether it's valid), use a counter, not a set"
+      ],
+      "siblings": ["T3-WIN-002"],
+      "problems": [
+        {"name": "Longest Substring Without Repeating Characters", "lc": 3, "slug": "longest-substring-without-repeating-characters"},
+        {"name": "Minimum Window Substring", "lc": 76, "slug": "minimum-window-substring"},
+        {"name": "Longest Repeating Character Replacement", "lc": 424, "slug": "longest-repeating-character-replacement"}
+      ]
+    },
+    {
+      "id": "T3-WIN-002",
+      "tier": "3",
+      "category": "WIN",
+      "front": "Single sweep tracking the best decision-against-history.",
+      "frontStyle": "scenario",
+      "techniqueName": "Sweep with running min/max and best",
+      "techniqueGist": "Walk forward in time. Keep a running summary of the past (cheapest seen, smallest seen). At each step, ask 'if I acted now, what would the result be?' and update the best answer.",
+      "skeletonRef": "T2-WIN-002",
+      "hints": [
+        "Lighter than a real sliding window — just two variables, no shrinking",
+        "Stock-buying problems are the canonical example",
+        "If the problem allows multiple transactions, the structure changes — that's a DP problem"
+      ],
+      "siblings": ["T3-WIN-001"],
+      "problems": [
+        {"name": "Best Time to Buy and Sell Stock", "lc": 121, "slug": "best-time-to-buy-and-sell-stock"},
+        {"name": "Maximum Subarray", "lc": 53, "slug": "maximum-subarray"}
+      ]
+    },
+
+    {
+      "id": "T3-STK-001",
+      "tier": "3",
+      "category": "STK",
+      "front": "Match opening and closing pairs (parentheses, brackets, tags, undo/redo).",
+      "frontStyle": "scenario",
+      "techniqueName": "Stack for matched pairs",
+      "techniqueGist": "Push every open. On every close, pop and compare. Mismatch → invalid. Stuff left at the end → unclosed opens.",
+      "skeletonRef": "T2-STK-001",
+      "hints": [
+        "Useful beyond brackets: HTML tags, BBCode, undo history",
+        "Empty stack on a close is also a fail (close with no preceding open)"
+      ],
+      "siblings": ["T3-STK-002"],
+      "problems": [
+        {"name": "Valid Parentheses", "lc": 20, "slug": "valid-parentheses"}
+      ]
+    },
+    {
+      "id": "T3-STK-002",
+      "tier": "3",
+      "category": "STK",
+      "front": "For each item, find the next greater (or smaller) thing somewhere ahead.",
+      "frontStyle": "scenario",
+      "techniqueName": "Monotonic stack",
+      "techniqueGist": "Walk through. Maintain a stack of items still waiting for their answer. When a new item resolves their wait, pop them and record the answer.",
+      "skeletonRef": "T2-STK-002",
+      "hints": [
+        "Decreasing stack → next greater. Increasing stack → next smaller",
+        "Each item pushed and popped at most once → O(n) overall, despite the inner while",
+        "Common in: temperatures, stock-span, trapping rain water (one of several solutions)"
+      ],
+      "siblings": ["T3-STK-001"],
+      "problems": [
+        {"name": "Daily Temperatures", "lc": 739, "slug": "daily-temperatures"},
+        {"name": "Next Greater Element I", "lc": 496, "slug": "next-greater-element-i"}
+      ]
+    },
+
+    {
+      "id": "T3-LL-001",
+      "tier": "3",
+      "category": "LL",
+      "front": "Reverse a linked list (or part of one).",
+      "frontStyle": "scenario",
+      "techniqueName": "Three-pointer reversal",
+      "techniqueGist": "Walk through with prev/current/next. At each step: save next, flip current's pointer to prev, move both forward.",
+      "skeletonRef": "T2-LL-001",
+      "hints": [
+        "Initialize `prev` to `None` (the new tail's `next`)",
+        "After the loop, `prev` is the new head",
+        "For partial reversals, isolate the section first, reverse it, then reattach"
+      ],
+      "siblings": ["T3-LL-002", "T3-LL-003"],
+      "problems": [
+        {"name": "Reverse Linked List", "lc": 206, "slug": "reverse-linked-list"}
+      ]
+    },
+    {
+      "id": "T3-LL-002",
+      "tier": "3",
+      "category": "LL",
+      "front": "Build a new linked list piece by piece.",
+      "frontStyle": "scenario",
+      "techniqueName": "Dummy node + tail pointer",
+      "techniqueGist": "Start with a fake head. Keep a tail pointer at the end. Append nodes by attaching to `tail.next` and advancing tail. Return `dummy.next`.",
+      "skeletonRef": "T2-LL-002",
+      "hints": [
+        "Eliminates the 'first node is special' edge case",
+        "The pattern works for any 'construct a linked list' problem: merge sorted lists, partition, etc."
+      ],
+      "siblings": ["T3-LL-001"],
+      "problems": [
+        {"name": "Merge Two Sorted Lists", "lc": 21, "slug": "merge-two-sorted-lists"}
+      ]
+    },
+    {
+      "id": "T3-LL-003",
+      "tier": "3",
+      "category": "LL",
+      "front": "Detect a cycle, find the middle, or find the kth-from-end without two passes.",
+      "frontStyle": "scenario",
+      "techniqueName": "Fast and slow pointers",
+      "techniqueGist": "Two pointers move at different speeds (typically slow=1, fast=2). When fast hits the end, slow is at the midpoint. If there's a cycle, fast laps slow and they meet.",
+      "skeletonRef": "T2-LL-003",
+      "hints": [
+        "For middle: stop when `fast` or `fast.next` is None",
+        "For cycle detection: meeting point means cycle exists",
+        "For cycle entrance (the harder version): after meeting, reset one pointer to head, advance both at speed 1"
+      ],
+      "siblings": ["T3-LL-001", "T3-LL-002"],
+      "problems": [
+        {"name": "Linked List Cycle", "lc": 141, "slug": "linked-list-cycle"},
+        {"name": "Middle of the Linked List", "lc": 876, "slug": "middle-of-the-linked-list"}
+      ]
+    },
+
+    {
+      "id": "T3-TREE-001",
+      "tier": "3",
+      "category": "TREE",
+      "front": "Walk every node of a tree to do something with each.",
+      "frontStyle": "scenario",
+      "techniqueName": "Recursive tree traversal",
+      "techniqueGist": "Define a function that takes a node. Base case: node is None, return. Otherwise: do something with the node, recurse on left, recurse on right.",
+      "skeletonRef": "T2-TREE-001",
+      "hints": [
+        "The position of the 'work' line determines pre/in/post-order",
+        "For BST in-order traversal: visits values in sorted order",
+        "Iterative version uses an explicit stack"
+      ],
+      "siblings": ["T3-TREE-002", "T3-TREE-003"],
+      "problems": [
+        {"name": "Invert Binary Tree", "lc": 226, "slug": "invert-binary-tree"},
+        {"name": "Binary Tree Inorder Traversal", "lc": 94, "slug": "binary-tree-inorder-traversal"}
+      ]
+    },
+    {
+      "id": "T3-TREE-002",
+      "tier": "3",
+      "category": "TREE",
+      "front": "Compute something about a tree by combining results from its subtrees.",
+      "frontStyle": "scenario",
+      "techniqueName": "Recursive aggregation",
+      "techniqueGist": "Recurse left and right. Each call returns its subtree's answer. Combine those with this node's value to produce this node's answer.",
+      "skeletonRef": "T2-TREE-002",
+      "hints": [
+        "Identify the empty-tree answer first (0 for size, -infinity for max, True for 'all match')",
+        "Common pattern: 'return both an answer and a contribution-to-parent' — diameter, max-path-sum",
+        "Watch for 'is balanced' — early-exit with a sentinel value can help"
+      ],
+      "siblings": ["T3-TREE-001"],
+      "problems": [
+        {"name": "Maximum Depth of Binary Tree", "lc": 104, "slug": "maximum-depth-of-binary-tree"},
+        {"name": "Same Tree", "lc": 100, "slug": "same-tree"},
+        {"name": "Balanced Binary Tree", "lc": 110, "slug": "balanced-binary-tree"}
+      ]
+    },
+    {
+      "id": "T3-TREE-003",
+      "tier": "3",
+      "category": "TREE",
+      "front": "Visit a tree level by level (top to bottom).",
+      "frontStyle": "scenario",
+      "techniqueName": "BFS on a tree (level order)",
+      "techniqueGist": "Use a queue starting with the root. Process the queue one *level* at a time by snapshotting the size at the start of each iteration.",
+      "skeletonRef": "T2-BFS-002",
+      "hints": [
+        "If you don't need to know which level is which, you can skip the level snapshot",
+        "Variations: zigzag (reverse every other level), right-side view (last node of each level)"
+      ],
+      "siblings": ["T3-TREE-001"],
+      "problems": [
+        {"name": "Binary Tree Level Order Traversal", "lc": 102, "slug": "binary-tree-level-order-traversal"}
+      ]
+    },
+
+    {
+      "id": "T3-GRPH-001",
+      "tier": "3",
+      "category": "GRPH",
+      "front": "Find connected regions in a graph or grid.",
+      "frontStyle": "scenario",
+      "techniqueName": "Flood fill / connected components",
+      "techniqueGist": "Walk every starting position. If unvisited, run a DFS or BFS from there to mark the entire connected region. Each new starting position that triggers an exploration is a new component.",
+      "skeletonRef": "T2-DFS-001",
+      "hints": [
+        "On grids, neighbors are the four (or eight) adjacent cells — see the four-direction array",
+        "BFS or DFS both work; DFS is shorter to write recursively",
+        "For 'fill a region with a new color,' modifying the grid in place IS the visited check"
+      ],
+      "siblings": ["T3-GRPH-002"],
+      "problems": [
+        {"name": "Number of Islands", "lc": 200, "slug": "number-of-islands"},
+        {"name": "Flood Fill", "lc": 733, "slug": "flood-fill"}
+      ]
+    },
+    {
+      "id": "T3-GRPH-002",
+      "tier": "3",
+      "category": "GRPH",
+      "front": "Find the shortest path in an unweighted graph.",
+      "frontStyle": "scenario",
+      "techniqueName": "BFS for shortest path",
+      "techniqueGist": "BFS explores in order of distance from the source. The first time you reach a node is by the shortest path.",
+      "skeletonRef": "T2-BFS-001",
+      "hints": [
+        "Only works for *unweighted* graphs (or all-equal weights). For weighted, use Dijkstra",
+        "Track distance by saving (node, distance) tuples in the queue, or by processing level-by-level",
+        "Bidirectional BFS (from both ends) can be faster but harder to write"
+      ],
+      "siblings": ["T3-GRPH-001"],
+      "problems": [
+        {"name": "Word Ladder", "lc": 127, "slug": "word-ladder"},
+        {"name": "Rotting Oranges", "lc": 994, "slug": "rotting-oranges"}
+      ]
+    },
+
+    {
+      "id": "T3-BS-001",
+      "tier": "3",
+      "category": "BS",
+      "front": "Find a target in a sorted list (or find a position satisfying a monotonic condition).",
+      "frontStyle": "scenario",
+      "techniqueName": "Binary search",
+      "techniqueGist": "Halve the search range each step using the comparison at the midpoint.",
+      "skeletonRef": "T2-BS-001",
+      "hints": [
+        "Pick one form (`low <= high` or `low < high`) and use it consistently — mixing causes off-by-ones",
+        "For 'leftmost' / 'rightmost' occurrences, the boundary form (`low < high`) is cleaner",
+        "Binary search isn't only for sorted arrays — it works on any *monotonic* property: 'is X feasible?' as X increases is often a binary search"
+      ],
+      "siblings": ["T3-LIN-001"],
+      "problems": [
+        {"name": "Binary Search", "lc": 704, "slug": "binary-search"},
+        {"name": "Search Insert Position", "lc": 35, "slug": "search-insert-position"}
+      ]
+    },
+
+    {
+      "id": "T3-BT-001",
+      "tier": "3",
+      "category": "BT",
+      "front": "Generate every subset / combination / permutation / arrangement.",
+      "frontStyle": "scenario",
+      "techniqueName": "Backtracking",
+      "techniqueGist": "Build solutions one choice at a time. After each choice, recurse. Then *undo* the choice and try the next one. Save the path when complete.",
+      "skeletonRef": "T2-BT-001",
+      "hints": [
+        "Always copy the path when saving (`path[:]`) — the same path object will keep mutating",
+        "For permutations, track which items are used. For subsets, track the next index to consider",
+        "Pruning early (don't recurse if the partial answer can't reach a valid one) is the main optimization"
+      ],
+      "siblings": [],
+      "problems": [
+        {"name": "Subsets", "lc": 78, "slug": "subsets"},
+        {"name": "Permutations", "lc": 46, "slug": "permutations"},
+        {"name": "Combination Sum", "lc": 39, "slug": "combination-sum"}
+      ]
+    },
+
+    {
+      "id": "T3-MRG-001",
+      "tier": "3",
+      "category": "MRG",
+      "front": "Combine multiple sorted things into one sorted output.",
+      "frontStyle": "scenario",
+      "techniqueName": "Two-pointer merge (or k-way merge with a heap)",
+      "techniqueGist": "For two sources: maintain a pointer in each, take the smaller front item, advance. For more than two: a min-heap of (current_value, source_index) lets you always grab the global smallest.",
+      "skeletonRef": "T2-MRG-001",
+      "hints": [
+        "For two: simple two-pointer merge",
+        "For k > 2: heap-based k-way merge in O(N log k) where N is total items",
+        "When sources are linked lists, the merge produces a new linked list — combine with the dummy-node pattern"
+      ],
+      "siblings": ["T3-LL-002"],
+      "problems": [
+        {"name": "Merge Two Sorted Lists", "lc": 21, "slug": "merge-two-sorted-lists"},
+        {"name": "Merge K Sorted Lists", "lc": 23, "slug": "merge-k-sorted-lists"}
+      ]
+    }
+
+  ]
+}

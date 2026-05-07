@@ -4,7 +4,12 @@
 
 <section class="hero-section relative min-h-screen overflow-hidden">
   <div class="parallax-container absolute inset-0">
-    <div class="parallax-bg"></div>
+    <div class="parallax-clip">
+      <div class="parallax-bg"></div>
+    </div>
+    <div class="parallax-clip-bottom">
+      <div class="parallax-bg-bottom"></div>
+    </div>
   </div>
 
   <div class="relative hero-spacer" style="z-index: 3;">
@@ -56,21 +61,45 @@
     width: 100%;
   }
 
-  .parallax-bg {
+  .parallax-clip {
+    position: absolute;
+    inset: 0;
+    -webkit-clip-path: polygon(0 0, 0% 100%, 100% 0);
+    clip-path: polygon(0 0, 0% 100%, 100% 0);
+  }
+
+  .parallax-clip-bottom {
+    position: absolute;
+    inset: 0;
+    -webkit-clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+    clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+  }
+
+  .parallax-bg,
+  .parallax-bg-bottom {
     background-image: url(/img/isometric-green.svg);
-    filter: saturate(200%) hue-rotate(-90deg) contrast(70%) invert();
     min-height: 100vh;
     width: 100%;
-    background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    clip-path: polygon(0 0, 0% 100%, 100% 0);
+  }
+
+  .parallax-bg {
+    filter: saturate(200%) hue-rotate(-90deg) contrast(70%) invert();
+  }
+
+  /* Faint SVG painted directly under the diagonal so the effect renders
+     identically in Safari (which doesn't reliably composite the body's
+     z-index:-1 fixed background through the section's stacking context). */
+  .parallax-bg-bottom {
+    opacity: 0.25;
   }
 
   .hero-section {
     position: relative;
     z-index: 2;
+    background: linear-gradient(to bottom, #4a2c6d 0%, #5a4a70 60%, #695a75 100%);
   }
 
   .hero-spacer {
@@ -263,8 +292,8 @@
   // Initialize with first phrase
   scrambleText(phrases[0]);
 
-  // Rotate every 4.5 seconds
-  setInterval(updateText, 4500);
+  // Rotate every 3.5 seconds
+  setInterval(updateText, 3500);
 
   // Scroll indicator click handler
   document.querySelector('.scroll-indicator')?.addEventListener('click', (e) => {
