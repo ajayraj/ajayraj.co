@@ -1,0 +1,1936 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+/* SEO-targeted structured data — WebApplication + FAQPage so search engines
+   index this as a free, ad-free utility, and LLM crawlers have ready-made
+   context describing what it is, who it's for, and why. */
+const SITE_URL = 'https://ajayraj.co';
+const PAGE_URL = `${SITE_URL}/hex`;
+
+const appSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'hex — Programmer\'s Calculator & Base Converter',
+  alternateName: [
+    'Hex Calculator', 'Binary Converter', 'Decimal to Hex Converter',
+    'Programmer\'s Calculator', 'Bitwise Calculator', 'Hexadecimal Calculator',
+  ],
+  url: PAGE_URL,
+  applicationCategory: 'UtilitiesApplication',
+  applicationSubCategory: 'Calculator',
+  operatingSystem: 'Any (web browser)',
+  browserRequirements: 'Requires JavaScript',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  description: 'Free, ad-free hex/binary/decimal/octal converter and programmer\'s calculator. Live cross-base conversion, bitwise operations (AND, OR, XOR, NOT, shifts), 8/16/32/64-bit widths, signed/unsigned, ASCII preview, 24-bit color swatch. No signup, no tracking, no popups. Works on every device. Built for engineers and students.',
+  featureList: [
+    'Convert between hexadecimal, decimal, binary, and octal in real time',
+    'Programmer\'s calculator with hex digit keypad',
+    'Bitwise operations: AND, OR, XOR, NOT, left shift, right shift',
+    'Bit-width selector: 8, 16, 32, 64-bit',
+    'Signed and unsigned integer support',
+    'ASCII character preview for byte values',
+    'Color swatch preview for 24-bit hex codes',
+    'Full keyboard support',
+    'Click-to-copy any value',
+    'No ads, no signup, no tracking, no popups',
+    'Works offline after first load',
+  ],
+  creator: {
+    '@type': 'Person',
+    name: 'Ajay Raj',
+    url: SITE_URL,
+  },
+  audience: {
+    '@type': 'Audience',
+    audienceType: 'Software engineers, embedded systems engineers, electrical engineers, computer science students, learners',
+  },
+  inLanguage: 'en',
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Is this hex calculator free?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Yes. The tool is completely free, ad-free, requires no signup, and stores no tracking data. It runs entirely in your browser.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do I convert hex to decimal?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Switch to the converter view, type any hex value into the hex field (e.g. ff), and the decimal, binary, and octal equivalents appear instantly in the other fields.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Does this calculator support bitwise operations?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Yes. The calculator includes AND (&), OR (|), XOR (^), NOT (~), left shift (<<), and right shift (>>) operations across 8, 16, 32, or 64-bit widths.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I use this calculator on my phone?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Yes. The calculator is mobile-first and works on any device with a browser. On phones, the calculator is shown by default; on desktop, both the calculator and converter are visible side-by-side.' },
+    },
+    {
+      '@type': 'Question',
+      name: 'What bit widths are supported?',
+      acceptedAnswer: { '@type': 'Answer', text: '8, 16, 32, and 64-bit, in both signed (two\'s complement) and unsigned modes. Internally the tool uses JavaScript BigInt so 64-bit values are exact, with no floating-point precision loss.' },
+    },
+  ],
+};
+---
+
+<Layout
+  title="Hex Calculator & Binary Converter — Free, Ad-Free, Instant · hex"
+  description="Free hex calculator and binary/decimal/octal converter. Ad-free, no signup, no tracking. Programmer's calculator with bitwise operations (AND OR XOR NOT shifts), 8/16/32/64-bit support, ASCII preview, 24-bit color swatch. Built for engineers and students who need a quick, distraction-free hex/binary/decimal calculator."
+>
+  <!-- Page-specific structured data: WebApplication + FAQPage.
+       Search engines + LLM crawlers use these to understand what the page is. -->
+  <script type="application/ld+json" set:html={JSON.stringify(appSchema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <main class="hex-page">
+    <a href="/" class="back-link">← ajayraj.co</a>
+
+    <header class="hex-header">
+      <h1 class="hex-title">hex</h1>
+      <p class="hex-subtitle">base converter & bitwise calculator</p>
+    </header>
+
+    <div class="mode-toggle" role="tablist" aria-label="View mode">
+      <button class="mode-tab" data-mode="calculator" role="tab" aria-selected="true">calculator</button>
+      <button class="mode-tab" data-mode="converter" role="tab" aria-selected="false">converter</button>
+    </div>
+
+    <div class="views-wrap">
+
+    <div id="view-converter" role="tabpanel" hidden>
+
+    <section class="hex-card">
+      <div class="hex-controls">
+        <div class="hex-control-group">
+          <label class="hex-control-label">width</label>
+          <div class="hex-pill-row" role="group" aria-label="Bit width">
+            <button class="hex-pill" data-width="8">8</button>
+            <button class="hex-pill active" data-width="16">16</button>
+            <button class="hex-pill" data-width="32">32</button>
+            <button class="hex-pill" data-width="64">64</button>
+          </div>
+        </div>
+        <div class="hex-control-group">
+          <label class="hex-control-label">sign</label>
+          <div class="hex-pill-row" role="group" aria-label="Signed or unsigned">
+            <button class="hex-pill active" data-sign="unsigned">u</button>
+            <button class="hex-pill" data-sign="signed">s</button>
+          </div>
+        </div>
+        <button class="hex-clear-btn" id="conv-clear" type="button" aria-label="Clear all fields">clear</button>
+      </div>
+
+      <div class="hex-fields">
+        <div class="hex-field">
+          <label class="hex-field-label" for="conv-hex">hex</label>
+          <div class="hex-input-row">
+            <span class="hex-prefix">0x</span>
+            <input
+              id="conv-hex"
+              type="text"
+              class="hex-input mono"
+              data-base="hex"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="ff"
+            />
+            <button class="hex-copy" data-target="conv-hex" aria-label="Copy hex value">⧉</button>
+          </div>
+        </div>
+
+        <div class="hex-field">
+          <label class="hex-field-label" for="conv-dec">decimal</label>
+          <div class="hex-input-row">
+            <input
+              id="conv-dec"
+              type="text"
+              class="hex-input mono"
+              data-base="dec"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="255"
+            />
+            <button class="hex-copy" data-target="conv-dec" aria-label="Copy decimal value">⧉</button>
+          </div>
+        </div>
+
+        <div class="hex-field">
+          <label class="hex-field-label" for="conv-bin">binary</label>
+          <div class="hex-input-row">
+            <span class="hex-prefix">0b</span>
+            <input
+              id="conv-bin"
+              type="text"
+              class="hex-input mono"
+              data-base="bin"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="1111 1111"
+            />
+            <button class="hex-copy" data-target="conv-bin" aria-label="Copy binary value">⧉</button>
+          </div>
+        </div>
+
+        <div class="hex-field">
+          <label class="hex-field-label" for="conv-oct">octal</label>
+          <div class="hex-input-row">
+            <span class="hex-prefix">0o</span>
+            <input
+              id="conv-oct"
+              type="text"
+              class="hex-input mono"
+              data-base="oct"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="377"
+            />
+            <button class="hex-copy" data-target="conv-oct" aria-label="Copy octal value">⧉</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hex-extras">
+        <div class="hex-extra">
+          <span class="hex-extra-label">ascii</span>
+          <span class="hex-extra-value mono" id="extra-ascii">—</span>
+        </div>
+        <div class="hex-extra">
+          <span class="hex-extra-label">color</span>
+          <span class="hex-extra-value mono" id="extra-color">—</span>
+          <span class="hex-color-swatch" id="color-swatch" aria-hidden="true"></span>
+        </div>
+        <div class="hex-extra">
+          <span class="hex-extra-label">range</span>
+          <span class="hex-extra-value mono" id="extra-range">0 — 65535</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="hex-card hex-bitwise">
+      <h2 class="hex-card-title">bitwise</h2>
+
+      <div class="hex-operands">
+        <div class="hex-field">
+          <label class="hex-field-label" for="op-a">A</label>
+          <div class="hex-input-row">
+            <span class="hex-prefix">0x</span>
+            <input
+              id="op-a"
+              type="text"
+              class="hex-input mono"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="f0"
+            />
+          </div>
+        </div>
+        <div class="hex-field">
+          <label class="hex-field-label" for="op-b">B</label>
+          <div class="hex-input-row">
+            <span class="hex-prefix">0x</span>
+            <input
+              id="op-b"
+              type="text"
+              class="hex-input mono"
+              spellcheck="false"
+              autocomplete="off"
+              placeholder="0f"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="hex-results">
+        <div class="hex-result"><span class="hex-result-label mono">A &amp; B</span><span class="hex-result-val mono" id="r-and">—</span></div>
+        <div class="hex-result"><span class="hex-result-label mono">A | B</span><span class="hex-result-val mono" id="r-or">—</span></div>
+        <div class="hex-result"><span class="hex-result-label mono">A ^ B</span><span class="hex-result-val mono" id="r-xor">—</span></div>
+        <div class="hex-result"><span class="hex-result-label mono">~A</span><span class="hex-result-val mono" id="r-not">—</span></div>
+        <div class="hex-result"><span class="hex-result-label mono">A &lt;&lt; 1</span><span class="hex-result-val mono" id="r-shl">—</span></div>
+        <div class="hex-result"><span class="hex-result-label mono">A &gt;&gt; 1</span><span class="hex-result-val mono" id="r-shr">—</span></div>
+      </div>
+    </section>
+
+    </div><!-- /#view-converter -->
+
+    <div id="view-calculator" role="tabpanel">
+      <section class="hex-card calc-card">
+        <div class="calc-display" aria-live="polite">
+          <div class="calc-display-history" id="calc-history"></div>
+          <div class="calc-display-value mono" id="calc-display">0</div>
+          <div class="calc-display-alt mono" id="calc-display-alt"></div>
+        </div>
+
+        <!-- Bit-grid visualizer: makes the binary representation tangible.
+             Each cell = one bit. Click to toggle. Active bits glow warm,
+             nibbles visually grouped, hex digit labeled below each group.
+             Hover info appears in the row below; number line shows position
+             in the chosen width's range. -->
+        <div class="bit-grid-wrap" aria-label="Binary representation" id="bit-grid-wrap">
+          <div class="bit-grid" id="bit-grid"></div>
+          <div class="bit-grid-hex" id="bit-grid-hex"></div>
+
+          <div class="bit-grid-info" id="bit-grid-info">
+            <span class="bit-info-default">hover a bit to see its weight</span>
+          </div>
+
+          <div class="number-line" aria-hidden="true">
+            <div class="number-line-track">
+              <div class="number-line-marker" id="number-line-marker"></div>
+              <div class="number-line-zero" id="number-line-zero"></div>
+            </div>
+            <div class="number-line-labels">
+              <span id="num-line-min">0</span>
+              <span id="num-line-cur">0</span>
+              <span id="num-line-max">2¹⁶−1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Operand overlay: when an operation is armed (e.g. user typed
+             A, then & ), show A, B, and the live result stacked so the
+             operation is visible bit-by-bit. -->
+        <div class="op-overlay" id="op-overlay" hidden>
+          <div class="op-row">
+            <span class="op-row-label mono">A</span>
+            <div class="bit-grid op-row-grid" id="op-grid-a"></div>
+          </div>
+          <div class="op-row op-row-op">
+            <span class="op-row-label mono op-row-symbol" id="op-symbol">&amp;</span>
+            <div class="bit-grid op-row-grid" id="op-grid-b"></div>
+          </div>
+          <div class="op-row op-row-result">
+            <span class="op-row-label mono">=</span>
+            <div class="bit-grid op-row-grid" id="op-grid-result"></div>
+          </div>
+        </div>
+
+        <div class="calc-modebar">
+          <div class="hex-pill-row" role="group" aria-label="Display base">
+            <button class="hex-pill calc-base active" data-cbase="hex">hex</button>
+            <button class="hex-pill calc-base" data-cbase="dec">dec</button>
+            <button class="hex-pill calc-base" data-cbase="bin">bin</button>
+            <button class="hex-pill calc-base" data-cbase="oct">oct</button>
+          </div>
+          <div class="hex-pill-row" role="group" aria-label="Bit width">
+            <button class="hex-pill calc-width" data-cwidth="8">8</button>
+            <button class="hex-pill calc-width" data-cwidth="16">16</button>
+            <button class="hex-pill calc-width active" data-cwidth="32">32</button>
+            <button class="hex-pill calc-width" data-cwidth="64">64</button>
+          </div>
+        </div>
+
+        <div class="calc-keypad">
+          <button class="calc-key key-fn"  data-action="clear">AC</button>
+          <button class="calc-key key-fn"  data-action="back" aria-label="Backspace">⌫</button>
+          <button class="calc-key key-op"  data-action="op" data-op="<<">&lt;&lt;</button>
+          <button class="calc-key key-op"  data-action="op" data-op=">>">&gt;&gt;</button>
+
+          <button class="calc-key key-hex" data-action="digit" data-digit="d">D</button>
+          <button class="calc-key key-hex" data-action="digit" data-digit="e">E</button>
+          <button class="calc-key key-hex" data-action="digit" data-digit="f">F</button>
+          <button class="calc-key key-op"  data-action="op" data-op="/">÷</button>
+
+          <button class="calc-key key-hex" data-action="digit" data-digit="a">A</button>
+          <button class="calc-key key-hex" data-action="digit" data-digit="b">B</button>
+          <button class="calc-key key-hex" data-action="digit" data-digit="c">C</button>
+          <button class="calc-key key-op"  data-action="op" data-op="*">×</button>
+
+          <button class="calc-key key-num" data-action="digit" data-digit="7">7</button>
+          <button class="calc-key key-num" data-action="digit" data-digit="8">8</button>
+          <button class="calc-key key-num" data-action="digit" data-digit="9">9</button>
+          <button class="calc-key key-op"  data-action="op" data-op="-">−</button>
+
+          <button class="calc-key key-num" data-action="digit" data-digit="4">4</button>
+          <button class="calc-key key-num" data-action="digit" data-digit="5">5</button>
+          <button class="calc-key key-num" data-action="digit" data-digit="6">6</button>
+          <button class="calc-key key-op"  data-action="op" data-op="+">+</button>
+
+          <button class="calc-key key-num" data-action="digit" data-digit="1">1</button>
+          <button class="calc-key key-num" data-action="digit" data-digit="2">2</button>
+          <button class="calc-key key-num" data-action="digit" data-digit="3">3</button>
+          <button class="calc-key key-op"  data-action="op" data-op="&amp;">&amp;</button>
+
+          <button class="calc-key key-num key-zero" data-action="digit" data-digit="0">0</button>
+          <button class="calc-key key-op"  data-action="op" data-op="|">|</button>
+          <button class="calc-key key-op"  data-action="op" data-op="^">^</button>
+          <button class="calc-key key-eq"  data-action="equals">=</button>
+        </div>
+
+        <div class="calc-helper">
+          <button class="calc-helper-btn" data-action="not" title="Bitwise NOT of current value">~ NOT</button>
+          <button class="calc-helper-btn" data-action="neg" title="Negate (two's complement)">±</button>
+          <button class="calc-helper-btn" data-action="send-to-converter">→ converter</button>
+        </div>
+      </section>
+    </div>
+
+    </div><!-- /.views-wrap -->
+
+    <!-- About — collapsed by default. <details> keeps content indexed
+         by search engines and LLM crawlers even when visually closed,
+         so the SEO content stays without cluttering the tool itself. -->
+    <details class="hex-about">
+      <summary class="about-summary">
+        <span class="about-summary-label">about</span>
+        <span class="about-summary-icon" aria-hidden="true">+</span>
+      </summary>
+
+      <div class="about-body">
+        <p class="about-why">
+          i made this because every hex calculator i found was slow,
+          cumbersome, and filled with ads.
+        </p>
+
+        <h2 class="about-h2">what it does</h2>
+        <ul class="hex-features">
+          <li>converts between hex, decimal, binary, and octal — type in one, the others update live</li>
+          <li>programmer's calculator with hex digits, bitwise ops (AND, OR, XOR, NOT, shifts), and full keyboard input</li>
+          <li>8, 16, 32, 64-bit widths · signed or unsigned · accurate to the bit (BigInt internally)</li>
+          <li>ASCII preview for bytes, color swatch for 24-bit hex codes</li>
+          <li>click-to-copy any value</li>
+          <li>no ads, no signup, no tracking. works offline once loaded.</li>
+        </ul>
+
+        <h2 class="about-h2">faq</h2>
+        <dl class="hex-faq">
+          <dt>is it free?</dt>
+          <dd>yes. no ads, no signup, no tracking. runs entirely in your browser.</dd>
+
+          <dt>how do i convert hex to decimal?</dt>
+          <dd>open the converter, type a hex value (like <code>ff</code>); decimal, binary, and octal show up instantly.</dd>
+
+          <dt>does it do bitwise ops?</dt>
+          <dd>yes — AND, OR, XOR, NOT, and shifts. results wrap at the chosen bit width.</dd>
+
+          <dt>how big can the numbers go?</dt>
+          <dd>up to 2<sup>64</sup>−1 unsigned (or 2<sup>63</sup>−1 signed). BigInt math, so no precision loss.</dd>
+        </dl>
+      </div>
+    </details>
+
+    <footer class="hex-footer">
+      <p>back to <a href="/">ajayraj.co</a></p>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  .hex-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    color: #f0e8ff;
+    position: relative;
+    z-index: 10;
+  }
+  @media (min-width: 960px) {
+    /* On desktop, widen the page so both views fit side-by-side. */
+    .hex-page { max-width: 1200px; }
+  }
+
+  /* Layout: stacked on mobile (single view at a time via toggle),
+     grid on desktop (both visible). */
+  .views-wrap {
+    display: block;
+  }
+  @media (min-width: 960px) {
+    .views-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+    /* Override [hidden] in side-by-side mode — both views always shown. */
+    .views-wrap > [hidden] { display: block; }
+    /* Hide the mode toggle on desktop since both are visible. */
+    .mode-toggle { display: none; }
+  }
+
+  .back-link {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.5rem;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .back-link:hover {
+    color: #ff9966;
+    border-bottom-color: #ff9966;
+  }
+
+  .hex-header {
+    margin-bottom: 1.5rem;
+  }
+  .hex-title {
+    font-family: var(--font-serif, 'Fraunces', Georgia, serif);
+    font-size: 2.75rem;
+    font-weight: 500;
+    color: #f0c9d9;
+    margin-bottom: 0.15rem;
+    letter-spacing: 0.02em;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  .hex-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+  }
+
+  .hex-card {
+    background: rgba(36, 24, 53, 0.78);
+    border: 1px solid rgba(190, 156, 212, 0.25);
+    border-radius: 1.25rem;
+    padding: 1.75rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+    margin-bottom: 1.5rem;
+  }
+
+  .hex-card-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #f0c9d9;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  /* Controls */
+  .hex-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    align-items: flex-end;
+  }
+  .hex-clear-btn {
+    margin-left: auto;
+    padding: 0.35rem 0.95rem;
+    font-family: inherit;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.55);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .hex-clear-btn:hover {
+    background: rgba(229, 115, 115, 0.12);
+    border-color: rgba(229, 115, 115, 0.4);
+    color: #e57373;
+  }
+  .hex-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .hex-control-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+  }
+  .hex-pill-row {
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.18);
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .hex-pill {
+    padding: 0.35rem 0.85rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    border-radius: 999px;
+    transition: background 0.15s, color 0.15s;
+    min-width: 2.3rem;
+  }
+  .hex-pill:hover { color: rgba(255, 255, 255, 0.85); }
+  .hex-pill.active {
+    background: rgba(255, 153, 102, 0.18);
+    color: #ff9966;
+  }
+
+  /* Fields */
+  .hex-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .hex-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .hex-field-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 600;
+  }
+  .hex-input-row {
+    display: flex;
+    align-items: stretch;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.5rem;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .hex-input-row:focus-within {
+    border-color: rgba(255, 153, 102, 0.5);
+    background: rgba(0, 0, 0, 0.32);
+  }
+  .hex-prefix {
+    padding: 0.6rem 0 0.6rem 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.95rem;
+  }
+  .hex-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0.6rem 0.7rem;
+    color: #f0e8ff;
+    font-size: 1rem;
+    outline: none;
+    min-width: 0;
+  }
+  .hex-input.invalid { color: #e57373; }
+  .mono { font-family: 'JetBrains Mono', 'Fira Code', 'Menlo', monospace; }
+  .hex-copy {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    padding: 0 0.85rem;
+    font-size: 1rem;
+    transition: color 0.15s;
+  }
+  .hex-copy:hover { color: #ff9966; }
+  .hex-copy.copied { color: #7abf9e; }
+
+  /* Extras */
+  .hex-extras {
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.75rem;
+    align-items: center;
+  }
+  .hex-extra {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .hex-extra-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+  }
+  .hex-extra-value {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.92rem;
+  }
+  .hex-color-swatch {
+    display: inline-block;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 0.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    transition: background 0.15s;
+  }
+
+  /* Bitwise */
+  .hex-operands {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin-bottom: 1.2rem;
+  }
+  .hex-results {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1.5rem;
+  }
+  .hex-result {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .hex-result-label {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+  .hex-result-val {
+    color: #ff9966;
+    font-size: 0.92rem;
+    text-align: right;
+    word-break: break-all;
+  }
+
+  /* About — collapsed by default via <details>. Content still in DOM
+     for search/LLM indexing; UI is the same minimal tone as the rest. */
+  .hex-about {
+    max-width: 720px;
+    margin: 2.5rem auto 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.65;
+  }
+  .about-summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .about-summary::-webkit-details-marker { display: none; }
+  .about-summary:hover {
+    background: rgba(255, 153, 102, 0.08);
+    border-color: rgba(255, 153, 102, 0.35);
+    color: #ff9966;
+  }
+  .about-summary-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    color: rgba(255, 153, 102, 0.7);
+    font-weight: 700;
+    transition: transform 0.2s;
+  }
+  .hex-about[open] .about-summary-icon { transform: rotate(45deg); color: #ff9966; }
+  .hex-about[open] .about-summary {
+    border-color: rgba(255, 153, 102, 0.35);
+    color: #ff9966;
+  }
+
+  .about-body {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    animation: aboutIn 0.25s ease;
+  }
+  @keyframes aboutIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .about-why {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.98rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .about-h2 {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(240, 201, 217, 0.85);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 1.5rem 0 0.6rem;
+  }
+  .hex-about p {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .hex-about strong {
+    color: #ffb88c;
+    font-weight: 600;
+  }
+  .hex-about code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.88em;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 0.1em 0.4em;
+    border-radius: 0.25rem;
+    color: #ff9966;
+  }
+  .hex-about kbd {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8em;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.1em 0.4em;
+    border-radius: 0.25rem;
+  }
+  .hex-features {
+    list-style: none;
+    padding-left: 0;
+    margin: 0 0 1rem;
+  }
+  .hex-features li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.92rem;
+  }
+  .hex-features li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #ff9966;
+  }
+  .hex-faq dt {
+    color: #ffb88c;
+    font-weight: 600;
+    margin-top: 0.85rem;
+    font-size: 0.94rem;
+  }
+  .hex-faq dd {
+    margin-left: 0;
+    margin-top: 0.25rem;
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.78);
+  }
+  .hex-about a {
+    color: #ff9966;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 153, 102, 0.5);
+  }
+  .hex-about a:hover {
+    color: #ffaa7a;
+    border-bottom-color: #ffaa7a;
+  }
+
+  /* Footer */
+  .hex-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .hex-footer a {
+    color: #ff9966;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 153, 102, 0.5);
+  }
+  .hex-footer a:hover {
+    color: #ffaa7a;
+    border-bottom-color: #ffaa7a;
+  }
+
+  @media (max-width: 540px) {
+    .hex-page { padding: 2rem 1rem 4rem; }
+    .hex-operands, .hex-results { grid-template-columns: 1fr; }
+  }
+
+  /* ── Mode tabs ── */
+  .mode-toggle {
+    display: inline-flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.22);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    margin-bottom: 1.25rem;
+  }
+  .mode-tab {
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .mode-tab:hover { color: rgba(255, 255, 255, 0.85); }
+  .mode-tab.active {
+    background: rgba(255, 153, 102, 0.22);
+    color: #ff9966;
+  }
+
+  /* ── Calculator ── */
+  .calc-card {
+    padding: 1.5rem;
+  }
+
+  /* Display */
+  .calc-display {
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.4rem 1.1rem;
+    margin-bottom: 1.25rem;
+    text-align: right;
+    min-height: 5.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+  .calc-display-history {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    min-height: 1rem;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .calc-display-value {
+    font-size: 2.2rem;
+    line-height: 1.1;
+    color: #f0e8ff;
+    font-weight: 500;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    /* hide scrollbar — overflow still scrollable via touch */
+    scrollbar-width: none;
+  }
+  .calc-display-value::-webkit-scrollbar { display: none; }
+  .calc-display-alt {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 0.35rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .calc-display-alt::-webkit-scrollbar { display: none; }
+
+  /* Bit visualizer — gives the value spatial form so the bits feel real.
+     Bits grouped into nibbles (4 bits each); each nibble gets a hex-digit
+     label below. Click a bit to toggle.
+     :global() because the inner cells are injected via innerHTML at runtime
+     and don't carry Astro's scope attribute — scoped selectors wouldn't match. */
+  :global(.bit-grid-wrap) {
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    --bit-size: 24px;
+  }
+  :global(.bit-grid), :global(.bit-grid-hex) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  :global(.bit-nibble) {
+    display: flex;
+    gap: 3px;
+  }
+  :global(.bit-nibble-hex) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: calc(var(--bit-size, 24px) * 4 + 9px);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 153, 102, 0.6);
+  }
+  :global(.bit-cell) {
+    width: var(--bit-size, 24px);
+    height: var(--bit-size, 24px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.08s, box-shadow 0.18s ease;
+    user-select: none;
+    padding: 0;
+  }
+  :global(.bit-cell:hover) {
+    border-color: rgba(255, 153, 102, 0.4);
+    transform: scale(1.08);
+  }
+  :global(.bit-cell.on) {
+    background: rgba(255, 153, 102, 0.28);
+    border-color: rgba(255, 153, 102, 0.6);
+    color: #ff9966;
+    box-shadow: 0 0 10px rgba(255, 153, 102, 0.25);
+  }
+  :global(.bit-cell.on:hover) {
+    background: rgba(255, 153, 102, 0.4);
+  }
+  @media (max-width: 540px) {
+    :global(.bit-grid-wrap) { padding: 0.8rem 0.5rem; --bit-size: 20px; }
+    :global(.bit-cell) { font-size: 0.7rem; }
+  }
+  @media (min-width: 960px) {
+    /* When in side-by-side mode, calculator column gets narrower */
+    :global(.bit-grid-wrap) { --bit-size: 21px; }
+  }
+
+  /* Bit flip animation — pulse a cell when its state changes.
+     Staggered via JS to make the bits ripple instead of all firing at once. */
+  :global(.bit-cell.flipped-on) {
+    animation: bitFlipOn 0.45s ease-out;
+  }
+  :global(.bit-cell.flipped-off) {
+    animation: bitFlipOff 0.45s ease-out;
+  }
+  @keyframes bitFlipOn {
+    0%   { transform: scale(1); box-shadow: 0 0 0 rgba(255, 153, 102, 0); }
+    35%  { transform: scale(1.25); box-shadow: 0 0 16px rgba(255, 153, 102, 0.6); background: rgba(255, 153, 102, 0.5); }
+    100% { transform: scale(1); }
+  }
+  @keyframes bitFlipOff {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(0.85); opacity: 0.4; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Shift animation: brief slide of the whole grid in the shift direction */
+  :global(.bit-grid-wrap.shift-left)  :global(.bit-grid),
+  :global(.bit-grid-wrap.shift-left)  :global(.bit-grid-hex) {
+    animation: shiftLeft 0.32s ease-out;
+  }
+  :global(.bit-grid-wrap.shift-right) :global(.bit-grid),
+  :global(.bit-grid-wrap.shift-right) :global(.bit-grid-hex) {
+    animation: shiftRight 0.32s ease-out;
+  }
+  @keyframes shiftLeft  {
+    0%   { transform: translateX(0); }
+    45%  { transform: translateX(-18px); opacity: 0.6; }
+    100% { transform: translateX(0); }
+  }
+  @keyframes shiftRight {
+    0%   { transform: translateX(0); }
+    45%  { transform: translateX(18px);  opacity: 0.6; }
+    100% { transform: translateX(0); }
+  }
+
+  /* Hover info: shows the weight (2^n) of the bit you're pointing at */
+  .bit-grid-info {
+    margin-top: 0.25rem;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.55);
+    min-height: 1.1rem;
+    text-align: center;
+  }
+  .bit-grid-info .bit-info-default { color: rgba(255, 255, 255, 0.3); font-style: italic; }
+  .bit-grid-info :global(.bit-info-active) { color: #ff9966; }
+  .bit-grid-info :global(.bit-info-pos) { color: #ffb88c; }
+  .bit-grid-info :global(.bit-info-weight) { color: rgba(255, 255, 255, 0.85); }
+
+  /* Number line: where does this value sit in the chosen width's range? */
+  .number-line {
+    margin-top: 0.85rem;
+    width: 100%;
+    max-width: 480px;
+  }
+  .number-line-track {
+    position: relative;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+  }
+  .number-line-zero {
+    position: absolute;
+    top: -3px;
+    bottom: -3px;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(-0.5px);
+  }
+  .number-line-marker {
+    position: absolute;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff9966;
+    box-shadow: 0 0 12px rgba(255, 153, 102, 0.55);
+    transform: translateX(-50%);
+    transition: left 0.25s ease;
+  }
+  .number-line-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 0.4rem;
+  }
+  .number-line-labels :global(#num-line-cur) {
+    color: #ff9966;
+    font-weight: 600;
+  }
+
+  /* Operand overlay: shown when an operation is armed (e.g. A & ?) */
+  .op-overlay {
+    margin: 0 0 1.25rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 153, 102, 0.25);
+    border-radius: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .op-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .op-row-label {
+    flex: 0 0 1.2rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .op-row-result .op-row-label,
+  .op-row-symbol {
+    color: #ff9966;
+  }
+  .op-row-grid {
+    flex: 1;
+    justify-content: flex-start;
+    --bit-size: 16px;
+  }
+  .op-overlay :global(.bit-cell) {
+    --bit-size: 16px;
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    cursor: default;
+    pointer-events: none;
+  }
+  .op-overlay :global(.bit-nibble) { gap: 1px; }
+  .op-overlay :global(.bit-grid) { gap: 0.3rem; }
+  .op-row-result :global(.bit-cell.on) {
+    box-shadow: 0 0 14px rgba(255, 153, 102, 0.5);
+  }
+
+  /* Mode bar */
+  .calc-modebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    justify-content: space-between;
+  }
+
+  /* Keypad */
+  .calc-keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+  .calc-key {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 1.05rem;
+    font-weight: 500;
+    padding: 0.95rem 0.5rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.04);
+    color: #f0e8ff;
+    cursor: pointer;
+    transition: background 0.1s, transform 0.08s, border-color 0.15s;
+    user-select: none;
+  }
+  .calc-key:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .calc-key:active { transform: translateY(1px); background: rgba(255, 255, 255, 0.12); }
+  .calc-key:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .calc-key.key-hex {
+    color: #ffb88c;
+    background: rgba(255, 153, 102, 0.06);
+    border-color: rgba(255, 153, 102, 0.15);
+  }
+  .calc-key.key-hex:hover {
+    background: rgba(255, 153, 102, 0.12);
+    border-color: rgba(255, 153, 102, 0.3);
+  }
+  .calc-key.key-op {
+    color: #f0c9d9;
+    background: rgba(212, 160, 192, 0.08);
+    border-color: rgba(212, 160, 192, 0.18);
+  }
+  .calc-key.key-op:hover {
+    background: rgba(212, 160, 192, 0.16);
+    border-color: rgba(212, 160, 192, 0.35);
+  }
+  .calc-key.key-op.armed {
+    background: rgba(255, 153, 102, 0.25);
+    color: #ff9966;
+    border-color: rgba(255, 153, 102, 0.55);
+  }
+  .calc-key.key-fn {
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.95rem;
+  }
+  .calc-key.key-eq {
+    background: #ff9966;
+    color: #1f1426;
+    font-weight: 700;
+    border-color: transparent;
+    font-size: 1.15rem;
+    box-shadow: 0 4px 12px rgba(255, 153, 102, 0.25);
+  }
+  .calc-key.key-eq:hover {
+    background: #ffaa7a;
+  }
+
+  /* Helper row below keypad */
+  .calc-helper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .calc-helper-btn {
+    flex: 1;
+    min-width: 110px;
+    padding: 0.55rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .calc-helper-btn:hover {
+    background: rgba(255, 153, 102, 0.08);
+    color: #ff9966;
+    border-color: rgba(255, 153, 102, 0.3);
+  }
+
+  /* When in dec/bin/oct mode, hex digit keys grey out */
+  .calc-card.base-dec .key-hex,
+  .calc-card.base-oct .key-hex { opacity: 0.25; pointer-events: none; }
+  .calc-card.base-oct .calc-key[data-digit="8"],
+  .calc-card.base-oct .calc-key[data-digit="9"] { opacity: 0.25; pointer-events: none; }
+  .calc-card.base-bin .key-hex,
+  .calc-card.base-bin .calc-key[data-digit="2"],
+  .calc-card.base-bin .calc-key[data-digit="3"],
+  .calc-card.base-bin .calc-key[data-digit="4"],
+  .calc-card.base-bin .calc-key[data-digit="5"],
+  .calc-card.base-bin .calc-key[data-digit="6"],
+  .calc-card.base-bin .calc-key[data-digit="7"],
+  .calc-card.base-bin .calc-key[data-digit="8"],
+  .calc-card.base-bin .calc-key[data-digit="9"] { opacity: 0.25; pointer-events: none; }
+</style>
+
+<script>
+  /* ── State ── */
+  type Sign = 'unsigned' | 'signed';
+  let width: number = 16;
+  let sign: Sign = 'unsigned';
+  let value: bigint | null = 0n;
+
+  /* ── Helpers ── */
+  const grpHex = (s: string) => s.replace(/^(-?)/, '$1').match(/.{1,2}(?=(.{2})*$)/g)?.join(' ') ?? s;
+  const grpBin = (s: string) => s.match(/.{1,4}(?=(.{4})*$)/g)?.join(' ') ?? s;
+  const stripGroups = (s: string) => s.replace(/[\s_]/g, '');
+
+  function mask(): bigint { return (1n << BigInt(width)) - 1n; }
+
+  function clamp(v: bigint): bigint | null {
+    const m = mask();
+    if (sign === 'unsigned') {
+      if (v < 0n || v > m) return null;
+      return v & m;
+    }
+    const halfHi = 1n << (BigInt(width) - 1n);
+    if (v < -halfHi || v >= halfHi) return null;
+    return v;
+  }
+
+  function parseInput(raw: string, base: 'hex' | 'dec' | 'bin' | 'oct'): bigint | null {
+    const cleaned = stripGroups(raw).trim();
+    if (cleaned === '' || cleaned === '-') return null;
+    try {
+      const prefixed = { hex: '0x', dec: '', bin: '0b', oct: '0o' }[base];
+      const negative = cleaned.startsWith('-');
+      const body = negative ? cleaned.slice(1) : cleaned;
+      const valid = {
+        hex: /^[0-9a-fA-F]+$/.test(body),
+        dec: /^[0-9]+$/.test(body),
+        bin: /^[01]+$/.test(body),
+        oct: /^[0-7]+$/.test(body),
+      }[base];
+      if (!valid) return null;
+      const parsed = BigInt(prefixed + body);
+      return negative ? -parsed : parsed;
+    } catch { return null; }
+  }
+
+  function formatHex(v: bigint | null): string {
+    if (v === null) return '';
+    const masked = (v < 0n ? (v & mask()) : v) & mask();
+    return masked.toString(16);
+  }
+  function formatDec(v: bigint | null): string {
+    if (v === null) return '';
+    return v.toString(10);
+  }
+  function formatBin(v: bigint | null): string {
+    if (v === null) return '';
+    const masked = (v < 0n ? (v & mask()) : v) & mask();
+    return grpBin(masked.toString(2).padStart(Math.min(width, masked === 0n ? 1 : Math.max(1, masked.toString(2).length)), '0'));
+  }
+  function formatOct(v: bigint | null): string {
+    if (v === null) return '';
+    const masked = (v < 0n ? (v & mask()) : v) & mask();
+    return masked.toString(8);
+  }
+
+  /* ── DOM refs ── */
+  const hexEl  = document.getElementById('conv-hex')  as HTMLInputElement;
+  const decEl  = document.getElementById('conv-dec')  as HTMLInputElement;
+  const binEl  = document.getElementById('conv-bin')  as HTMLInputElement;
+  const octEl  = document.getElementById('conv-oct')  as HTMLInputElement;
+  const asciiEl  = document.getElementById('extra-ascii')!;
+  const colorEl  = document.getElementById('extra-color')!;
+  const swatchEl = document.getElementById('color-swatch')!;
+  const rangeEl  = document.getElementById('extra-range')!;
+  const opA = document.getElementById('op-a') as HTMLInputElement;
+  const opB = document.getElementById('op-b') as HTMLInputElement;
+
+  /* ── Render ── */
+  function updateConverter(skip?: HTMLInputElement) {
+    if (hexEl !== skip) hexEl.value = formatHex(value);
+    if (decEl !== skip) decEl.value = formatDec(value);
+    if (binEl !== skip) binEl.value = formatBin(value);
+    if (octEl !== skip) octEl.value = formatOct(value);
+
+    /* ASCII — only for byte-range printable */
+    if (value !== null && value >= 32n && value <= 126n) {
+      asciiEl.textContent = `'${String.fromCharCode(Number(value))}'`;
+    } else if (value !== null && value >= 0n && value < 256n) {
+      asciiEl.textContent = `non-printable (${value})`;
+    } else {
+      asciiEl.textContent = '—';
+    }
+
+    /* Color preview — when hex value is a 6-digit value (0x000000 – 0xFFFFFF) */
+    if (value !== null && value >= 0n && value <= 0xFFFFFFn) {
+      const hex = '#' + formatHex(value).padStart(6, '0');
+      colorEl.textContent = hex.toUpperCase();
+      swatchEl.style.background = hex;
+    } else {
+      colorEl.textContent = '—';
+      swatchEl.style.background = 'transparent';
+    }
+
+    /* Range display reflects current width + sign */
+    if (sign === 'unsigned') {
+      rangeEl.textContent = `0 — ${((1n << BigInt(width)) - 1n).toString(10)}`;
+    } else {
+      const hi = (1n << (BigInt(width) - 1n));
+      rangeEl.textContent = `${(-hi).toString(10)} — ${(hi - 1n).toString(10)}`;
+    }
+
+    updateBitwise();
+  }
+
+  function markInvalid(el: HTMLInputElement, bad: boolean) {
+    el.classList.toggle('invalid', bad);
+  }
+
+  function handleInput(el: HTMLInputElement, base: 'hex' | 'dec' | 'bin' | 'oct') {
+    const parsed = parseInput(el.value, base);
+    if (el.value.trim() === '') {
+      value = null;
+      markInvalid(el, false);
+      updateConverter(el);
+      return;
+    }
+    if (parsed === null) { markInvalid(el, true); return; }
+    const clamped = clamp(parsed);
+    if (clamped === null) { markInvalid(el, true); return; }
+    markInvalid(el, false);
+    value = clamped;
+    updateConverter(el);
+  }
+
+  hexEl.addEventListener('input', () => handleInput(hexEl, 'hex'));
+  decEl.addEventListener('input', () => handleInput(decEl, 'dec'));
+  binEl.addEventListener('input', () => handleInput(binEl, 'bin'));
+  octEl.addEventListener('input', () => handleInput(octEl, 'oct'));
+
+  /* Width / sign pills */
+  document.querySelectorAll<HTMLButtonElement>('.hex-pill[data-width]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.hex-pill[data-width]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      width = parseInt(btn.dataset.width!, 10);
+      if (value !== null) {
+        const c = clamp(value);
+        value = c !== null ? c : null;
+      }
+      updateConverter();
+    });
+  });
+  document.querySelectorAll<HTMLButtonElement>('.hex-pill[data-sign]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.hex-pill[data-sign]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      sign = btn.dataset.sign as Sign;
+      if (value !== null) {
+        const c = clamp(value);
+        value = c !== null ? c : null;
+      }
+      updateConverter();
+    });
+  });
+
+  /* Clear-all button (converter view) */
+  document.getElementById('conv-clear')?.addEventListener('click', () => {
+    value = null;
+    hexEl.value = decEl.value = binEl.value = octEl.value = '';
+    [hexEl, decEl, binEl, octEl].forEach(el => el.classList.remove('invalid'));
+    opA.value = ''; opB.value = '';
+    updateConverter();
+    hexEl.focus();
+  });
+
+  /* Copy buttons */
+  document.querySelectorAll<HTMLButtonElement>('.hex-copy').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const targetId = btn.dataset.target!;
+      const target = document.getElementById(targetId) as HTMLInputElement;
+      if (!target?.value) return;
+      try {
+        await navigator.clipboard.writeText(target.value);
+        btn.classList.add('copied');
+        const original = btn.textContent;
+        btn.textContent = '✓';
+        setTimeout(() => { btn.classList.remove('copied'); btn.textContent = original ?? '⧉'; }, 1200);
+      } catch {/* clipboard API unavailable; fail quiet */}
+    });
+  });
+
+  /* ── Bitwise ── */
+  function updateBitwise() {
+    const a = parseInput(opA.value, 'hex');
+    const b = parseInput(opB.value, 'hex');
+    const m = mask();
+    const fmt = (v: bigint | null) => v === null ? '—' : '0x' + grpHex((v & m).toString(16));
+
+    const ca = a !== null ? a & m : null;
+    const cb = b !== null ? b & m : null;
+
+    document.getElementById('r-and')!.textContent = (ca !== null && cb !== null) ? fmt(ca & cb) : '—';
+    document.getElementById('r-or')!.textContent  = (ca !== null && cb !== null) ? fmt(ca | cb) : '—';
+    document.getElementById('r-xor')!.textContent = (ca !== null && cb !== null) ? fmt(ca ^ cb) : '—';
+    document.getElementById('r-not')!.textContent = (ca !== null) ? fmt((~ca) & m) : '—';
+    document.getElementById('r-shl')!.textContent = (ca !== null) ? fmt((ca << 1n) & m) : '—';
+    document.getElementById('r-shr')!.textContent = (ca !== null) ? fmt(ca >> 1n) : '—';
+  }
+  opA.addEventListener('input', updateBitwise);
+  opB.addEventListener('input', updateBitwise);
+
+  /* Seed */
+  value = 255n;
+  opA.value = 'f0';
+  opB.value = '0f';
+  updateConverter();
+
+  /* ════════════════════════════════════════
+     MODE TOGGLE (converter ⇄ calculator)
+     ════════════════════════════════════════ */
+  const viewConverter  = document.getElementById('view-converter')!;
+  const viewCalculator = document.getElementById('view-calculator')!;
+
+  document.querySelectorAll<HTMLButtonElement>('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.mode-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      const mode = tab.dataset.mode!;
+      viewConverter.hidden  = mode !== 'converter';
+      viewCalculator.hidden = mode !== 'calculator';
+      if (mode === 'calculator') renderCalc();
+    });
+  });
+
+  /* ════════════════════════════════════════
+     CALCULATOR
+     state: typedDigits (string), accumulator (bigint), pendingOp (string|null)
+     ════════════════════════════════════════ */
+  type CalcBase = 'hex' | 'dec' | 'bin' | 'oct';
+  type Op = '+' | '-' | '*' | '/' | '&' | '|' | '^' | '<<' | '>>';
+
+  let calcBase: CalcBase = 'hex';
+  let calcWidth: number  = 32;
+  let typed: string      = '';
+  let accumulator: bigint | null = null;
+  let pendingOp: Op | null = null;
+  let justEvaluated = false;
+  let history: string = '';
+
+  const calcCard       = document.querySelector('.calc-card') as HTMLElement;
+  const calcDisplay    = document.getElementById('calc-display')!;
+  const calcDisplayAlt = document.getElementById('calc-display-alt')!;
+  const calcHistory    = document.getElementById('calc-history')!;
+
+  function calcMask(): bigint { return (1n << BigInt(calcWidth)) - 1n; }
+
+  function parseTyped(s: string): bigint {
+    if (s === '' || s === '-') return 0n;
+    const negative = s.startsWith('-');
+    const body = negative ? s.slice(1) : s;
+    const prefix = { hex: '0x', dec: '', bin: '0b', oct: '0o' }[calcBase];
+    const cleaned = body.replace(/[\s_]/g, '');
+    try {
+      const v = BigInt(prefix + cleaned);
+      return (negative ? -v : v) & calcMask();
+    } catch { return 0n; }
+  }
+
+  function formatForBase(v: bigint, base: CalcBase): string {
+    const m = calcMask();
+    const masked = v & m;
+    switch (base) {
+      case 'hex': return masked.toString(16);
+      case 'dec': return masked.toString(10);
+      case 'bin': return grpBin(masked.toString(2));
+      case 'oct': return masked.toString(8);
+    }
+  }
+
+  function basePrefix(b: CalcBase): string {
+    return { hex: '0x', dec: '', bin: '0b', oct: '0o' }[b];
+  }
+
+  /* ── Bit-grid visualizer ── */
+  const bitGridEl    = document.getElementById('bit-grid')!;
+  const bitGridHexEl = document.getElementById('bit-grid-hex')!;
+  const bitGridWrap  = document.getElementById('bit-grid-wrap')!;
+  const bitGridInfo  = document.getElementById('bit-grid-info')!;
+  const numLineMin   = document.getElementById('num-line-min')!;
+  const numLineCur   = document.getElementById('num-line-cur')!;
+  const numLineMax   = document.getElementById('num-line-max')!;
+  const numLineMark  = document.getElementById('number-line-marker')!;
+  const numLineZero  = document.getElementById('number-line-zero')!;
+  const opOverlay    = document.getElementById('op-overlay')!;
+  const opSymbolEl   = document.getElementById('op-symbol')!;
+  const opGridA      = document.getElementById('op-grid-a')!;
+  const opGridB      = document.getElementById('op-grid-b')!;
+  const opGridResult = document.getElementById('op-grid-result')!;
+
+  let lastBits: bigint | null = null;   /* for flip animation diff */
+  let pendingShift: 'left' | 'right' | null = null;
+
+  function currentCalcValue(): bigint {
+    if (typed !== '') return parseTyped(typed);
+    return (accumulator ?? 0n) & calcMask();
+  }
+
+  function buildGridHTML(v: bigint): { cells: string; hex: string } {
+    const nibbles = calcWidth / 4;
+    const cells: string[] = [];
+    const hexLabels: string[] = [];
+    for (let n = nibbles - 1; n >= 0; n--) {
+      const nibbleBits: string[] = [];
+      let nibbleVal = 0;
+      for (let b = 3; b >= 0; b--) {
+        const bitPos = n * 4 + b;
+        const on = ((v >> BigInt(bitPos)) & 1n) === 1n;
+        if (on) nibbleVal |= (1 << b);
+        nibbleBits.push(
+          `<button class="bit-cell ${on ? 'on' : ''}" data-bit="${bitPos}" aria-label="Bit ${bitPos}, ${on ? 'on' : 'off'}" type="button">${on ? '1' : '0'}</button>`
+        );
+      }
+      cells.push(`<div class="bit-nibble">${nibbleBits.join('')}</div>`);
+      hexLabels.push(`<div class="bit-nibble-hex">${nibbleVal.toString(16)}</div>`);
+    }
+    return { cells: cells.join(''), hex: hexLabels.join('') };
+  }
+
+  function renderBitGrid() {
+    const v = currentCalcValue();
+    const grid = buildGridHTML(v);
+    bitGridEl.innerHTML    = grid.cells;
+    bitGridHexEl.innerHTML = grid.hex;
+
+    /* Diff against previous render → stagger-pulse changed bits.
+       Suggestion 2: typing decimal digit-by-digit shows bits ripple on. */
+    if (lastBits !== null && lastBits !== v) {
+      const diff = lastBits ^ v;
+      let staggerIdx = 0;
+      for (let pos = 0; pos < calcWidth; pos++) {
+        if (((diff >> BigInt(pos)) & 1n) === 1n) {
+          const cell = bitGridEl.querySelector<HTMLElement>(`.bit-cell[data-bit="${pos}"]`);
+          if (!cell) continue;
+          const wasOn = ((lastBits >> BigInt(pos)) & 1n) === 1n;
+          const cls = wasOn ? 'flipped-off' : 'flipped-on';
+          /* small per-bit stagger so the change reads as a ripple */
+          cell.style.animationDelay = `${staggerIdx * 12}ms`;
+          cell.classList.add(cls);
+          /* clean up so future renders aren't sticky */
+          setTimeout(() => { cell.classList.remove(cls); cell.style.animationDelay = ''; }, 600);
+          staggerIdx++;
+        }
+      }
+    }
+    lastBits = v;
+
+    /* Shift slide animation (suggestion 3) */
+    if (pendingShift !== null) {
+      bitGridWrap.classList.add(`shift-${pendingShift}`);
+      setTimeout(() => bitGridWrap.classList.remove(`shift-left`, `shift-right`), 320);
+      pendingShift = null;
+    }
+
+    /* Wire bit-toggle clicks + hover info */
+    bitGridEl.querySelectorAll<HTMLButtonElement>('.bit-cell').forEach(cell => {
+      const bitPos = parseInt(cell.dataset.bit!, 10);
+      cell.addEventListener('click', () => {
+        const cur = currentCalcValue();
+        const flipped = (cur ^ (1n << BigInt(bitPos))) & calcMask();
+        accumulator = flipped;
+        typed = '';
+        justEvaluated = false;
+        renderCalc();
+      });
+      /* Suggestion 1: hover shows position + weight */
+      cell.addEventListener('mouseenter', () => showHoverInfo(bitPos));
+      cell.addEventListener('mouseleave', clearHoverInfo);
+      cell.addEventListener('focus',      () => showHoverInfo(bitPos));
+      cell.addEventListener('blur',       clearHoverInfo);
+    });
+
+    renderNumberLine(v);
+    renderOpOverlay();
+  }
+
+  function showHoverInfo(bitPos: number) {
+    const weight = 1n << BigInt(bitPos);
+    const v = currentCalcValue();
+    const on = ((v >> BigInt(bitPos)) & 1n) === 1n;
+    bitGridInfo.innerHTML =
+      `<span class="bit-info-pos">bit ${bitPos}</span>` +
+      ` · weight <span class="bit-info-weight">2<sup>${bitPos}</sup></span>` +
+      ` = <span class="bit-info-weight">${weight.toString(10)}</span>` +
+      ` <span class="bit-info-active">${on ? '· on' : ''}</span>`;
+  }
+
+  function clearHoverInfo() {
+    bitGridInfo.innerHTML = '<span class="bit-info-default">hover a bit to see its weight</span>';
+  }
+
+  /* Number line (suggestion 5) — marker shows where the current value sits
+     in the chosen width's range. In signed mode, zero is centered. */
+  function renderNumberLine(v: bigint) {
+    if (sign === 'unsigned' || true /* calc uses unsigned semantics for display */) {
+      const m = calcMask();
+      const pct = m === 0n ? 0 : Number((v * 10000n) / m) / 100;
+      numLineMark.style.left = `${pct}%`;
+      numLineZero.style.left = '0%';
+      numLineMin.textContent = '0';
+      numLineMax.textContent = `2${supDigits(calcWidth)}−1`;
+      numLineCur.textContent = `${v.toString(10)}`;
+    }
+  }
+
+  function supDigits(n: number): string {
+    /* Render Unicode superscript digits — 32 → "³²", 16 → "¹⁶" etc. */
+    const sup = ['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹'];
+    return String(n).split('').map(d => sup[Number(d)]).join('');
+  }
+
+  /* Operand overlay (suggestion 4) — when an operation is armed, show
+     A, B, and the live result stacked so the bit-level effect is visible. */
+  function renderOpOverlay() {
+    if (pendingOp === null) {
+      opOverlay.hidden = true;
+      return;
+    }
+    /* Only show overlay for ops where seeing both operands matters most */
+    const supported: Op[] = ['&', '|', '^'];
+    if (!supported.includes(pendingOp)) {
+      opOverlay.hidden = true;
+      return;
+    }
+    opOverlay.hidden = false;
+    const a = (accumulator ?? 0n) & calcMask();
+    const b = typed !== '' ? parseTyped(typed) : 0n;
+    const r = compute(a, pendingOp, b);
+    opSymbolEl.textContent = pendingOp;
+    opGridA.innerHTML      = buildGridHTML(a).cells;
+    opGridB.innerHTML      = buildGridHTML(b).cells;
+    opGridResult.innerHTML = buildGridHTML(r).cells;
+  }
+
+  function renderCalc() {
+    /* Update the main display + alt-base sub-display */
+    const current = typed === '' ? (accumulator ?? 0n) : parseTyped(typed);
+    const displayStr = typed !== '' ? typed : formatForBase(current, calcBase);
+    calcDisplay.textContent = (basePrefix(calcBase) + displayStr) || '0';
+
+    /* Alt: show value in the three other bases compactly */
+    const others = (['hex', 'dec', 'bin', 'oct'] as CalcBase[]).filter(b => b !== calcBase);
+    calcDisplayAlt.textContent = others
+      .map(b => `${basePrefix(b)}${formatForBase(current, b)}`)
+      .join('  ·  ');
+
+    /* History line: shows pending operation */
+    calcHistory.textContent = history;
+
+    /* Sync base/width pill state in the calculator */
+    document.querySelectorAll<HTMLButtonElement>('.calc-base').forEach(b =>
+      b.classList.toggle('active', b.dataset.cbase === calcBase));
+    document.querySelectorAll<HTMLButtonElement>('.calc-width').forEach(b =>
+      b.classList.toggle('active', b.dataset.cwidth === String(calcWidth)));
+
+    /* Disable digit keys that aren't valid for current base */
+    calcCard.classList.remove('base-hex', 'base-dec', 'base-bin', 'base-oct');
+    calcCard.classList.add(`base-${calcBase}`);
+
+    /* Highlight armed operator */
+    document.querySelectorAll<HTMLButtonElement>('.key-op[data-op]').forEach(b =>
+      b.classList.toggle('armed', !!pendingOp && b.dataset.op === pendingOp));
+
+    renderBitGrid();
+  }
+
+  function appendDigit(d: string) {
+    if (justEvaluated) {
+      typed = '';
+      justEvaluated = false;
+    }
+    /* Validate digit against current base */
+    const valid = {
+      hex: /^[0-9a-f]$/i,
+      dec: /^[0-9]$/,
+      bin: /^[01]$/,
+      oct: /^[0-7]$/,
+    }[calcBase];
+    if (!valid.test(d)) return;
+    /* Prevent leading zero pile-up unless typing 0 alone */
+    if (typed === '0') typed = '';
+    typed += d.toLowerCase();
+    renderCalc();
+  }
+
+  function applyOp(op: Op) {
+    const rhs = typed !== '' ? parseTyped(typed) : (accumulator ?? 0n);
+    if (accumulator === null) {
+      accumulator = rhs;
+    } else if (pendingOp !== null && typed !== '') {
+      accumulator = compute(accumulator, pendingOp, rhs);
+    }
+    pendingOp = op;
+    typed = '';
+    justEvaluated = false;
+    history = `${basePrefix(calcBase)}${formatForBase(accumulator, calcBase)} ${op}`;
+    renderCalc();
+  }
+
+  function compute(a: bigint, op: Op, b: bigint): bigint {
+    const m = calcMask();
+    const aMasked = a & m;
+    const bMasked = b & m;
+    let r: bigint;
+    switch (op) {
+      case '+':  r = aMasked + bMasked; break;
+      case '-':  r = aMasked - bMasked; break;
+      case '*':  r = aMasked * bMasked; break;
+      case '/':  r = bMasked === 0n ? 0n : aMasked / bMasked; break;
+      case '&':  r = aMasked & bMasked; break;
+      case '|':  r = aMasked | bMasked; break;
+      case '^':  r = aMasked ^ bMasked; break;
+      case '<<': r = aMasked << bMasked; break;
+      case '>>': r = aMasked >> bMasked; break;
+    }
+    /* Wrap into width on overflow / underflow */
+    if (r < 0n) r = ((r % (m + 1n)) + (m + 1n)) % (m + 1n);
+    return r & m;
+  }
+
+  function equals() {
+    if (pendingOp === null) return;
+    const rhs = typed !== '' ? parseTyped(typed) : (accumulator ?? 0n);
+    const opAtEval = pendingOp;
+    const result = compute(accumulator ?? 0n, pendingOp, rhs);
+    history = `${basePrefix(calcBase)}${formatForBase(accumulator ?? 0n, calcBase)} ${pendingOp} ${basePrefix(calcBase)}${formatForBase(rhs, calcBase)} =`;
+    accumulator = result;
+    pendingOp = null;
+    typed = '';
+    justEvaluated = true;
+    /* Trigger shift-slide animation if the eval was a shift */
+    if (opAtEval === '<<') pendingShift = 'left';
+    if (opAtEval === '>>') pendingShift = 'right';
+    renderCalc();
+  }
+
+  function clearAll() {
+    typed = '';
+    accumulator = null;
+    pendingOp = null;
+    justEvaluated = false;
+    history = '';
+    renderCalc();
+  }
+
+  function backspace() {
+    if (typed.length > 0) typed = typed.slice(0, -1);
+    renderCalc();
+  }
+
+  function notOp() {
+    const v = typed !== '' ? parseTyped(typed) : (accumulator ?? 0n);
+    const r = (~v) & calcMask();
+    accumulator = r;
+    typed = '';
+    history = `~${basePrefix(calcBase)}${formatForBase(v, calcBase)} =`;
+    justEvaluated = true;
+    renderCalc();
+  }
+
+  function negate() {
+    const v = typed !== '' ? parseTyped(typed) : (accumulator ?? 0n);
+    /* Two's complement negation, masked to width */
+    const r = ((~v) + 1n) & calcMask();
+    accumulator = r;
+    typed = '';
+    history = `−(${basePrefix(calcBase)}${formatForBase(v, calcBase)}) =`;
+    justEvaluated = true;
+    renderCalc();
+  }
+
+  function sendToConverter() {
+    const v = typed !== '' ? parseTyped(typed) : (accumulator ?? 0n);
+    value = v;
+    width = calcWidth;
+    /* Sync width pill in converter view */
+    document.querySelectorAll('.hex-pill[data-width]').forEach(b => {
+      b.classList.toggle('active', (b as HTMLElement).dataset.width === String(calcWidth));
+    });
+    updateConverter();
+    /* Swap to converter view */
+    (document.querySelector('.mode-tab[data-mode="converter"]') as HTMLButtonElement)?.click();
+  }
+
+  /* ── Wire keypad ── */
+  document.querySelectorAll<HTMLButtonElement>('.calc-key').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      switch (action) {
+        case 'digit':  appendDigit(btn.dataset.digit!); break;
+        case 'op':     applyOp(btn.dataset.op as Op); break;
+        case 'equals': equals(); break;
+        case 'clear':  clearAll(); break;
+        case 'back':   backspace(); break;
+      }
+    });
+  });
+
+  /* Helper row */
+  document.querySelectorAll<HTMLButtonElement>('.calc-helper-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const a = btn.dataset.action;
+      if (a === 'not')                a !== null && notOp();
+      if (a === 'neg')                negate();
+      if (a === 'send-to-converter')  sendToConverter();
+    });
+  });
+
+  /* Base/width pills inside calc view */
+  document.querySelectorAll<HTMLButtonElement>('.calc-base').forEach(btn => {
+    btn.addEventListener('click', () => {
+      calcBase = btn.dataset.cbase as CalcBase;
+      typed = ''; /* avoid carrying invalid digits across bases */
+      renderCalc();
+    });
+  });
+  document.querySelectorAll<HTMLButtonElement>('.calc-width').forEach(btn => {
+    btn.addEventListener('click', () => {
+      calcWidth = parseInt(btn.dataset.cwidth!, 10);
+      renderCalc();
+    });
+  });
+
+  /* Keyboard input — only when calculator view is visible */
+  document.addEventListener('keydown', (e) => {
+    if (viewCalculator.hidden) return;
+    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+    const k = e.key;
+    if (/^[0-9a-fA-F]$/.test(k)) { appendDigit(k); e.preventDefault(); return; }
+    if (k === '+' || k === '-' || k === '*' || k === '/' || k === '&' || k === '|' || k === '^') {
+      applyOp(k as Op); e.preventDefault(); return;
+    }
+    if (k === 'Enter' || k === '=') { equals(); e.preventDefault(); return; }
+    if (k === 'Backspace')          { backspace(); e.preventDefault(); return; }
+    if (k === 'Escape')             { clearAll(); e.preventDefault(); return; }
+  });
+
+  /* Initial render */
+  renderCalc();
+</script>
