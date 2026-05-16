@@ -5,7 +5,10 @@
 <footer class="footer-block section-layer">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="text-center">
-      <a 
+      <p class="footer-availability">
+        san diego / remote · <a href="mailto:ajay@ajayraj.co">ajay@ajayraj.co</a>
+      </p>
+      <a
         href="https://github.com/ajayraj/ajayraj.co"
         target="_blank"
         rel="noopener noreferrer"
@@ -25,6 +28,23 @@
     background-color: #595959;
     display: flex;
     align-items: center;
+  }
+
+  .footer-availability {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.02em;
+  }
+  .footer-availability a {
+    color: #ffa07a;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 160, 122, 0.5);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .footer-availability a:hover {
+    color: #ff8c42;
+    border-bottom-color: #ff8c42;
   }
 
   .footer-link {

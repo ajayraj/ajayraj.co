@@ -4,30 +4,190 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
 }
 
-const { 
-  title = 'Ajay Raj - Software Engineer',
-  description = 'Personal website of Ajay Raj - Software Engineer and builder of things.'
+const SITE_URL = 'https://ajayraj.co';
+
+const {
+  title = 'Ajay Raj — Independent Software Engineer · San Diego / Remote | Embedded, Hardware, ML/AI, System Design',
+  description = 'San Diego–based independent software engineer (remote). I work with clients on safety-critical or mission-critical systems, MVPs in messy scientific domains, and inherited projects to decipher and ship. Embedded, hardware/software co-design, production ML, prototype to production. Background: FDA-cleared medical devices, military avionics, production-scale web.',
+  ogImage = `${SITE_URL}/og-image.png`,
 } = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, SITE_URL).href;
+
+/* Person + ProfessionalService structured data — tells search engines and
+   LLM crawlers explicitly: this person works in these domains and is
+   available for hire. The knowsAbout array is what gets indexed against
+   queries like "freelance embedded engineer" or "ML systems consultant". */
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Ajay Raj',
+  url: SITE_URL,
+  image: ogImage,
+  jobTitle: 'Independent Software Engineer & Contractor',
+  description,
+  email: 'mailto:ajay@ajayraj.co',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'San Diego',
+    addressRegion: 'CA',
+    addressCountry: 'US',
+  },
+  workLocation: [
+    { '@type': 'Place', name: 'San Diego, California' },
+    { '@type': 'Place', name: 'Remote — Worldwide' },
+  ],
+  sameAs: [
+    'https://github.com/ajayraj',
+    'https://linkedin.com/in/ajayjonathanraj',
+  ],
+  knowsAbout: [
+    /* Core engineering */
+    'Embedded Systems',
+    'Embedded Software',
+    'Firmware Development',
+    'Real-Time Operating Systems',
+    'FreeRTOS',
+    'FPGA',
+    'Verilog',
+    'Microcontrollers',
+    'Device Drivers',
+    'System Design',
+    'System Architecture',
+    'Hardware Engineering',
+    'Hardware/Software Co-design',
+    'Mechatronics',
+    'Robotics Software',
+    'Internet of Things',
+    'Edge Computing',
+    /* Methodology */
+    'Prototype to Production',
+    'Test-Driven Development',
+    'Traceable Software Development',
+    'Software Architecture',
+    'Internal Tools',
+    'Developer Infrastructure',
+    /* ML / AI */
+    'Machine Learning',
+    'AI Systems',
+    'Production ML',
+    'MLOps',
+    'Model Deployment',
+    /* Domains */
+    'Medical Device Software',
+    'IEC 62304',
+    'ISO 13485',
+    'FDA Software',
+    'Avionics Software',
+    /* Languages / platforms */
+    'C',
+    'C++',
+    'Python',
+    'Linux',
+    'Docker',
+  ],
+  alumniOf: [
+    { '@type': 'Organization', name: 'Philips' },
+    { '@type': 'Organization', name: 'General Atomics Aeronautical Systems' },
+  ],
+};
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'Ajay Raj — Independent Software Engineering',
+  alternateName: [
+    'Embedded Systems Consultant',
+    'Firmware Contractor',
+    'Hardware/Software Engineer',
+    'ML Systems Engineer',
+    'Independent Software Contractor',
+  ],
+  url: SITE_URL,
+  description: 'Independent software engineering and contracting in embedded systems, firmware, hardware/software co-design, production ML, and prototype-to-production product builds. Based in San Diego, working remotely worldwide.',
+  provider: {
+    '@type': 'Person',
+    name: 'Ajay Raj',
+    url: SITE_URL,
+  },
+  areaServed: [
+    { '@type': 'City', name: 'San Diego' },
+    { '@type': 'AdministrativeArea', name: 'California' },
+    { '@type': 'Country', name: 'United States' },
+    { '@type': 'Place', name: 'Remote — Worldwide' },
+  ],
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'San Diego',
+    addressRegion: 'CA',
+    addressCountry: 'US',
+  },
+  serviceType: [
+    'Embedded systems development',
+    'Firmware engineering',
+    'Hardware/software co-design',
+    'FPGA integration',
+    'Mechatronic prototyping',
+    'Prototype to production',
+    'System architecture review',
+    'Production ML systems',
+    'MLOps integration',
+    'Internal tooling and developer infrastructure',
+    'Medical device software (IEC 62304 / ISO 13485)',
+    'Test-driven, traceable software development',
+    'Architecture rescue and refactor',
+  ],
+};
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="author" content="Ajay Raj" />
+    <meta name="robots" content="index, follow" />
+    <meta name="keywords" content="independent software engineer, software contractor San Diego, freelance embedded engineer, firmware contractor, hardware/software co-design, FPGA contractor, embedded systems consultant, machine learning engineer for hire, ML systems consultant, MLOps contractor, medical device software, IEC 62304, FDA software, system design consultant, prototype to production, test-driven development, traceable software, hardware engineering contractor, remote software engineer, San Diego, California" />
+    <meta name="geo.placename" content="San Diego, California" />
+    <meta name="geo.region" content="US-CA" />
+    <link rel="canonical" href={canonicalUrl} />
+
     <!-- Theme-aware favicon: light icon in light mode, dark icon in dark mode -->
     <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
     <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#4a2c6d" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph (LinkedIn, Slack, Discord, iMessage, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content="Ajay Raj — Independent Software Engineer" />
+    <meta property="og:site_name" content="ajayraj.co" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet" />
     <title>{title}</title>
+
+    <!-- Structured data: Person + ProfessionalService -->
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
   </head>
   <body class="text-white font-sans antialiased">
     <div class="fixed-parallax-bg"></div>

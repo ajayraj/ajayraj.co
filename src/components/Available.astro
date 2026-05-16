@@ -1,0 +1,353 @@
+---
+// CTA / "Available for projects" — sits between Experience and How I Think,
+// reading as the natural "and now…" beat after the previous-roles narrative.
+
+/* Capacity badge — set to 0 to hide, or update the number as bookings change.
+   Living config so you don't have to edit markup; just bump this one number. */
+const OPEN_SPOTS = 1;
+---
+
+<section id="available" class="pt-12 pb-16 available-section section-layer">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="available-card fade-in-on-scroll">
+      <div class="available-status-row">
+        <div class="available-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="status-label">Now — independent</span>
+        </div>
+        {OPEN_SPOTS > 0 && (
+          <div class="capacity-badge" aria-label={`Currently has room for ${OPEN_SPOTS} more client`}>
+            <span class="capacity-spark" aria-hidden="true"></span>
+            <span class="capacity-label">
+              Room for <strong>{OPEN_SPOTS}</strong> more client
+            </span>
+          </div>
+        )}
+        <div class="available-location" aria-label="Location">
+          <span class="location-pin" aria-hidden="true">◉</span>
+          san diego · remote
+        </div>
+      </div>
+
+      <h2 class="available-title">
+        <a href="/work-with-me" class="available-title-link">Working with me <span class="title-arrow" aria-hidden="true">→</span></a>
+      </h2>
+
+      <p class="available-lede">
+        My clients usually have
+        <span class="highlight-text">safety-critical or mission-critical</span>
+        needs that have to be met above all,
+        <span class="highlight-text">MVPs in messy scientific domains</span>,
+        or <span class="highlight-text">inherited projects</span> to decipher and ship.
+        If that sounds like you, we'll work well together.
+      </p>
+
+      <ul class="available-fits">
+        <li><strong>Embedded, firmware &amp; OS</strong> — RTOS, kernel/BSP, drivers, FPGA, compliance-ready</li>
+        <li><strong>Custom devices &amp; co-design</strong> — schematic-aware code, mechatronics, blissful end products</li>
+        <li><strong>Production ML</strong> — research code into systems that scale with load</li>
+        <li><strong>AI systems</strong> — MCP, RAG, agents; implemented safely, fixing vibe-slop</li>
+        <li><strong>Prototype to production</strong> — quick first cuts, built to last</li>
+        <li><strong>Internal tooling</strong> — tools, workflow, and documentation your team will love</li>
+        <li><strong>Architecture review &amp; rescue</strong> — audits, refactors, inherited projects, getting unstuck</li>
+      </ul>
+
+      <aside class="available-fulltime">
+        <p>
+          <strong>Hiring for your team?</strong>
+          I'd like to chat, and am open to the right role if there's alignment.
+        </p>
+      </aside>
+
+      <div class="available-actions">
+        <a href="mailto:ajay@ajayraj.co?subject=Project%20inquiry" class="cta-primary">
+          ajay@ajayraj.co →
+        </a>
+        <a href="/work-with-me" class="cta-interested">
+          Interested? <span class="cta-interested-arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Top stop matches end-of-Experience (rgba(100, 87, 120, 0.7)), bottom
+     hands off to How I Think's top stop (rgba(100, 87, 120, 0.7)) — so this
+     section visually bridges without introducing a new color. */
+  .available-section {
+    background: linear-gradient(to bottom,
+      rgba(100, 87, 120, 0.7) 0%,
+      rgba(105, 90, 117, 0.55) 100%
+    );
+  }
+
+  .available-card {
+    position: relative;
+    background: rgba(77, 77, 77, 0.7);
+    border: 1px solid rgba(255, 160, 122, 0.45);
+    border-radius: 1rem;
+    padding: 2rem 2rem 1.75rem;
+    box-shadow:
+      0 12px 32px rgba(0, 0, 0, 0.3),
+      0 0 32px rgba(255, 153, 102, 0.12);
+  }
+
+  .available-status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .available-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(122, 191, 158, 0.12);
+    border: 1px solid rgba(122, 191, 158, 0.3);
+    color: #7abf9e;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  /* Padding-left matches the chips' inner padding so the orange pin lines
+     up visually with the green dots inside the chips above. */
+  .available-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0.7rem;
+  }
+  .location-pin {
+    color: #ff9966;
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+
+  /* Warm chip — distinct from the green status pill so the eye reads it as
+     "act on this" rather than "informational." Soft pulse on the spark to
+     draw attention without nagging. */
+  .capacity-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    background: rgba(255, 153, 102, 0.14);
+    border: 1px solid rgba(255, 153, 102, 0.45);
+    color: #ffb88c;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+  }
+  .capacity-badge strong {
+    color: #ff9966;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .capacity-spark {
+    width: 6px;
+    height: 6px;
+    background: #ff9966;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 153, 102, 0.7);
+    animation: capacityBlink 2.6s ease-in-out infinite;
+  }
+  @keyframes capacityBlink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.85); }
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #7abf9e;
+    box-shadow: 0 0 8px rgba(122, 191, 158, 0.7);
+    animation: statusPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes statusPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+  }
+
+  .available-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #f0c9d9;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.75rem;
+  }
+  .available-title-link {
+    color: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+    border-bottom: 1px dashed rgba(255, 153, 102, 0.35);
+    padding-bottom: 0.15rem;
+  }
+  .available-title-link:hover {
+    color: #ff9966;
+    border-bottom-color: #ff9966;
+  }
+  .title-arrow {
+    font-size: 0.75em;
+    color: #ff9966;
+    opacity: 1;
+    transition: transform 0.25s ease;
+    display: inline-block;
+  }
+  .available-title-link:hover .title-arrow {
+    transform: translateX(4px);
+  }
+
+  .available-lede {
+    color: rgba(255, 255, 255, 0.92);
+    line-height: 1.7;
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .available-fits {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  @media (min-width: 768px) {
+    .available-fits {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem 1.5rem;
+    }
+  }
+  .available-fits li {
+    position: relative;
+    padding-left: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .available-fits li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #ffa07a;
+  }
+  .available-fits strong {
+    color: #ffb88c;
+    font-weight: 600;
+  }
+
+  /* Same warm-orange treatment as the /work-with-me aside, so internal
+     hirers passing through the home page also see the door is open. */
+  .available-fulltime {
+    margin: 1rem 0 1.25rem;
+    padding: 0.85rem 1.1rem;
+    border-left: 2px solid rgba(255, 160, 122, 0.45);
+    background: rgba(255, 153, 102, 0.05);
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  .available-fulltime p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.78);
+    font-style: italic;
+    line-height: 1.55;
+  }
+  .available-fulltime strong {
+    color: #ffb88c;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .available-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #ff9966;
+    color: #1f1426;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.25rem;
+    border-radius: 0.625rem;
+    text-decoration: none;
+    transition: transform 0.18s ease, box-shadow 0.2s ease, background 0.2s;
+    box-shadow: 0 4px 14px rgba(255, 153, 102, 0.3);
+  }
+  .cta-primary:hover {
+    background: #ffaa7a;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(255, 153, 102, 0.45);
+  }
+
+  .cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.1rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(190, 156, 212, 0.4);
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .cta-secondary:hover {
+    background: rgba(190, 156, 212, 0.15);
+    border-color: rgba(255, 160, 122, 0.5);
+  }
+
+  /* "Interested?" navigation CTA — visually distinct from the email primary
+     (no solid orange fill, doesn't compete) but stronger than a plain
+     secondary so it reads as "click for more" rather than just "social link." */
+  .cta-interested {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0.625rem;
+    background: rgba(255, 153, 102, 0.12);
+    border: 1px solid rgba(255, 153, 102, 0.55);
+    color: #ffb88c;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.18s ease;
+  }
+  .cta-interested:hover {
+    background: rgba(255, 153, 102, 0.2);
+    border-color: rgba(255, 153, 102, 0.85);
+    color: #ff9966;
+    transform: translateY(-1px);
+  }
+  .cta-interested-arrow {
+    display: inline-block;
+    transition: transform 0.25s ease;
+  }
+  .cta-interested:hover .cta-interested-arrow {
+    transform: translateX(4px);
+  }
+
+  :global(.highlight-text) {
+    color: #ff9966;
+    font-weight: 500;
+    text-shadow: 0 0 8px rgba(255, 160, 122, 0.3);
+  }
+</style>

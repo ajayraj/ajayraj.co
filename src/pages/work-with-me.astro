@@ -1,0 +1,409 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+/* Mirror the open-spots constant on the home Available section. Update both
+   when capacity changes (or refactor into a shared module if you start
+   adding more shared content later). */
+const OPEN_SPOTS = 1;
+---
+
+<Layout
+  title="Working with Ajay Raj — Independent Software Engineer · Embedded, Hardware, ML/AI"
+  description="Ajay Raj — independent software engineer in San Diego (remote). Available for safety-critical or mission-critical builds, MVPs in messy scientific domains, and inherited projects to decipher and ship. Embedded systems, hardware/software co-design, production ML, AI tooling, internal tooling."
+>
+  <main class="card-page">
+    <a href="/" class="back-link">← ajayraj.co</a>
+
+    <article class="business-card">
+    <header class="card-header">
+      <h1 class="card-name">Ajay Raj</h1>
+      <p class="card-role">engineer for hard problems</p>
+      <p class="card-specialties">embedded · hardware · ML · operating systems</p>
+
+      <div class="card-status-row">
+        <div class="card-chip card-chip-status">
+          <span class="status-dot" aria-hidden="true"></span>
+          Now — independent
+        </div>
+        {OPEN_SPOTS > 0 && (
+          <div class="card-chip card-chip-warm">
+            <span class="capacity-spark" aria-hidden="true"></span>
+            Room for <strong>{OPEN_SPOTS}</strong> more client
+          </div>
+        )}
+        <div class="card-chip card-chip-quiet">
+          <span class="location-pin" aria-hidden="true">◉</span>
+          san diego · remote
+        </div>
+      </div>
+    </header>
+
+    <section class="card-aside card-aside-top">
+      <p>
+        <strong>Hiring for your team?</strong>
+        I'd like to chat, and am open to the right role if there's alignment.
+      </p>
+    </section>
+
+    <section class="card-section">
+      <h2>Working with me</h2>
+      <p>My clients usually have:</p>
+      <ul class="card-needs">
+        <li><span class="hl">safety-critical or mission-critical</span> needs that have to be met above all</li>
+        <li><span class="hl">MVPs in messy scientific domains</span></li>
+        <li><span class="hl">inherited projects</span> to decipher and ship</li>
+      </ul>
+      <p>If that sounds like you, we'll work well together.</p>
+      <p>
+        I enjoy messy intersections, where the science, the hardware, or the
+        real world meets the code. I own products end-to-end: prototype
+        quickly to iterate towards requirements and core features, then
+        release. The version I ship is <span class="hl">test-driven</span>,
+        <span class="hl">traceable</span>, documented, and mature enough for
+        anyone to pick the work back up.
+      </p>
+    </section>
+
+    <section class="card-section">
+      <h2>What I take on</h2>
+      <ul class="card-fits">
+        <li><strong>Embedded, firmware &amp; OS</strong> — RTOS, kernel and driver work, BSPs, FPGA, system-level performance; compliance-ready (FDA / IEC 62304 / ISO 13485 background)</li>
+        <li><strong>Custom devices &amp; co-design</strong> — full builds from spec to ship: enclosure, electronics, schematic-aware firmware, mechatronic integration; blissful end products</li>
+        <li><strong>Production ML</strong> — research code into systems that scale with load</li>
+        <li><strong>AI systems</strong> — MCP, RAG, agents, evaluators; implemented safely, fixing vibe-slop</li>
+        <li><strong>Prototype to production</strong> — quick first cuts, built to last</li>
+        <li><strong>Internal tooling</strong> — tools, workflow, and documentation your team will love</li>
+        <li><strong>Open-ended problems</strong> — exploratory R&amp;D, scoping unknown territory, “we don't know what this needs to be yet”</li>
+        <li><strong>Architecture review &amp; rescue</strong> — audits, refactors, inherited projects, getting unstuck</li>
+      </ul>
+    </section>
+
+    <section class="card-section">
+      <h2>How engagements typically work</h2>
+      <ul class="card-engagements">
+        <li><strong>Discovery</strong> — short paid scoping call or week. We figure out shape and fit before either of us commits.</li>
+        <li><strong>Build</strong> — fixed-scope when the work is well-defined, hourly when the shape is still emerging.</li>
+        <li><strong>Retainer</strong> — open to flexible arrangements: a committed bucket of hours plus stand-by support, for ongoing work or unpredictable needs.</li>
+        <li><strong>Handoff</strong> — code, tests, docs, runbooks. I leave the work better than I found it, so the next team can pick it up cold.</li>
+      </ul>
+    </section>
+
+    <section class="card-section card-cta">
+      <h2>Let's talk</h2>
+      <p>Tell me about the problem in a few sentences — happy to read a brief, repo, or rough sketch.</p>
+      <div class="card-actions">
+        <a href="mailto:ajay@ajayraj.co?subject=Project%20inquiry" class="cta-primary">
+          ajay@ajayraj.co →
+        </a>
+        <a href="https://linkedin.com/in/ajayjonathanraj" target="_blank" rel="noopener noreferrer" class="cta-secondary">
+          LinkedIn
+        </a>
+      </div>
+    </section>
+    </article>
+
+    <footer class="card-footer">
+      <p>
+        For background, projects, and how I think →
+        <a href="/">ajayraj.co</a>
+      </p>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  .card-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    color: #f0e8ff;
+    position: relative;
+    z-index: 10;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.5rem;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .back-link:hover {
+    color: #ff9966;
+    border-bottom-color: #ff9966;
+  }
+
+  /* Single card wraps the whole pitch — gives the white text a defined dark
+     surface to sit on (much more readable than text floating on the page
+     gradient) and matches the card-everywhere aesthetic of the main site. */
+  .business-card {
+    background: rgba(36, 24, 53, 0.78);
+    border: 1px solid rgba(190, 156, 212, 0.25);
+    border-radius: 1.25rem;
+    padding: 2.5rem 2.5rem 2rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+  }
+  @media (max-width: 600px) {
+    .business-card {
+      padding: 1.75rem 1.25rem 1.5rem;
+      border-radius: 0.875rem;
+    }
+  }
+
+  .card-header {
+    margin-bottom: 3rem;
+  }
+  .card-name {
+    font-family: var(--font-serif, 'Fraunces', Georgia, serif);
+    font-size: 2.5rem;
+    font-weight: 500;
+    color: #f0c9d9;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.25rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  .card-role {
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+  }
+  /* Smaller, quieter byline directly under the role — lists the specialty
+     surfaces without making them the headline. */
+  .card-specialties {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 1.25rem;
+  }
+  .card-status-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .card-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+  }
+  .card-chip-status {
+    background: rgba(122, 191, 158, 0.12);
+    border: 1px solid rgba(122, 191, 158, 0.3);
+    color: #7abf9e;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+  .card-chip-warm {
+    background: rgba(255, 153, 102, 0.14);
+    border: 1px solid rgba(255, 153, 102, 0.45);
+    color: #ffb88c;
+  }
+  .card-chip-warm strong {
+    color: #ff9966;
+    font-weight: 700;
+  }
+  .card-chip-quiet {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .status-dot, .capacity-spark {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .status-dot {
+    background: #7abf9e;
+    box-shadow: 0 0 8px rgba(122, 191, 158, 0.7);
+    animation: cardStatusPulse 2.4s ease-in-out infinite;
+  }
+  .capacity-spark {
+    width: 6px;
+    height: 6px;
+    background: #ff9966;
+    box-shadow: 0 0 8px rgba(255, 153, 102, 0.7);
+    animation: cardCapacityBlink 2.6s ease-in-out infinite;
+  }
+  .location-pin {
+    color: #ff9966;
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+  @keyframes cardStatusPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+  }
+  @keyframes cardCapacityBlink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .card-section {
+    margin-bottom: 2.25rem;
+  }
+  .card-section h2 {
+    /* Sans on section headings — keeps the page feeling modern.
+       The serif on the H1 name carries the personality alone. */
+    font-family: inherit;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #f0c9d9;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+  }
+  .card-section p {
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: 0.85rem;
+    font-size: 0.98rem;
+  }
+
+  .card-fits, .card-engagements, .card-needs {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .card-fits li, .card-engagements li, .card-needs li {
+    position: relative;
+    padding-left: 1.4rem;
+    margin-bottom: 0.65rem;
+    line-height: 1.55;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.88);
+  }
+  .card-fits li::before, .card-engagements li::before, .card-needs li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #ff9966;
+    font-weight: bold;
+  }
+  .card-fits strong, .card-engagements strong {
+    color: #ffb88c;
+    font-weight: 600;
+  }
+  .card-needs {
+    margin: 0.5rem 0 0.85rem;
+  }
+
+  .card-cta {
+    background: rgba(74, 44, 109, 0.45);
+    border: 1px solid rgba(255, 160, 122, 0.4);
+    border-radius: 0.875rem;
+    padding: 1.5rem 1.75rem;
+    margin-top: 1.25rem;
+  }
+
+  /* Quiet "by the way" — italic, slightly muted, sits between engagements
+     and the primary CTA without competing with either. */
+  .card-aside {
+    margin: 0.5rem 0 1.5rem;
+    padding: 0.85rem 1.1rem;
+    border-left: 2px solid rgba(255, 160, 122, 0.45);
+    background: rgba(255, 153, 102, 0.05);
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  /* Tighter top margin so it tucks right under the header chips */
+  .card-aside-top {
+    margin: 0 0 2rem;
+  }
+  .card-aside p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: rgba(255, 255, 255, 0.78);
+    font-style: italic;
+    line-height: 1.55;
+  }
+  .card-aside strong {
+    color: #ffb88c;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  .cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #ff9966;
+    color: #1f1426;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.25rem;
+    border-radius: 0.625rem;
+    text-decoration: none;
+    transition: transform 0.18s ease, box-shadow 0.2s ease, background 0.2s;
+    box-shadow: 0 4px 14px rgba(255, 153, 102, 0.3);
+  }
+  .cta-primary:hover {
+    background: #ffaa7a;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(255, 153, 102, 0.45);
+  }
+  .cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1.1rem;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(190, 156, 212, 0.4);
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .cta-secondary:hover {
+    background: rgba(190, 156, 212, 0.15);
+    border-color: rgba(255, 160, 122, 0.5);
+  }
+
+  .card-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+  }
+  .card-footer p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .card-footer a {
+    color: #ff9966;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 153, 102, 0.5);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .card-footer a:hover {
+    color: #ffaa7a;
+    border-bottom-color: #ffaa7a;
+  }
+
+  .hl {
+    color: #ff9966;
+    font-weight: 500;
+    text-shadow: 0 0 8px rgba(255, 160, 122, 0.3);
+  }
+
+  @media (max-width: 600px) {
+    .card-page { padding: 2.5rem 1rem 4rem; }
+    .card-name { font-size: 2rem; }
+    .card-section h2 { font-size: 1.2rem; }
+  }
+</style>
