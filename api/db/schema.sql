@@ -55,4 +55,3 @@ CREATE TABLE IF NOT EXISTS clips (
 );
 
 CREATE INDEX IF NOT EXISTS idx_clips_expires ON clips(expires_at);
-CREATE INDEX IF NOT EXISTS idx_clips_pw      ON clips(password_hash);
