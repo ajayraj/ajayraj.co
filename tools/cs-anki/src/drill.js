@@ -110,14 +110,16 @@ async function updateQueueSummary() {
   // Summary text
   const summaryEl = document.getElementById('drill-queue-summary');
   if (summaryEl) {
-    const newTodayStr = isLoggedIn()
-      ? `<span class="queue-new">${newDrilledToday}/${NEW_BUDGET} new today</span>`
-      : `<span class="queue-new">${newCount} new</span>`;
-    summaryEl.innerHTML =
-      `<strong>${total}</strong> cards ready — ` +
-      `<span class="queue-reviews">${reviewCount} due for review</span>, ` +
-      newTodayStr +
-      (!isLoggedIn() ? ' <span class="queue-offline">(local)</span>' : '');
+    const newRemaining = isLoggedIn()
+      ? Math.max(0, NEW_BUDGET - newDrilledToday)
+      : newCount;
+    const parts = [];
+    parts.push(`<span class="queue-reviews">${reviewCount} due for review</span>`);
+    if (newRemaining > 0)
+      parts.push(`<span class="queue-new">${newRemaining} new</span>`);
+    if (!isLoggedIn())
+      parts.push(`<span class="queue-offline">(local)</span>`);
+    summaryEl.innerHTML = parts.join(', ');
   }
 
   // Update button counts + enabled state
