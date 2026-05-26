@@ -1,0 +1,256 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+/* /uses — what i actually use day to day. matter-of-fact, no spec sheets,
+   no affiliate links, no ranking opinions. just the kit + why each piece
+   is here. add new sections as work + tools evolve. */
+---
+
+<Layout
+  title="uses — the tools i work with · ajayraj.co"
+  description="What I actually use to build — desktop, NAS, laptops, keyboard, layout, editor. Hardware, software, and the things that make day-to-day engineering feel right."
+>
+  <main class="uses-page">
+    <a href="/" class="back-link">← ajayraj.co</a>
+
+    <header class="uses-header">
+      <h1 class="uses-title">uses</h1>
+      <p class="uses-subtitle">the tools i actually use, day to day.</p>
+    </header>
+
+    <article class="uses-card">
+      <p class="uses-intro">
+        tools are deeply personal, here's what works for me
+      </p>
+
+      <section class="uses-section">
+        <h2>desktop / build server</h2>
+        <ul class="uses-list">
+          <li><strong>OS</strong> — Arch Linux</li>
+          <li><strong>CPU</strong> — AMD Ryzen 9 5900X</li>
+          <li><strong>GPU</strong> — RTX 3080 Ti (12 GB) primary, plus an RTX 3080 (12 GB) hung off the chassis via Oculink.</li>
+          <li><strong>Role</strong> — build server, training rig, League of Legends...</li>
+        </ul>
+      </section>
+
+      <section class="uses-section">
+        <h2>NAS</h2>
+        <ul class="uses-list">
+          <li><strong>Board</strong> — Intel N100 board. from China. Adventure!</li>
+          <li><strong>Storage</strong> — 6 × 16&nbsp;TB drives, a few NVMEs. ZFS pool.</li>
+          <li><strong>Role</strong> — Databases, files, media, object storage.</li>
+        </ul>
+      </section>
+
+      <section class="uses-section">
+        <h2>other compute</h2>
+        <ul class="uses-list">
+          <li><strong>Mac mini M4</strong></li>
+          <li><strong>MacBook Air</strong> — battery life got me</li>
+        </ul>
+      </section>
+
+      <section class="uses-section">
+        <h2>keyboard</h2>
+        <p>
+          <strong>Hillside 46</strong>, split ergonomic. I designed and CNC'd
+          the case out of layered plywood, then bocote.
+        </p>
+        <p>
+          Layout is <strong>ISRT</strong>.
+        </p>
+        <div class="uses-images">
+          <figure class="uses-figure">
+            <img src="/img/uses/kbd-iridescent.jpg" alt="bocote case build" loading="lazy" />
+            <figcaption>bocote case, CNC milled</figcaption>
+          </figure>
+          <figure class="uses-figure">
+            <img src="/img/uses/kbd-ivory.jpg" alt="plywood build" loading="lazy" />
+            <figcaption>nice plywood, hand routed</figcaption>
+          </figure>
+          <figure class="uses-figure uses-figure-wide">
+            <img src="/img/uses/isrt-base.jpg" alt="ISRT base layer" loading="lazy" />
+            <figcaption>ISRT — base layer</figcaption>
+          </figure>
+          <figure class="uses-figure uses-figure-wide">
+            <img src="/img/uses/isrt-symbols.jpg" alt="ISRT symbols layer" loading="lazy" />
+            <figcaption>symbols + numbers layer</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="uses-section">
+        <h2>chair</h2>
+        <p>
+          A high-back bungee chair — similar in spirit to what the Container Store
+          or Euro Style sell, but a high-back version from a company that no longer
+          exists. Sitting in it is like sitting in a hammock. I've tried all the
+          clouty chairs. This is the only one that works for my back.
+        </p>
+      </section>
+
+      <p class="uses-coming">i'll add more eventually</p>
+    </article>
+
+    <footer class="uses-footer">
+      <p>back to <a href="/">ajayraj.co</a></p>
+    </footer>
+  </main>
+</Layout>
+
+<style>
+  .uses-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    color: #f0e8ff;
+    position: relative;
+    z-index: 10;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.5rem;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .back-link:hover { color: #ff9966; border-bottom-color: #ff9966; }
+
+  .uses-header { margin-bottom: 1.5rem; }
+  .uses-title {
+    font-family: var(--font-serif, 'Fraunces', Georgia, serif);
+    font-size: 2.75rem;
+    font-weight: 500;
+    color: #f0c9d9;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.15rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  .uses-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+  }
+
+  .uses-card {
+    background: rgba(36, 24, 53, 0.78);
+    border: 1px solid rgba(190, 156, 212, 0.25);
+    border-radius: 1.25rem;
+    padding: 2rem 2.25rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+    line-height: 1.65;
+  }
+
+  .uses-intro {
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.98rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .uses-section {
+    margin-bottom: 1.75rem;
+  }
+  .uses-section h2 {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f0c9d9;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.85rem;
+  }
+  .uses-section p {
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .uses-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .uses-list li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.55rem;
+    font-size: 0.94rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .uses-list li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #ff9966;
+  }
+  .uses-list strong {
+    color: #ffb88c;
+    font-weight: 600;
+  }
+
+  .uses-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+  .uses-figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .uses-figure-wide { grid-column: 1 / -1; }
+  .uses-figure img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.625rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.2);
+    display: block;
+  }
+  .uses-figure figcaption {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.55);
+    font-style: italic;
+    text-align: center;
+  }
+
+  .uses-coming {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
+    font-style: italic;
+    text-align: center;
+  }
+
+  .uses-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .uses-footer a {
+    color: #ff9966;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(255, 153, 102, 0.5);
+  }
+  .uses-footer a:hover { color: #ffaa7a; border-bottom-color: #ffaa7a; }
+
+  @media (max-width: 600px) {
+    .uses-page { padding: 2rem 1rem 4rem; }
+    .uses-card { padding: 1.5rem 1.25rem; border-radius: 0.875rem; }
+    .uses-title { font-size: 2rem; }
+    .uses-images { grid-template-columns: 1fr; }
+  }
+</style>

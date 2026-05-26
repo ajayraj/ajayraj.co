@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Atomic Cards — cs-anki</title>
+  <title>Recall — cs-anki</title>
   <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
   <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -16,29 +16,39 @@
 
     <div class="header-row">
       <a href="https://ajayraj.co" class="back-link">← ajayraj.co</a>
-      <button id="theme-btn" class="theme-btn" title="Toggle theme">☀︎</button>
+      <div class="header-controls">
+        <button id="auth-btn" class="auth-btn" title="Log in">Log in</button>
+        <button id="theme-btn" class="theme-btn" title="Toggle theme">☀︎</button>
+      </div>
     </div>
 
     <header>
-      <h1>Atomic Cards</h1>
+      <h1>Recall</h1>
       <div class="subtitle">one card at a time.</div>
       <div class="stats" id="stats"></div>
     </header>
+
+    <!-- Daily session banner — populated by main.js after session fetch -->
+    <div id="daily-banner" class="daily-banner hidden"></div>
 
     <nav class="mode-nav">
       <button class="mode-btn active" data-mode="browse">Browse</button>
       <button class="mode-btn" data-mode="drill">Drill</button>
       <button class="mode-btn" data-mode="quiz">Quiz</button>
       <button class="mode-btn" data-mode="workspace">Workspace</button>
+      <button class="mode-btn" data-mode="progress">Progress</button>
     </nav>
 
     <!-- Browse mode -->
     <div id="view-browse">
       <div class="filters"></div>
+      <div class="browse-row-controls">
+        <div class="browse-row-filters"></div>
+        <div id="sort-control-slot"></div>
+      </div>
       <input type="text" class="search" id="search" placeholder="Search cards…" />
       <div class="cat-filter" id="catFilter"></div>
       <div class="legend"></div>
-      <div class="helper-text">tap to flip · expand for more · links jump to cards</div>
       <div id="deck"><div class="loading">Loading cards…</div></div>
     </div>
 
@@ -57,11 +67,16 @@
       <div id="workspace-container"></div>
     </div>
 
+    <!-- Progress mode -->
+    <div id="view-progress" class="hidden">
+      <div id="progress-container"></div>
+    </div>
+
     <footer id="footer"></footer>
 
   </div>
 
-  <!-- Scroll-to-top: same triple-chevron used on ajayraj.co, rotated 180° -->
+  <!-- Scroll-to-top -->
   <button class="scroll-to-top" id="scroll-to-top" aria-label="Scroll to top" type="button">
     <svg width="30" height="40" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
       <defs>

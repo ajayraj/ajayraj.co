@@ -7,7 +7,6 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       emptyOutDir: true,
     },
-    // Expose VITE_API_BASE to the browser bundle
     define: {
       'import.meta.env.VITE_API_BASE': JSON.stringify(env.VITE_API_BASE ?? ''),
     },

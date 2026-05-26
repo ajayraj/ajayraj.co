@@ -1,38 +1,36 @@
-import { renderCardMeta, renderCardFrontContent, renderCardBack, attachCardHandlers, cardProseContent } from './render.js';
-import { getCardProgress, saveCardProgress, computeNext } from './store.js';
+/* drill.js — self-graded flashcard drill with SM-2 spaced repetition.
+   Flow: front → user writes → reveal → compare → rate → next card.
+   Text matching is deliberately removed: the user is the grader. */
+
+import { renderCardMeta, renderCardFrontContent, renderCardBack, attachCardHandlers } from './render.js';
+import { getCardProgress, saveCardProgress, computeNext, isLoggedIn, isDue, isUnseen, addDailyNewDrilled } from './store.js';
+import { apiGetSession, apiSubmitReview } from './api.js';
 import { TIER_META, shuffle, renderTierTabs } from './util.js';
 
-const SESSION_SIZE = 20;
-/* Filler words and generic verbs that don't represent recall-worthy concepts.
-   Curated to avoid grading the student on incidental phrasing. */
-const STOPWORDS    = new Set([
-  'the','and','that','this','with','from','have','when','what','some','into','your',
-  'each','will','they','just','used','also','than','then','does','for','are','can',
-  'not','you','its','was','were','but','use','using','which','has','all','any','been',
-  'more','one','two','way','let','put','run','how','why','see','may','only','too',
-  'big','small','their','tells','still','again','until','over','most','need','know',
-  'something','exactly','imagine','means','might','otherwise','before','already',
-  'before','after','first','last','next','step','rule','side','here','there','very',
-  'extra','simpler','holds','pull','push','forward','watch','found','find','write',
-  'ask','answers','data','item','items','number','numbers','list','rest','many',
-  'much','new','old','once','twice','thing','things','case','cases','same','other',
-  'others','must','should','these','those','make','makes','made','say','says','goes',
-]);
+const NEW_BUDGET     = 10;
+const MAX_REVIEWS    = 20;
+const SESSION_SIZE   = NEW_BUDGET + MAX_REVIEWS;
 
-let allCards   = [];
-let queue      = [];
-let idx        = 0;
-let tally      = { got_it: 0, almost: 0, no: 0 };
-let tierFilter = 'all';
+let allCards      = [];
+let queue         = [];
+let idx           = 0;
+let tally         = { got_it: 0, almost: 0, no: 0 };
+let tierFilter    = 'all';
+let sessionType   = 'review'; // 'review' | 'new'
+let newCardsInSession = 0;    // count of unseen cards added to queue this session
+
+// Server session data (populated on start when logged in)
+let serverSession = null;
 
 export function initDrill(cards) {
   allCards = cards;
   renderSetup();
 }
 
-/* ── Setup screen ── */
+/* ── Setup ────────────────────────────────────────────────────────────── */
+
 function renderSetup() {
-  const el      = document.getElementById('drill-container');
+  const el = document.getElementById('drill-container');
   const tierBtns = [
     { value: 'all', label: 'All tiers', sub: null },
     ...Object.entries(TIER_META).map(([v, m]) => ({ value: v, label: m.label, sub: m.sub })),
@@ -41,19 +39,29 @@ function renderSetup() {
   el.innerHTML = `
     <div class="drill-setup">
       <h2>Drill</h2>
-      <p>Type your answer, then reveal the back and rate yourself.<br>
-         Cards you struggle with come back sooner.</p>
+      <p>Write your answer, reveal the card, then rate yourself.
+         Cards you review more often will reappear sooner; ones you know well come back later.</p>
 
       <div class="drill-filters">
         ${renderTierTabs(tierBtns, tierFilter, 'drill-filter-btn')}
       </div>
 
-      <div class="queue-summary" id="drill-queue-summary"></div>
-      <button class="start-btn" id="drill-start-btn">Start session</button>
+      <div class="queue-summary" id="drill-queue-summary">
+        <span class="queue-loading">Loading queue…</span>
+      </div>
+
+      <div class="drill-start-row">
+        <button class="drill-session-btn" id="drill-btn-review" disabled>
+          <span class="drill-btn-label">Today's cards</span>
+          <span class="drill-btn-count" id="drill-review-count">—</span>
+        </button>
+        <button class="drill-session-btn" id="drill-btn-new" disabled>
+          <span class="drill-btn-label">New cards</span>
+          <span class="drill-btn-count" id="drill-new-count">—</span>
+        </button>
+      </div>
     </div>
   `;
-
-  updateQueueSummary();
 
   el.querySelector('.drill-filters').addEventListener('click', e => {
     const btn = e.target.closest('.drill-filter-btn');
@@ -63,47 +71,140 @@ function renderSetup() {
     updateQueueSummary();
   });
 
-  el.querySelector('#drill-start-btn').addEventListener('click', startSession);
+  el.querySelector('#drill-btn-review').addEventListener('click', () => startSession('review'));
+  el.querySelector('#drill-btn-new').addEventListener('click',    () => startSession('new'));
+
+  updateQueueSummary();
 }
 
 function candidateCards() {
   return allCards.filter(c => tierFilter === 'all' || c.tier === tierFilter);
 }
 
-function buildQueue() {
-  const now  = Date.now();
+async function updateQueueSummary() {
   const pool = candidateCards();
+  let reviewCount, newCount;
 
-  const overdue = pool
-    .filter(c => { const p = getCardProgress(c.id); return p && p.nextDue <= now; })
-    .sort((a, b) => (getCardProgress(a.id)?.nextDue ?? 0) - (getCardProgress(b.id)?.nextDue ?? 0));
+  if (isLoggedIn()) {
+    serverSession = await apiGetSession();
+    if (serverSession) {
+      const seenSet = new Set(serverSession.seen_card_ids);
+      // Filter review cards to those in the current tier filter
+      const poolIds = new Set(pool.map(c => c.id));
+      reviewCount = serverSession.review_card_ids.filter(id => poolIds.has(id)).length;
+      newCount    = pool.filter(c => !seenSet.has(c.id)).length;
+    } else {
+      reviewCount = 0;
+      newCount = pool.length;
+    }
+  } else {
+    const today = new Date().toISOString().slice(0, 10);
+    reviewCount = pool.filter(c => isDue(c.id)).length;
+    newCount    = pool.filter(c => isUnseen(c.id)).length;
+  }
 
-  const unseen = shuffle(pool.filter(c => !getCardProgress(c.id)));
-  return [...overdue, ...unseen].slice(0, SESSION_SIZE);
+  const cappedNew = Math.min(newCount, NEW_BUDGET);
+  const total     = Math.min(reviewCount + cappedNew, SESSION_SIZE);
+
+  // Summary text
+  const summaryEl = document.getElementById('drill-queue-summary');
+  if (summaryEl) {
+    summaryEl.innerHTML =
+      `<strong>${total}</strong> cards ready — ` +
+      `<span class="queue-reviews">${reviewCount} due for review</span>, ` +
+      `<span class="queue-new">${cappedNew} new</span>` +
+      (!isLoggedIn() ? ' <span class="queue-offline">(local)</span>' : '');
+  }
+
+  // Update button counts + enabled state
+  const reviewBtn   = document.getElementById('drill-btn-review');
+  const newBtn      = document.getElementById('drill-btn-new');
+  const reviewCount_el = document.getElementById('drill-review-count');
+  const newCount_el    = document.getElementById('drill-new-count');
+  if (reviewCount_el) {
+    if (reviewCount === 0) {
+      reviewCount_el.textContent = '✓ all done';
+      reviewCount_el.classList.add('drill-done-count');
+    } else {
+      reviewCount_el.textContent = `${reviewCount} due`;
+      reviewCount_el.classList.remove('drill-done-count');
+    }
+  }
+  if (newCount_el) newCount_el.textContent = `${cappedNew} cards`;
+  // Review button: always enabled — clicking with 0 due re-drills today's completed cards
+  if (reviewBtn) reviewBtn.disabled = false;
+  if (newBtn)    newBtn.disabled    = cappedNew === 0;
 }
 
-function updateQueueSummary() {
-  const now  = Date.now();
+/* ── Session ──────────────────────────────────────────────────────────── */
+
+async function startSession(type = 'review') {
+  sessionType      = type;
+  newCardsInSession = 0;
   const pool = candidateCards();
-  const over = pool.filter(c => { const p = getCardProgress(c.id); return p && p.nextDue <= now; }).length;
-  const new_ = pool.filter(c => !getCardProgress(c.id)).length;
-  const total = Math.min(over + new_, SESSION_SIZE);
-
-  document.getElementById('drill-queue-summary').innerHTML =
-    `<strong>${total}</strong> cards ready — ${over} overdue, ${new_} new`;
-
-  const btn = document.getElementById('drill-start-btn');
-  if (btn) btn.disabled = total === 0;
-}
-
-/* ── Session ── */
-function startSession() {
-  queue = buildQueue();
+  queue = [];
   idx   = 0;
   tally = { got_it: 0, almost: 0, no: 0 };
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (isLoggedIn() && serverSession) {
+    const seenSet = new Set(serverSession.seen_card_ids);
+    const poolIds = new Set(pool.map(c => c.id));
+    const budget  = serverSession.new_budget ?? NEW_BUDGET;
+
+    if (type === 'review') {
+      const dueCards = serverSession.review_card_ids
+        .filter(id => poolIds.has(id))
+        .map(id => pool.find(c => c.id === id))
+        .filter(Boolean);
+
+      if (dueCards.length > 0) {
+        queue = dueCards;
+      } else {
+        // Nothing due — re-drill cards reviewed today in shuffled order
+        queue = shuffle(pool.filter(c => {
+          const p = getCardProgress(c.id);
+          return p?.last_reviewed?.startsWith(today);
+        }));
+      }
+    } else {
+      const newCards = shuffle(pool.filter(c => !seenSet.has(c.id))).slice(0, budget);
+      newCardsInSession = newCards.length;
+      queue = newCards;
+    }
+  } else {
+    // Offline/local path
+    if (type === 'review') {
+      const dueCards = pool
+        .filter(c => isDue(c.id))
+        .sort((a, b) => {
+          const da = getCardProgress(a.id)?.next_review ?? '';
+          const db = getCardProgress(b.id)?.next_review ?? '';
+          return da.localeCompare(db);
+        });
+
+      if (dueCards.length > 0) {
+        queue = dueCards;
+      } else {
+        // Re-drill today's completed reviews
+        queue = shuffle(pool.filter(c => {
+          const p = getCardProgress(c.id);
+          return p?.last_reviewed?.startsWith(today);
+        }));
+      }
+    } else {
+      const newCards = shuffle(pool.filter(c => isUnseen(c.id))).slice(0, NEW_BUDGET);
+      newCardsInSession = newCards.length;
+      queue = newCards;
+    }
+  }
+
   if (!queue.length) return;
   renderCard();
 }
+
+/* ── Card ─────────────────────────────────────────────────────────────── */
 
 function renderCard() {
   if (idx >= queue.length) { renderDone(); return; }
@@ -126,12 +227,12 @@ function renderCard() {
       ${renderCardFrontContent(card)}
 
       <textarea class="drill-answer-input" id="drill-textarea"
-        placeholder="Write your answer before revealing…" rows="3"></textarea>
+        placeholder="Write your answer before revealing…" rows="4"></textarea>
 
-      <button class="reveal-btn" id="drill-reveal">Reveal</button>
+      <button class="reveal-btn" id="drill-reveal">Reveal answer</button>
 
       <div class="card-back hidden" id="drill-back">
-        <div id="drill-comparison"></div>
+        <div id="drill-your-answer"></div>
         ${renderCardBack(card)}
         <div class="rating-row">
           <button class="rating-btn no"     data-rating="no">✗ No</button>
@@ -144,78 +245,69 @@ function renderCard() {
 
   attachCardHandlers(el.querySelector('.card'));
 
+  // Focus textarea for keyboard-first flow
+  requestAnimationFrame(() => {
+    document.getElementById('drill-textarea')?.focus();
+  });
+
   document.getElementById('drill-reveal').addEventListener('click', function () {
-    const userAnswer = document.getElementById('drill-textarea')?.value ?? '';
-    const back       = document.getElementById('drill-back');
+    const userText = document.getElementById('drill-textarea')?.value?.trim() ?? '';
+    const back     = document.getElementById('drill-back');
     back.classList.remove('hidden');
     this.style.display = 'none';
 
-    const comparison = document.getElementById('drill-comparison');
-    if (userAnswer.trim()) {
-      const grade = autograde(card, userAnswer);
-      comparison.innerHTML = renderComparison(userAnswer, grade);
+    // Show the user's answer above the card back for comparison
+    const yourEl = document.getElementById('drill-your-answer');
+    if (userText) {
+      yourEl.innerHTML = `
+        <div class="drill-your-block">
+          <div class="back-label">Your answer</div>
+          <div class="drill-user-answer">${escHtml(userText)}</div>
+        </div>
+      `;
     }
   });
 
-  el.querySelector('.rating-row').addEventListener('click', e => {
+  el.querySelector('.rating-row').addEventListener('click', async e => {
     const btn = e.target.closest('.rating-btn');
     if (!btn) return;
     const rating = btn.dataset.rating;
-    saveCardProgress(card.id, computeNext(getCardProgress(card.id), rating));
+
+    // Update local cache immediately (no flash on next card)
+    const next = computeNext({ ...getCardProgress(card.id), card_id: card.id }, rating);
+    saveCardProgress(card.id, next);
     tally[rating]++;
+
+    // Sync to server (fire-and-forget — don't block the study flow)
+    if (isLoggedIn()) {
+      apiSubmitReview(card.id, rating, 'drill').catch(() => {/* silently ignore */});
+    }
+
     idx++;
     renderCard();
   });
 }
 
-/* ── Autograde ── */
-function autograde(card, userAnswer) {
-  const raw    = cardProseContent(card).toLowerCase();
-  const lower  = userAnswer.toLowerCase();
-
-  const terms = [...new Set((raw.match(/\b[a-z_][\w]{2,}\b/g) ?? [])
-    .filter(w => !STOPWORDS.has(w) && w.length >= 3)
-  )];
-
-  if (!terms.length) return null;
-
-  const matched = terms.filter(t => lower.includes(t));
-  const missed  = terms.filter(t => !lower.includes(t));
-  const score   = Math.round((matched.length / terms.length) * 100);
-
-  return { score, matchedCount: matched.length, total: terms.length, missed: missed.slice(0, 10) };
+function escHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function renderComparison(userAnswer, grade) {
-  const userBlock = `
-    <div class="back-label">Your answer</div>
-    <div class="drill-user-answer">${userAnswer.trim()}</div>
-  `;
+/* ── Done ─────────────────────────────────────────────────────────────── */
 
-  if (!grade) return userBlock;
-
-  const missedHTML = grade.missed.length
-    ? `<div class="autograde-terms">${grade.missed.map(t => `<span class="autograde-term">${t}</span>`).join('')}</div>`
-    : `<div class="autograde-perfect">All key terms covered</div>`;
-
-  const gradeBlock = `
-    <div class="autograde">
-      <div class="autograde-header">
-        <span class="autograde-pct">${grade.score}%</span>
-        <span class="autograde-sub">${grade.matchedCount} / ${grade.total} key terms</span>
-      </div>
-      ${grade.missed.length ? `<div class="autograde-missed-label">Terms not mentioned</div>` : ''}
-      ${missedHTML}
-    </div>
-  `;
-
-  return userBlock + gradeBlock;
-}
-
-/* ── Done screen ── */
 function renderDone() {
   const el  = document.getElementById('drill-container');
   const tot = queue.length;
+  const pct = tot > 0 ? Math.round((tally.got_it / tot) * 100) : 0;
+
+  // Track new cards drilled today so the daily banner stays accurate
+  if (newCardsInSession > 0) {
+    addDailyNewDrilled(newCardsInSession);
+  }
+
+  // Notify main.js to refresh the daily banner
+  document.dispatchEvent(new CustomEvent('drill:session-complete', {
+    detail: { newCards: newCardsInSession, type: sessionType },
+  }));
 
   el.innerHTML = `
     <div class="drill-done">
@@ -237,6 +329,8 @@ function renderDone() {
         </div>
       </div>
 
+      ${tot > 0 ? `<p class="drill-done-pct">${pct}% got it</p>` : ''}
+
       <button class="start-btn" id="drill-again">Drill again</button>
       <br>
       <button class="start-btn" id="drill-setup-btn"
@@ -244,7 +338,6 @@ function renderDone() {
     </div>
   `;
 
-  document.getElementById('drill-again').addEventListener('click', startSession);
+  document.getElementById('drill-again').addEventListener('click', () => startSession(sessionType));
   document.getElementById('drill-setup-btn').addEventListener('click', renderSetup);
 }
-

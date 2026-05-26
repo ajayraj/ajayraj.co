@@ -54,13 +54,14 @@ export function inlineCode(s) {
   return withMarkdown.replace(/\x00(\d+)\x00/g, (_, i) => slots[+i]);
 }
 
-export function renderCardMeta(card) {
+export function renderCardMeta(card, badge = '') {
   const tier  = card.tier ?? '';
   const label = TIER_LABELS[tier] ?? tier;
   return `
     <div class="card-meta">
       <span class="card-tier-label">T${tier} · ${label}</span>
       <div class="card-meta-right">
+        ${badge}
         ${card.pythonSpecific ? '<span class="python-badge">PY</span>' : ''}
         <span class="card-id">${escHtml(card.id)}</span>
       </div>

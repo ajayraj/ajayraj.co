@@ -1,0 +1,948 @@
+---
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="clip — paste and share code snippets. Syntax highlighting, burn-once, expiry control. No signup required." />
+  <title>clip — ajayraj.co</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500&family=Nunito:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style is:global>
+    /* ── Tokens ──────────────────────────────────────────────────────────── */
+    :root {
+      --bg:         #100d18;
+      --paper:      #16121f;
+      --soft:       #1e1829;
+      --rule:       rgba(255, 255, 255, 0.08);
+      --ink:        #e8e0f0;
+      --ink-soft:   #b8a8cc;
+      --ink-faint:  #6e5f82;
+      --warm:       #ff9966;
+      --warm-hover: #ffaa7a;
+      --cool:       #7abf9e;
+      --font-serif: 'Fraunces', Georgia, serif;
+      --font-sans:  'Nunito', system-ui, sans-serif;
+      --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
+      --radius-sm:  6px;
+      --radius-md:  10px;
+      --radius-lg:  14px;
+      --radius-pill:999px;
+      --shadow:     rgba(0, 0, 0, 0.4);
+    }
+    [data-theme="light"] {
+      --bg:        #f5f0eb;
+      --paper:     #fffdf9;
+      --soft:      #ede8e2;
+      --rule:      rgba(0, 0, 0, 0.09);
+      --ink:       #1a1410;
+      --ink-soft:  #4a3f35;
+      --ink-faint: #8a7a6a;
+      --shadow:    rgba(0, 0, 0, 0.08);
+    }
+
+    /* ── Reset ───────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Shell ───────────────────────────────────────────────────────────── */
+    .clip-shell {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 22px 18px 72px;
+    }
+
+    /* ── Header ──────────────────────────────────────────────────────────── */
+    .clip-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .back-link {
+      font-size: 12px;
+      color: var(--ink-faint);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--ink-faint);
+      transition: color 0.2s, border-color 0.2s;
+      font-family: var(--font-mono);
+    }
+    .back-link:hover { color: var(--warm); border-color: var(--warm); }
+    .theme-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--rule);
+      color: var(--ink-soft);
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+      line-height: 1;
+    }
+    .theme-btn:hover { background: var(--soft); }
+
+    /* ── Hero ────────────────────────────────────────────────────────────── */
+    .clip-hero { text-align: center; margin-bottom: 28px; }
+    .hero-title {
+      font-family: var(--font-serif);
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .hero-dot  { color: var(--warm); }
+    .hero-sub  { font-size: 13px; color: var(--ink-faint); margin-top: 6px; font-style: italic; }
+
+    /* ── Form ────────────────────────────────────────────────────────────── */
+    .clip-form { display: flex; flex-direction: column; gap: 12px; }
+    .clip-title-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    .clip-title-input::placeholder { color: var(--ink-faint); }
+    .clip-title-input:focus { outline: none; border-color: var(--warm); }
+    .editor-wrap {
+      position: relative;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      background: var(--paper);
+      transition: border-color 0.2s;
+    }
+    .editor-wrap:focus-within { border-color: var(--warm); }
+    .clip-content {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.65;
+      border: none;
+      resize: vertical;
+      min-height: 260px;
+      tab-size: 2;
+    }
+    .clip-content::placeholder { color: var(--ink-faint); }
+    .clip-content:focus { outline: none; }
+    .editor-meta-bar {
+      display: flex;
+      gap: 14px;
+      padding: 6px 14px;
+      border-top: 1px solid var(--rule);
+      font-size: 11px;
+      color: var(--ink-faint);
+      font-family: var(--font-mono);
+    }
+
+    /* ── Options ─────────────────────────────────────────────────────────── */
+    .clip-options { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .opt-label { display: flex; flex-direction: column; gap: 3px; }
+    .opt-label-text {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .opt-select {
+      background: var(--soft);
+      border: 1px solid var(--rule);
+      color: var(--ink-soft);
+      font-size: 12.5px;
+      font-family: var(--font-mono);
+      padding: 5px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .opt-select:focus { outline: none; border-color: var(--warm); }
+    .opt-check {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      padding: 5px 0;
+      margin-top: auto;
+      user-select: none;
+    }
+    .opt-check input { accent-color: var(--warm); cursor: pointer; }
+    .burn-icon { font-size: 14px; }
+
+    /* ── Form error ──────────────────────────────────────────────────────── */
+    .form-error {
+      font-size: 13px;
+      color: #e07070;
+      padding: 8px 12px;
+      border: 1px solid rgba(224, 112, 112, 0.3);
+      border-radius: var(--radius-sm);
+      background: rgba(224, 112, 112, 0.08);
+    }
+
+    /* ── Submit ──────────────────────────────────────────────────────────── */
+    .submit-btn {
+      align-self: flex-end;
+      background: var(--warm);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 11px 24px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.18s, transform 0.1s;
+    }
+    .submit-btn:hover   { background: var(--warm-hover); transform: translateY(-1px); }
+    .submit-btn:active  { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .submit-hint { align-self: flex-end; font-size: 11px; color: var(--ink-faint); margin-top: -4px; }
+
+    /* ── CLI hint ────────────────────────────────────────────────────────── */
+    .api-hint {
+      margin-top: 32px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .api-hint summary {
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .api-hint summary::-webkit-details-marker { display: none; }
+    .api-hint[open] summary { border-bottom: 1px solid var(--rule); }
+    .api-pre { background: var(--paper); padding: 14px; overflow-x: auto; }
+    .api-pre code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-soft);
+      white-space: pre;
+    }
+
+    /* ── Loading / error ─────────────────────────────────────────────────── */
+    .view-loading { text-align: center; padding: 80px 0; color: var(--ink-faint); font-style: italic; }
+    .view-error {
+      text-align: center;
+      padding: 72px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .view-error-icon { font-size: 36px; color: var(--ink-faint); opacity: 0.5; }
+    .view-error p { font-size: 15px; color: var(--ink-soft); }
+    .new-clip-btn {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 9px 20px;
+      background: var(--warm);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: background 0.18s;
+    }
+    .new-clip-btn:hover { background: var(--warm-hover); }
+
+    /* ── View metadata ───────────────────────────────────────────────────── */
+    .view-meta { margin-bottom: 14px; }
+    .view-title {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .view-info-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+    .lang-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255,153,102,0.12);
+      color: var(--warm);
+      border: 1px solid rgba(255,153,102,0.25);
+      border-radius: var(--radius-pill);
+      padding: 1px 8px;
+    }
+    .info-sep   { color: var(--rule); }
+    .view-stat  { color: var(--ink-faint); }
+    .view-expires { color: var(--ink-faint); font-style: italic; }
+    .burn-badge { font-size: 11.5px; color: #e07070; }
+
+    /* ── Code block ──────────────────────────────────────────────────────── */
+    .code-wrap {
+      position: relative;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .code-actions {
+      display: flex;
+      gap: 6px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--rule);
+      background: var(--soft);
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--rule);
+      background: var(--paper);
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      line-height: 1.6;
+    }
+    .action-btn:hover { background: var(--rule); color: var(--ink); }
+    .action-btn-del { color: #e07070; border-color: rgba(224,112,112,0.25); }
+    .action-btn-del:hover { background: rgba(224,112,112,0.1); color: #e07070; }
+
+    .code-body { position: relative; }
+    .code-pre {
+      margin: 0;
+      overflow-x: auto;
+      padding: 16px 18px 16px 56px;
+      font-size: 13px;
+      line-height: 1.65;
+      tab-size: 2;
+    }
+    .code-pre code { font-family: var(--font-mono); background: none; }
+    .line-nums {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 40px;
+      padding-top: 16px;
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+      pointer-events: none;
+      user-select: none;
+    }
+    .line-nums span {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-faint);
+      opacity: 0.4;
+      line-height: 1.65;
+      padding-right: 8px;
+    }
+
+    /* ── highlight.js theme ──────────────────────────────────────────────── */
+    .hljs                         { background: transparent; color: #c9bfe8; }
+    .hljs-comment, .hljs-meta     { color: var(--ink-faint); font-style: italic; }
+    .hljs-keyword, .hljs-built_in { color: #c792ea; }
+    .hljs-string, .hljs-attr      { color: #c3e88d; }
+    .hljs-number, .hljs-literal   { color: #f78c6c; }
+    .hljs-title, .hljs-name       { color: #82aaff; }
+    .hljs-type, .hljs-class       { color: #ffcb6b; }
+    .hljs-variable, .hljs-params  { color: #e2cff5; }
+    .hljs-operator, .hljs-punctuation { color: #89ddff; }
+    .hljs-deletion  { background: rgba(255,80,80,0.15); color: #ff8888; }
+    .hljs-addition  { background: rgba(100,200,120,0.12); color: #80c880; }
+
+    [data-theme="light"] .hljs            { color: #36304a; }
+    [data-theme="light"] .hljs-keyword    { color: #7c3aed; }
+    [data-theme="light"] .hljs-string     { color: #166534; }
+    [data-theme="light"] .hljs-number     { color: #c2410c; }
+    [data-theme="light"] .hljs-title      { color: #1d4ed8; }
+    [data-theme="light"] .hljs-type       { color: #854d0e; }
+    [data-theme="light"] .hljs-comment    { color: var(--ink-faint); }
+
+    /* ── QR code ─────────────────────────────────────────────────────────── */
+    .qr-wrap {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-lg);
+    }
+    .qr-wrap.visible { display: flex; }
+    .qr-wrap canvas, .qr-wrap img {
+      border-radius: var(--radius-sm);
+      image-rendering: pixelated;
+    }
+    .qr-url { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); word-break: break-all; }
+    .qr-toggle-btn {
+      display: block;
+      margin: 14px auto 0;
+      padding: 4px 14px;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: var(--ink-faint);
+      font-size: 11px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: background 0.15s, color 0.15s;
+    }
+    .qr-toggle-btn:hover { background: var(--soft); color: var(--ink-soft); }
+
+    /* ── Delete confirm ──────────────────────────────────────────────────── */
+    .delete-confirm {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid rgba(224,112,112,0.25);
+      border-radius: var(--radius-md);
+      background: rgba(224,112,112,0.06);
+    }
+    .delete-confirm p { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 12px; }
+    .delete-confirm-row { display: flex; gap: 8px; }
+    .delete-error { color: #e07070; font-size: 13px; }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .clip-shell { padding: 16px 14px 60px; }
+      .hero-title { font-size: 36px; }
+      .clip-options { flex-direction: column; }
+      .submit-btn { align-self: stretch; }
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- highlight.js full build — all common languages included (~43 KB gzipped) -->
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<!-- QRCode.js -->
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script is:inline>
+(function () {
+'use strict';
+
+/* ── Config ─────────────────────────────────────────────────────────────── */
+var API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:8787'
+  : 'https://ajayraj.co';
+
+var LANGUAGES = [
+  ['text',       'plaintext'],
+  ['javascript', 'javascript'],
+  ['typescript', 'typescript'],
+  ['python',     'python'],
+  ['go',         'go'],
+  ['rust',       'rust'],
+  ['bash',       'bash / shell'],
+  ['html',       'html'],
+  ['css',        'css'],
+  ['json',       'json'],
+  ['sql',        'sql'],
+  ['markdown',   'markdown'],
+  ['yaml',       'yaml'],
+  ['c',          'c / c++'],
+  ['java',       'java'],
+  ['diff',       'diff'],
+];
+
+/* ── State ──────────────────────────────────────────────────────────────── */
+var app = document.getElementById('app');
+var forkData = null;
+
+/* ── Theme ──────────────────────────────────────────────────────────────── */
+var THEME_KEY = 'clip-theme';
+function getTheme() { return localStorage.getItem(THEME_KEY) || 'dark'; }
+function saveTheme(t) { localStorage.setItem(THEME_KEY, t); }
+function applyTheme(t) { document.documentElement.dataset.theme = t; }
+function wireTheme(btn) {
+  if (!btn) return;
+  function upBtn(t) { btn.textContent = t === 'dark' ? '☀︎' : '☽'; }
+  upBtn(getTheme());
+  btn.addEventListener('click', function () {
+    var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next); saveTheme(next); upBtn(next);
+  });
+}
+
+/* ── Routing ────────────────────────────────────────────────────────────── */
+function route() {
+  applyTheme(getTheme());
+  var hash = window.location.hash.slice(1).trim();
+  if (hash) {
+    renderView(hash);
+  } else {
+    renderCreate(forkData);
+    forkData = null;
+  }
+}
+
+/** Navigate to create form, optionally pre-filled. */
+function goToNew(prefill) {
+  forkData = prefill || null;
+  history.replaceState(null, '', '/clip');
+  renderCreate(forkData);
+  forkData = null;
+}
+
+/* ── API ────────────────────────────────────────────────────────────────── */
+async function apiCreateClip(opts) {
+  try {
+    var r = await fetch(API_BASE + '/api/clip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(opts),
+    });
+    if (!r.ok) {
+      var d = await r.json().catch(function () { return {}; });
+      return { ok: false, error: d.error || 'HTTP ' + r.status };
+    }
+    return { ok: true, data: await r.json() };
+  } catch (e) {
+    return { ok: false, error: 'Network error — is the API running?' };
+  }
+}
+
+async function apiGetClip(id) {
+  try {
+    var r = await fetch(API_BASE + '/api/clip/' + encodeURIComponent(id));
+    if (r.status === 404) return { ok: false, error: 'Clip not found.' };
+    if (r.status === 410) {
+      var d = await r.json().catch(function () { return {}; });
+      return { ok: false, error: d.error || 'Clip has expired or been burned.' };
+    }
+    if (!r.ok) return { ok: false, error: 'Server error (' + r.status + ')' };
+    return { ok: true, data: await r.json() };
+  } catch (e) {
+    return { ok: false, error: 'Network error.' };
+  }
+}
+
+async function apiDeleteClip(id) {
+  try {
+    var r = await fetch(API_BASE + '/api/clip/' + encodeURIComponent(id), {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    return r.ok;
+  } catch (e) { return false; }
+}
+
+/* ── Create page ────────────────────────────────────────────────────────── */
+function renderCreate(prefill) {
+  document.title = 'clip — ajayraj.co';
+
+  var langOpts = LANGUAGES.map(function (pair) {
+    var sel = ((prefill && prefill.language) || 'text') === pair[0] ? ' selected' : '';
+    return '<option value="' + pair[0] + '"' + sel + '>' + escHtml(pair[1]) + '</option>';
+  }).join('');
+
+  app.innerHTML =
+    '<div class="clip-shell">' +
+      '<header class="clip-header">' +
+        '<a href="/" class="back-link">← ajayraj.co</a>' +
+        '<button id="theme-btn" class="theme-btn" title="Toggle theme"></button>' +
+      '</header>' +
+      '<div class="clip-hero">' +
+        '<h1 class="hero-title">clip<span class="hero-dot">.</span></h1>' +
+        '<p class="hero-sub">paste it, share it.</p>' +
+      '</div>' +
+      '<form id="clip-form" class="clip-form" autocomplete="off">' +
+        '<input type="text" id="clip-title-input" class="clip-title-input"' +
+          ' placeholder="Title (optional)" maxlength="200"' +
+          ' value="' + (prefill && prefill.title ? escHtml(prefill.title) : '') + '" />' +
+        '<div class="editor-wrap">' +
+          '<textarea id="clip-content" class="clip-content"' +
+            ' placeholder="Paste your text or code here…"' +
+            ' spellcheck="false" rows="16">' +
+            (prefill && prefill.content ? escHtml(prefill.content) : '') +
+          '</textarea>' +
+          '<div class="editor-meta-bar">' +
+            '<span id="char-count">0 chars</span>' +
+            '<span id="line-count">0 lines</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="clip-options">' +
+          '<label class="opt-label">' +
+            '<span class="opt-label-text">Language</span>' +
+            '<select id="lang-select" class="opt-select">' + langOpts + '</select>' +
+          '</label>' +
+          '<label class="opt-label">' +
+            '<span class="opt-label-text">Expires</span>' +
+            '<select id="expiry-select" class="opt-select">' +
+              '<option value="1h">1 hour</option>' +
+              '<option value="24h">24 hours</option>' +
+              '<option value="7d" selected>7 days</option>' +
+              '<option value="30d">30 days</option>' +
+              '<option value="">never</option>' +
+            '</select>' +
+          '</label>' +
+          '<label class="opt-check" title="Clip is deleted after the first read">' +
+            '<input type="checkbox" id="burn-check" />' +
+            '<span class="burn-icon">🔥</span>' +
+            '<span>burn once</span>' +
+          '</label>' +
+        '</div>' +
+        '<div id="form-error" class="form-error" style="display:none"></div>' +
+        '<button type="submit" class="submit-btn" id="submit-btn">Create clip →</button>' +
+        '<p class="submit-hint">Cmd+Enter to submit</p>' +
+      '</form>' +
+      '<details class="api-hint">' +
+        '<summary>CLI usage</summary>' +
+        '<pre class="api-pre"><code id="api-example"></code></pre>' +
+      '</details>' +
+    '</div>';
+
+  wireTheme(document.getElementById('theme-btn'));
+
+  // CLI hint
+  var apiEx = document.getElementById('api-example');
+  if (apiEx) {
+    apiEx.textContent =
+      '# Create a clip from stdin\n' +
+      'echo "hello world" | curl -s -X POST ' + API_BASE + '/api/clip \\\n' +
+      '  -H \'Content-Type: application/json\' \\\n' +
+      '  -d "{\\"content\\":\\"$(cat)\\"}" | jq -r .url\n\n' +
+      '# Or pipe a file\n' +
+      'curl -s -X POST ' + API_BASE + '/api/clip \\\n' +
+      '  -H \'Content-Type: application/json\' \\\n' +
+      '  -d "{\\"content\\":\\"$(cat file.js)\\",\\"language\\":\\"javascript\\"}" | jq -r .url';
+  }
+
+  // Char/line counter
+  var ta     = document.getElementById('clip-content');
+  var charEl = document.getElementById('char-count');
+  var lineEl = document.getElementById('line-count');
+  function updateCounts() {
+    var v = ta.value;
+    charEl.textContent = v.length.toLocaleString() + ' chars';
+    var lines = v === '' ? 0 : v.split('\n').length;
+    lineEl.textContent = lines + ' ' + (lines === 1 ? 'line' : 'lines');
+  }
+  updateCounts();
+  ta.addEventListener('input', updateCounts);
+
+  // Cmd/Ctrl+Enter shortcut
+  ta.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      document.getElementById('clip-form').requestSubmit();
+    }
+  });
+
+  // Form submit
+  var form      = document.getElementById('clip-form');
+  var submitBtn = document.getElementById('submit-btn');
+  var errorEl   = document.getElementById('form-error');
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    errorEl.style.display = 'none';
+
+    var content = ta.value.trim();
+    if (!content) {
+      errorEl.textContent = 'Content is required.';
+      errorEl.style.display = 'block';
+      ta.focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating…';
+
+    var result = await apiCreateClip({
+      content:    content,
+      title:      document.getElementById('clip-title-input').value.trim(),
+      language:   document.getElementById('lang-select').value,
+      expires_in: document.getElementById('expiry-select').value,
+      burn:       document.getElementById('burn-check').checked,
+    });
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Create clip →';
+
+    if (!result.ok) {
+      errorEl.textContent = result.error || 'Something went wrong.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    // Navigate to view via hash — triggers hashchange → renderView
+    window.location.hash = result.data.id;
+  });
+}
+
+/* ── View page ──────────────────────────────────────────────────────────── */
+async function renderView(id) {
+  document.title = 'clip/' + id + ' — ajayraj.co';
+
+  app.innerHTML =
+    '<div class="clip-shell">' +
+      '<header class="clip-header">' +
+        '<a href="#" class="back-link" id="new-clip-link">+ new clip</a>' +
+        '<button id="theme-btn" class="theme-btn" title="Toggle theme"></button>' +
+      '</header>' +
+      '<div class="view-loading">Loading clip…</div>' +
+    '</div>';
+
+  wireTheme(document.getElementById('theme-btn'));
+  document.getElementById('new-clip-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    goToNew(null);
+  });
+
+  var result = await apiGetClip(id);
+  var shell  = app.querySelector('.clip-shell');
+
+  if (!result.ok) {
+    var errDiv = document.createElement('div');
+    errDiv.className = 'view-error';
+    errDiv.innerHTML =
+      '<div class="view-error-icon">⊘</div>' +
+      '<p>' + escHtml(result.error) + '</p>';
+    var newBtn = document.createElement('button');
+    newBtn.className = 'new-clip-btn';
+    newBtn.textContent = 'Create a new clip';
+    newBtn.addEventListener('click', function () { goToNew(null); });
+    errDiv.appendChild(newBtn);
+    shell.appendChild(errDiv);
+    return;
+  }
+
+  var clip = result.data;
+  document.title = clip.title
+    ? clip.title + ' — clip'
+    : 'clip/' + id + ' — ajayraj.co';
+
+  // Syntax highlighting
+  var lang = 'text';
+  var highlighted;
+  if (window.hljs) {
+    lang        = window.hljs.getLanguage(clip.language) ? clip.language : 'text';
+    highlighted = window.hljs.highlight(clip.content, { language: lang, ignoreIllegals: true }).value;
+  } else {
+    highlighted = escHtml(clip.content);
+  }
+
+  var rawURL   = API_BASE + '/api/clip/' + id + '?raw=1';
+  var shareURL = clip.url || (window.location.origin + '/clip#' + id);
+
+  // Build view HTML
+  var metaHTML = '';
+  if (clip.title) metaHTML += '<h1 class="view-title">' + escHtml(clip.title) + '</h1>';
+  metaHTML += '<div class="view-info-row">' +
+    '<span class="lang-badge">' + escHtml(clip.language) + '</span>' +
+    '<span class="info-sep">&middot;</span>' +
+    '<span class="view-stat">' + clip.view_count + ' ' + (clip.view_count === 1 ? 'view' : 'views') + '</span>' +
+    '<span class="info-sep">&middot;</span>' +
+    '<span class="view-stat">' + relDate(clip.created_at) + '</span>';
+  if (clip.expires_at) {
+    metaHTML += '<span class="info-sep">&middot;</span>' +
+      '<span class="view-expires">expires ' + relDate(clip.expires_at) + '</span>';
+  }
+  if (clip.burn) {
+    metaHTML += '<span class="info-sep">&middot;</span>' +
+      '<span class="burn-badge">🔥 burned</span>';
+  }
+  metaHTML += '</div>';
+
+  shell.innerHTML =
+    '<header class="clip-header">' +
+      '<a href="#" class="back-link" id="new-clip-link">+ new clip</a>' +
+      '<button id="theme-btn" class="theme-btn" title="Toggle theme"></button>' +
+    '</header>' +
+    '<div class="view-meta">' + metaHTML + '</div>' +
+    '<div class="code-wrap">' +
+      '<div class="code-actions">' +
+        '<button class="action-btn" id="copy-url-btn">Copy URL</button>' +
+        '<button class="action-btn" id="copy-btn">Copy</button>' +
+        '<a class="action-btn" href="' + rawURL + '" target="_blank" rel="noopener">Raw</a>' +
+        '<button class="action-btn" id="fork-btn">Fork</button>' +
+        '<button class="action-btn action-btn-del" id="delete-btn">Delete</button>' +
+      '</div>' +
+      '<div class="code-body">' +
+        '<div class="line-nums" id="line-nums"></div>' +
+        '<pre class="code-pre"><code class="hljs language-' + escHtml(lang) + '">' + highlighted + '</code></pre>' +
+      '</div>' +
+    '</div>' +
+    '<button class="qr-toggle-btn" id="qr-btn">QR</button>' +
+    '<div id="qr-wrap" class="qr-wrap">' +
+      '<div id="qr-container"></div>' +
+      '<p class="qr-url">' + escHtml(shareURL) + '</p>' +
+    '</div>' +
+    '<div id="delete-confirm" class="delete-confirm" style="display:none">' +
+      '<p>Delete this clip permanently?</p>' +
+      '<div class="delete-confirm-row">' +
+        '<button class="action-btn action-btn-del" id="confirm-delete-btn">Yes, delete</button>' +
+        '<button class="action-btn" id="cancel-delete-btn">Cancel</button>' +
+      '</div>' +
+    '</div>';
+
+  wireTheme(document.getElementById('theme-btn'));
+  document.getElementById('new-clip-link').addEventListener('click', function (e) {
+    e.preventDefault();
+    goToNew(null);
+  });
+
+  // Copy URL
+  document.getElementById('copy-url-btn').addEventListener('click', function () {
+    navigator.clipboard.writeText(shareURL).catch(function () {});
+    flash('copy-url-btn', 'Copied!', 'Copy URL');
+  });
+
+  // Copy content
+  document.getElementById('copy-btn').addEventListener('click', function () {
+    navigator.clipboard.writeText(clip.content).catch(function () {});
+    flash('copy-btn', 'Copied!', 'Copy');
+  });
+
+  // Fork
+  document.getElementById('fork-btn').addEventListener('click', function () {
+    goToNew({
+      content:  clip.content,
+      title:    clip.title ? 'Fork of ' + clip.title : '',
+      language: clip.language,
+    });
+  });
+
+  // Delete
+  var confirmBox = document.getElementById('delete-confirm');
+  document.getElementById('delete-btn').addEventListener('click', function () {
+    confirmBox.style.display = 'block';
+  });
+  document.getElementById('cancel-delete-btn').addEventListener('click', function () {
+    confirmBox.style.display = 'none';
+  });
+  document.getElementById('confirm-delete-btn').addEventListener('click', async function () {
+    var ok = await apiDeleteClip(clip.id);
+    if (ok) {
+      goToNew(null);
+    } else {
+      confirmBox.innerHTML = '<p class="delete-error">Delete failed — are you logged in?</p>';
+    }
+  });
+
+  // Line numbers
+  var lineNums = document.getElementById('line-nums');
+  if (lineNums) {
+    var lineCount = clip.content.split('\n').length;
+    var nums = [];
+    for (var i = 1; i <= lineCount; i++) nums.push('<span>' + i + '</span>');
+    lineNums.innerHTML = nums.join('');
+  }
+
+  // QR code — generated lazily on first open
+  var qrBtn       = document.getElementById('qr-btn');
+  var qrWrap      = document.getElementById('qr-wrap');
+  var qrContainer = document.getElementById('qr-container');
+  var qrGenerated = false;
+
+  qrBtn.addEventListener('click', function () {
+    var isOpen = qrWrap.classList.contains('visible');
+    if (!isOpen) {
+      qrWrap.classList.add('visible');
+      if (!qrGenerated && window.QRCode) {
+        qrGenerated = true;
+        new window.QRCode(qrContainer, {
+          text:         shareURL,
+          width:        160,
+          height:       160,
+          colorDark:    '#ff9966',
+          colorLight:   document.documentElement.dataset.theme === 'light' ? '#fffdf9' : '#1a1128',
+          correctLevel: window.QRCode.CorrectLevel.M,
+        });
+      }
+    } else {
+      qrWrap.classList.remove('visible');
+    }
+  });
+}
+
+/* ── Helpers ────────────────────────────────────────────────────────────── */
+function escHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function relDate(iso) {
+  if (!iso) return '';
+  var ms   = Date.now() - new Date(iso).getTime();
+  var abMs = Math.abs(ms);
+  var future = ms < 0;
+  var days = Math.floor(abMs / 86400000);
+  var hrs  = Math.floor(abMs / 3600000);
+  var mins = Math.floor(abMs / 60000);
+  var s;
+  if      (mins < 1)   s = 'just now';
+  else if (hrs  < 1)   s = mins + 'm ago';
+  else if (days < 1)   s = hrs + 'h ago';
+  else if (days < 7)   s = days + 'd ago';
+  else if (days < 30)  s = Math.floor(days / 7) + 'w ago';
+  else                 s = Math.floor(days / 30) + 'mo ago';
+  if (future) s = s.replace(' ago', '').replace('just now', 'in a moment');
+  return s;
+}
+
+function flash(id, next, reset) {
+  var btn = document.getElementById(id);
+  if (!btn) return;
+  btn.textContent = next;
+  setTimeout(function () { btn.textContent = reset; }, 1600);
+}
+
+/* ── Boot ───────────────────────────────────────────────────────────────── */
+window.addEventListener('hashchange', route);
+route();
+
+})();
+</script>
+</body>
+</html>

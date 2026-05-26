@@ -1,5 +1,5 @@
 import { TIER_LABELS, escHtml, renderCardMeta, renderCardFrontContent, renderCardBack, attachCardHandlers } from './render.js';
-import { getRevealed, saveRevealed } from './store.js';
+import { getCardProgress } from './store.js';
 import { TIER_META } from './util.js';
 
 const FILTER_TABS = [
@@ -7,15 +7,36 @@ const FILTER_TABS = [
   ...Object.entries(TIER_META).map(([v, m]) => ({ value: v, label: m.label, sub: m.sub })),
 ];
 
-let cards = [];
+// Status filter values — granular tiers matching the badge system
+const STATUS_TABS = [
+  { value: 'all',      label: 'All' },
+  { value: 'unseen',   label: 'Unseen' },
+  { value: 'due',      label: 'Due' },
+  { value: 'learning', label: 'Learning' },
+  { value: 'steady',   label: 'Steady' },
+  { value: 'strong',   label: 'Strong' },
+];
+
+// Sort options
+const SORT_OPTIONS = [
+  { value: 'default',  label: 'Default order' },
+  { value: 'weakest',  label: 'Weakest first' },
+  { value: 'due',      label: 'Due first' },
+  { value: 'strongest', label: 'Strongest first' },
+];
+
+let cards       = [];
 let activeTier  = 'all';
 let activeCat   = 'all';
+let activeStatus = 'all';
+let activeSort  = 'default';
 let query       = '';
-const _revealed = getRevealed();
 
 export function initBrowse(allCards) {
   cards = allCards;
   buildFilterTabs();
+  buildStatusTabs();
+  buildSortControl();
   buildCategoryPills();
   buildLegend();
   renderDeck();
@@ -28,15 +49,21 @@ export function initBrowse(allCards) {
   });
 }
 
-/* Navigate to a card by ID — resets all filters if needed, then glows the card. */
+/** Re-render the deck in place — called when progress updates so badges refresh. */
+export function refreshBrowse() {
+  renderDeck();
+  updateStats();
+}
+
 export function navigateToCard(targetId) {
-  // Reset any active filters so the target card is guaranteed to be in the DOM
-  activeTier = 'all';
-  activeCat  = 'all';
-  query      = '';
+  activeTier   = 'all';
+  activeCat    = 'all';
+  activeStatus = 'all';
+  query        = '';
   const searchEl = document.getElementById('search');
   if (searchEl) searchEl.value = '';
   buildFilterTabs();
+  buildStatusTabs();
   buildCategoryPills();
   renderDeck();
   updateStats();
@@ -45,12 +72,14 @@ export function navigateToCard(targetId) {
     const el = document.getElementById(`card-${targetId}`);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    el.classList.remove('link-target');       // reset if already glowing
-    void el.offsetWidth;                      // force reflow to restart animation
+    el.classList.remove('link-target');
+    void el.offsetWidth;
     el.classList.add('link-target');
     setTimeout(() => el.classList.remove('link-target'), 2600);
   });
 }
+
+/* ── Filter / sort controls ───────────────────────────────────────────── */
 
 function buildFilterTabs() {
   const el = document.querySelector('.filters');
@@ -64,6 +93,53 @@ function buildFilterTabs() {
     if (!btn) return;
     activeTier = btn.dataset.filter;
     el.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderDeck();
+    updateStats();
+  });
+}
+
+function buildStatusTabs() {
+  let statusEl = document.querySelector('.status-filters');
+  if (!statusEl) {
+    statusEl = document.createElement('div');
+    statusEl.className = 'status-filters';
+    const slot = document.querySelector('.browse-row-filters');
+    if (slot) slot.appendChild(statusEl);
+  }
+  statusEl.innerHTML = STATUS_TABS.map(t => `
+    <button class="status-btn${t.value === activeStatus ? ' active' : ''}" data-status="${t.value}">
+      ${t.label}
+    </button>
+  `).join('');
+  statusEl.addEventListener('click', e => {
+    const btn = e.target.closest('.status-btn');
+    if (!btn) return;
+    activeStatus = btn.dataset.status;
+    statusEl.querySelectorAll('.status-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderDeck();
+    updateStats();
+  });
+}
+
+function buildSortControl() {
+  let sortEl = document.querySelector('.sort-control');
+  if (!sortEl) {
+    sortEl = document.createElement('div');
+    sortEl.className = 'sort-control';
+    const slot = document.getElementById('sort-control-slot');
+    if (slot) slot.appendChild(sortEl);
+  }
+  sortEl.innerHTML = `
+    <label class="sort-label">Sort
+      <select class="sort-select" id="sort-select">
+        ${SORT_OPTIONS.map(o => `
+          <option value="${o.value}"${o.value === activeSort ? ' selected' : ''}>${o.label}</option>
+        `).join('')}
+      </select>
+    </label>
+  `;
+  sortEl.querySelector('#sort-select').addEventListener('change', e => {
+    activeSort = e.target.value;
     renderDeck();
     updateStats();
   });
@@ -96,8 +172,8 @@ function buildLegend() {
   `;
 }
 
-/* Weights for relevance ranking. ID and front are highest signal, prose
-   fields are middle, code/example lowest. Anything not listed isn't searched. */
+/* ── Search & filter ──────────────────────────────────────────────────── */
+
 const SEARCH_WEIGHTS = [
   { fields: ['id'],                                   weight: 8 },
   { fields: ['front', 'techniqueName'],               weight: 6 },
@@ -122,27 +198,105 @@ function searchScore(card, q) {
   return score;
 }
 
+/** Returns 0–4 familiarity level for a card: 0=unseen, 1=due/weak, 2=learning, 3=solid, 4=strong */
+function familiarityLevel(id) {
+  const prog = getCardProgress(id);
+  if (!prog) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  const due = prog.next_review && prog.next_review <= today;
+  if (due) return 1;
+  const ef   = prog.ease_factor  ?? 2.5;
+  const reps = prog.repetitions  ?? 0;
+  if (ef >= 2.8 && reps >= 3) return 4;  // strong
+  if (ef >= 2.3 && reps >= 2) return 3;  // solid (requires 2+ successful reviews)
+  return 2; // learning
+}
+
+function statusOf(id) {
+  const prog = getCardProgress(id);
+  if (!prog) return 'unseen';
+  const today = new Date().toISOString().slice(0, 10);
+  if (prog.next_review && prog.next_review <= today) return 'due';
+  const ef   = prog.ease_factor  ?? 2.5;
+  const reps = prog.repetitions  ?? 0;
+  if (ef >= 2.8 && reps >= 3) return 'strong';
+  if (ef >= 2.3 && reps >= 2) return 'steady';
+  return 'learning';
+}
+
 function filtered() {
   const q = query.trim();
-  const matched = cards.filter(c => {
+  const today = new Date().toISOString().slice(0, 10);
+
+  let matched = cards.filter(c => {
     if (activeTier !== 'all' && c.tier !== activeTier) return false;
     if (activeCat  !== 'all' && c.category !== activeCat) return false;
     if (q && searchScore(c, q) === 0) return false;
+
+    if (activeStatus !== 'all') {
+      const s = statusOf(c.id);
+      if (s !== activeStatus) return false;
+    }
     return true;
   });
-  if (!q) return matched;
-  /* Stable sort by score descending; ties keep card-deck order. */
-  return matched
-    .map((c, i) => [c, searchScore(c, q), i])
-    .sort((a, b) => b[1] - a[1] || a[2] - b[2])
-    .map(([c]) => c);
+
+  // Search score sort takes precedence over other sorts when query is active
+  if (q) {
+    return matched
+      .map((c, i) => [c, searchScore(c, q), i])
+      .sort((a, b) => b[1] - a[1] || a[2] - b[2])
+      .map(([c]) => c);
+  }
+
+  // Apply selected sort
+  switch (activeSort) {
+    case 'weakest':
+      return matched.slice().sort((a, b) => familiarityLevel(a.id) - familiarityLevel(b.id));
+    case 'strongest':
+      return matched.slice().sort((a, b) => familiarityLevel(b.id) - familiarityLevel(a.id));
+    case 'due': {
+      return matched.slice().sort((a, b) => {
+        const pa = getCardProgress(a.id);
+        const pb = getCardProgress(b.id);
+        const da = pa?.next_review ?? '9999';
+        const db_ = pb?.next_review ?? '9999';
+        return da.localeCompare(db_);
+      });
+    }
+    default:
+      return matched;
+  }
 }
 
 function updateStats() {
-  const vis = filtered().length;
-  document.getElementById('stats').textContent =
-    vis === cards.length ? `${cards.length} cards` : `${vis} of ${cards.length} cards`;
+  const vis   = filtered().length;
+  const total = cards.length;
+  const seenCount = cards.filter(c => getCardProgress(c.id)).length;
+
+  document.getElementById('stats').innerHTML =
+    vis === total
+      ? `${total} cards · <span class="stats-seen">${seenCount} seen</span>`
+      : `${vis} of ${total} · <span class="stats-seen">${seenCount} seen</span>`;
 }
+
+/* ── Familiarity badge ────────────────────────────────────────────────── */
+
+function renderFamiliarityBadge(id) {
+  const prog = getCardProgress(id);
+  if (!prog) return '<span class="fam-badge fam-unseen">new</span>';
+
+  const today = new Date().toISOString().slice(0, 10);
+  const due   = prog.next_review && prog.next_review <= today;
+  if (due) return '<span class="fam-badge fam-due">due</span>';
+
+  const ef   = prog.ease_factor  ?? 2.5;
+  const reps = prog.repetitions  ?? 0;
+  if (ef >= 2.8 && reps >= 3) return '<span class="fam-badge fam-strong">strong</span>';
+  if (ef >= 2.3 && reps >= 2) return '<span class="fam-badge fam-steady">steady</span>';
+  return '<span class="fam-badge fam-learning">learning</span>';
+}
+
+/* ── Deck render ──────────────────────────────────────────────────────── */
 
 function renderDeck() {
   const deck = document.getElementById('deck');
@@ -156,7 +310,7 @@ function renderDeck() {
   deck.innerHTML = list.map(c => `
     <div class="card tier-${c.tier ?? ''}" id="card-${c.id}">
       <div class="card-tier-strip"></div>
-      ${renderCardMeta(c)}
+      ${renderCardMeta(c, renderFamiliarityBadge(c.id))}
       ${renderCardFrontContent(c)}
       <button class="reveal-btn">Reveal</button>
       <div class="card-back hidden">${renderCardBack(c)}</div>
@@ -165,22 +319,5 @@ function renderDeck() {
 
   deck.querySelectorAll('.card').forEach(el => {
     attachCardHandlers(el);
-    const cardId = el.id.replace('card-', '');
-    const revealBtn = el.querySelector('.reveal-btn');
-    const back      = el.querySelector('.card-back');
-    // Restore open state
-    if (_revealed.has(cardId) && back && revealBtn) {
-      back.classList.remove('hidden');
-      revealBtn.textContent = 'Hide';
-    }
-    // Track future opens/closes via the reveal button
-    revealBtn?.addEventListener('click', () => {
-      if (back?.classList.contains('hidden')) {
-        _revealed.delete(cardId);
-      } else {
-        _revealed.add(cardId);
-      }
-      saveRevealed(_revealed);
-    });
   });
 }

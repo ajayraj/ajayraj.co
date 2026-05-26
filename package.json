@@ -7,8 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev --prefix tools/cs-anki\"",
-    "build:all": "npm run build && npm run build --prefix tools/cs-anki"
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev --prefix tools/cs-anki\" \"npm run dev --prefix tools/clip\"",
+    "build:all": "npm run build && npm run build --prefix tools/cs-anki && npm run build --prefix tools/clip"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",

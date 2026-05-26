@@ -7,7 +7,7 @@ export function showOnboarding() {
   overlay.className = 'onboarding-overlay';
   overlay.innerHTML = `
     <div class="onboarding-modal" role="dialog" aria-labelledby="ob-title">
-      <h2 id="ob-title">Welcome to Atomic Cards</h2>
+      <h2 id="ob-title">Welcome to Recall</h2>
       <p class="onboarding-lede">
         A study deck for learning algorithm problem-solving from the ground up,
         inspired by anki studying techniques.
