@@ -40,17 +40,19 @@ CREATE INDEX IF NOT EXISTS idx_progress_review  ON card_progress(user_id, next_r
 CREATE INDEX IF NOT EXISTS idx_reviews_user     ON card_reviews(user_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_card     ON card_reviews(user_id, card_id);
 
-/* ── Clip (paste service) ── */
+/* ── Clip (cross-device clipboard) ── */
 
 CREATE TABLE IF NOT EXISTS clips (
-    id          TEXT PRIMARY KEY,           -- 7-char base62 slug
-    content     TEXT NOT NULL,
-    language    TEXT NOT NULL DEFAULT 'text',
-    title       TEXT NOT NULL DEFAULT '',
-    expires_at  DATETIME,                   -- NULL = never expires
-    burn        INTEGER NOT NULL DEFAULT 0, -- 1 = delete after first read
-    view_count  INTEGER NOT NULL DEFAULT 0,
-    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+    id            TEXT PRIMARY KEY,           -- 7-char base62 slug
+    content       TEXT NOT NULL,
+    language      TEXT NOT NULL DEFAULT 'text',
+    title         TEXT NOT NULL DEFAULT '',
+    expires_at    DATETIME,                   -- NULL = never expires
+    burn          INTEGER NOT NULL DEFAULT 0, -- 1 = delete after first read
+    view_count    INTEGER NOT NULL DEFAULT 0,
+    password_hash TEXT NOT NULL DEFAULT '',   -- SHA-256 hex of "clip:"+keyword (client-computed)
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_clips_expires ON clips(expires_at);
+CREATE INDEX IF NOT EXISTS idx_clips_pw      ON clips(password_hash);

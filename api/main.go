@@ -40,10 +40,10 @@ func main() {
 	mux.HandleFunc("GET /api/anki/mastery",  middleware.RequireAuth(database, h.GetMastery))
 	mux.HandleFunc("GET /api/anki/history",  middleware.RequireAuth(database, h.GetCardHistory))
 
-	// Clip — public read, open write, auth required for delete
-	mux.HandleFunc("POST /api/clip",          h.ClipCreate)
-	mux.HandleFunc("GET /api/clip/{id}",      h.ClipGet)
-	mux.HandleFunc("DELETE /api/clip/{id}",   middleware.RequireAuth(database, h.ClipDelete))
+	// Clip — password-keyed cross-device clipboard (key is SHA-256 hash, computed client-side)
+	mux.HandleFunc("POST /api/clip",        h.ClipCreate)
+	mux.HandleFunc("GET /api/clip",         h.ClipList)
+	mux.HandleFunc("DELETE /api/clip/{id}", h.ClipDelete) // key= query param acts as auth
 
 	port := os.Getenv("PORT")
 	if port == "" {

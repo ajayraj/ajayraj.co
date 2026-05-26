@@ -1,11 +1,13 @@
 ---
+// clip — cross-device clipboard, keyword-keyed.
+// The keyword is hashed client-side (SHA-256); only the hash reaches the server.
 ---
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="clip — paste and share code snippets. Syntax highlighting, burn-once, expiry control. No signup required." />
+  <meta name="description" content="clip — cross-device clipboard. Drop text with a keyword; pick it up anywhere. No links, no accounts." />
   <title>clip — ajayraj.co</title>
   <link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
   <link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />
@@ -13,8 +15,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500&family=Nunito:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style is:global>
-    /* ── Tokens ──────────────────────────────────────────────────────────── */
+  <style>
+    /* ── Tokens ── */
     :root {
       --bg:         #100d18;
       --paper:      #16121f;
@@ -24,8 +26,10 @@
       --ink-soft:   #b8a8cc;
       --ink-faint:  #6e5f82;
       --warm:       #ff9966;
+      --warm-light: #ffb88c;
       --warm-hover: #ffaa7a;
       --cool:       #7abf9e;
+      --red:        #e07070;
       --font-serif: 'Fraunces', Georgia, serif;
       --font-sans:  'Nunito', system-ui, sans-serif;
       --font-mono:  'JetBrains Mono', 'Fira Code', monospace;
@@ -33,20 +37,9 @@
       --radius-md:  10px;
       --radius-lg:  14px;
       --radius-pill:999px;
-      --shadow:     rgba(0, 0, 0, 0.4);
-    }
-    [data-theme="light"] {
-      --bg:        #f5f0eb;
-      --paper:     #fffdf9;
-      --soft:      #ede8e2;
-      --rule:      rgba(0, 0, 0, 0.09);
-      --ink:       #1a1410;
-      --ink-soft:  #4a3f35;
-      --ink-faint: #8a7a6a;
-      --shadow:    rgba(0, 0, 0, 0.08);
     }
 
-    /* ── Reset ───────────────────────────────────────────────────────────── */
+    /* ── Reset ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body {
@@ -58,852 +51,443 @@
       min-height: 100vh;
     }
 
-    /* ── Shell ───────────────────────────────────────────────────────────── */
+    /* ── Shell ── */
     .clip-shell {
-      max-width: 680px;
+      max-width: 640px;
       margin: 0 auto;
-      padding: 22px 18px 72px;
+      padding: 24px 18px 72px;
     }
 
-    /* ── Header ──────────────────────────────────────────────────────────── */
-    .clip-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
+    /* ── Back link ── */
     .back-link {
+      display: inline-block;
+      font-family: var(--font-mono);
       font-size: 12px;
       color: var(--ink-faint);
       text-decoration: none;
       border-bottom: 1px dotted var(--ink-faint);
+      margin-bottom: 20px;
       transition: color 0.2s, border-color 0.2s;
-      font-family: var(--font-mono);
     }
     .back-link:hover { color: var(--warm); border-color: var(--warm); }
-    .theme-btn {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--rule);
-      color: var(--ink-soft);
-      font-size: 14px;
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      cursor: pointer;
-      font-family: inherit;
-      transition: background 0.2s;
-      line-height: 1;
-    }
-    .theme-btn:hover { background: var(--soft); }
 
-    /* ── Hero ────────────────────────────────────────────────────────────── */
-    .clip-hero { text-align: center; margin-bottom: 28px; }
+    /* ── Hero ── */
+    .clip-hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
     .hero-title {
       font-family: var(--font-serif);
-      font-size: 48px;
+      font-size: 52px;
       font-weight: 500;
-      color: var(--ink);
+      color: #f0c9d9;
       letter-spacing: -0.02em;
       line-height: 1;
     }
-    .hero-dot  { color: var(--warm); }
-    .hero-sub  { font-size: 13px; color: var(--ink-faint); margin-top: 6px; font-style: italic; }
+    .hero-dot { color: var(--warm); }
+    .hero-sub {
+      font-size: 13px;
+      color: var(--ink-faint);
+      margin-top: 7px;
+      font-style: italic;
+    }
 
-    /* ── Form ────────────────────────────────────────────────────────────── */
-    .clip-form { display: flex; flex-direction: column; gap: 12px; }
-    .clip-title-input {
+    /* ── Main card ── */
+    .clip-card {
+      background: rgba(36, 24, 53, 0.78);
+      border: 1px solid rgba(190, 156, 212, 0.25);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.5rem 1.25rem;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ── Password field ── */
+    .pw-row {
+      margin-bottom: 1rem;
+    }
+    .pw-input {
       width: 100%;
       padding: 10px 14px;
-      border: 1px solid var(--rule);
-      border-radius: var(--radius-md);
       background: var(--paper);
+      border: 1px solid rgba(190, 156, 212, 0.3);
+      border-radius: var(--radius-md);
       color: var(--ink);
-      font-family: var(--font-sans);
+      font-family: var(--font-mono);
       font-size: 14px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
     }
-    .clip-title-input::placeholder { color: var(--ink-faint); }
-    .clip-title-input:focus { outline: none; border-color: var(--warm); }
-    .editor-wrap {
-      position: relative;
+    .pw-input::placeholder { color: var(--ink-faint); }
+    .pw-input:focus {
+      border-color: var(--warm);
+      box-shadow: 0 0 0 3px rgba(255, 153, 102, 0.12);
+    }
+
+    /* ── Mode tabs ── */
+    .mode-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 1.1rem;
+    }
+    .mode-tab {
+      flex: 1;
+      padding: 7px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(190, 156, 212, 0.2);
+      background: transparent;
+      color: var(--ink-faint);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s, border-color 0.18s;
+      letter-spacing: 0.03em;
+    }
+    .mode-tab:hover {
+      background: rgba(255, 153, 102, 0.07);
+      color: var(--ink-soft);
+    }
+    .mode-tab.active {
+      background: rgba(255, 153, 102, 0.12);
+      border-color: rgba(255, 153, 102, 0.45);
+      color: var(--warm-light);
+    }
+
+    /* ── Views ── */
+    .view { display: flex; flex-direction: column; gap: 10px; }
+    .view[hidden] { display: none; }
+
+    /* ── Textarea ── */
+    .clip-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--paper);
       border: 1px solid var(--rule);
       border-radius: var(--radius-md);
-      background: var(--paper);
-      transition: border-color 0.2s;
-    }
-    .editor-wrap:focus-within { border-color: var(--warm); }
-    .clip-content {
-      width: 100%;
-      padding: 14px;
-      background: transparent;
       color: var(--ink);
       font-family: var(--font-mono);
       font-size: 13px;
       line-height: 1.65;
-      border: none;
       resize: vertical;
-      min-height: 260px;
+      min-height: 180px;
       tab-size: 2;
+      outline: none;
+      transition: border-color 0.2s;
     }
-    .clip-content::placeholder { color: var(--ink-faint); }
-    .clip-content:focus { outline: none; }
-    .editor-meta-bar {
+    .clip-textarea::placeholder { color: var(--ink-faint); }
+    .clip-textarea:focus { border-color: rgba(190, 156, 212, 0.5); }
+
+    /* ── Drop footer (options + button in one row) ── */
+    .drop-footer {
       display: flex;
-      gap: 14px;
-      padding: 6px 14px;
-      border-top: 1px solid var(--rule);
-      font-size: 11px;
-      color: var(--ink-faint);
-      font-family: var(--font-mono);
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
-    /* ── Options ─────────────────────────────────────────────────────────── */
-    .clip-options { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .opt-label { display: flex; flex-direction: column; gap: 3px; }
-    .opt-label-text {
-      font-size: 10.5px;
-      font-weight: 600;
-      color: var(--ink-faint);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .opt-select {
-      background: var(--soft);
-      border: 1px solid var(--rule);
-      color: var(--ink-soft);
-      font-size: 12.5px;
-      font-family: var(--font-mono);
-      padding: 5px 8px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-    .opt-select:focus { outline: none; border-color: var(--warm); }
-    .opt-check {
+    /* ── Burn toggle ── */
+    .burn-toggle {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 12.5px;
+      font-size: 13px;
       color: var(--ink-soft);
       cursor: pointer;
-      padding: 5px 0;
-      margin-top: auto;
       user-select: none;
     }
-    .opt-check input { accent-color: var(--warm); cursor: pointer; }
-    .burn-icon { font-size: 14px; }
+    .burn-toggle input { accent-color: var(--warm); cursor: pointer; }
+    .burn-icon { font-size: 15px; }
 
-    /* ── Form error ──────────────────────────────────────────────────────── */
-    .form-error {
-      font-size: 13px;
-      color: #e07070;
-      padding: 8px 12px;
-      border: 1px solid rgba(224, 112, 112, 0.3);
-      border-radius: var(--radius-sm);
-      background: rgba(224, 112, 112, 0.08);
-    }
-
-    /* ── Submit ──────────────────────────────────────────────────────────── */
-    .submit-btn {
-      align-self: flex-end;
+    /* ── Buttons ── */
+    .btn-primary {
+      padding: 9px 22px;
       background: var(--warm);
-      color: #fff;
+      color: #1a1020;
       border: none;
       border-radius: var(--radius-md);
-      padding: 11px 24px;
       font-family: var(--font-sans);
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       letter-spacing: 0.02em;
       transition: background 0.18s, transform 0.1s;
+      white-space: nowrap;
     }
-    .submit-btn:hover   { background: var(--warm-hover); transform: translateY(-1px); }
-    .submit-btn:active  { transform: translateY(0); }
-    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
-    .submit-hint { align-self: flex-end; font-size: 11px; color: var(--ink-faint); margin-top: -4px; }
+    .btn-primary:hover   { background: var(--warm-hover); transform: translateY(-1px); }
+    .btn-primary:active  { transform: translateY(0); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    /* ── CLI hint ────────────────────────────────────────────────────────── */
-    .api-hint {
-      margin-top: 32px;
-      border: 1px solid var(--rule);
-      border-radius: var(--radius-md);
-      overflow: hidden;
-    }
-    .api-hint summary {
-      padding: 10px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--ink-faint);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      cursor: pointer;
-      list-style: none;
-      user-select: none;
-    }
-    .api-hint summary::-webkit-details-marker { display: none; }
-    .api-hint[open] summary { border-bottom: 1px solid var(--rule); }
-    .api-pre { background: var(--paper); padding: 14px; overflow-x: auto; }
-    .api-pre code {
-      font-family: var(--font-mono);
-      font-size: 12px;
+    .btn-secondary {
+      padding: 8px 18px;
+      background: rgba(190, 156, 212, 0.1);
+      border: 1px solid rgba(190, 156, 212, 0.3);
       color: var(--ink-soft);
-      white-space: pre;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .btn-secondary:hover { background: rgba(190, 156, 212, 0.18); border-color: rgba(190, 156, 212, 0.5); }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Messages ── */
+    .msg-error {
+      font-size: 13px;
+      color: var(--red);
+      padding: 8px 12px;
+      border: 1px solid rgba(224, 112, 112, 0.3);
+      border-radius: var(--radius-sm);
+      background: rgba(224, 112, 112, 0.07);
+    }
+    .msg-success {
+      font-size: 13px;
+      color: var(--cool);
+      padding: 8px 12px;
+      border: 1px solid rgba(122, 191, 158, 0.3);
+      border-radius: var(--radius-sm);
+      background: rgba(122, 191, 158, 0.07);
     }
 
-    /* ── Loading / error ─────────────────────────────────────────────────── */
-    .view-loading { text-align: center; padding: 80px 0; color: var(--ink-faint); font-style: italic; }
-    .view-error {
-      text-align: center;
-      padding: 72px 20px;
+    /* ── Pick up header ── */
+    .pickup-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .pickup-hint {
+      font-size: 12px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    /* ── Clip list ── */
+    #clip-list {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 14px;
+      gap: 10px;
+      margin-top: 2px;
     }
-    .view-error-icon { font-size: 36px; color: var(--ink-faint); opacity: 0.5; }
-    .view-error p { font-size: 15px; color: var(--ink-soft); }
-    .new-clip-btn {
-      display: inline-block;
-      margin-top: 4px;
-      padding: 9px 20px;
-      background: var(--warm);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      font-family: var(--font-sans);
-      transition: background 0.18s;
-    }
-    .new-clip-btn:hover { background: var(--warm-hover); }
-
-    /* ── View metadata ───────────────────────────────────────────────────── */
-    .view-meta { margin-bottom: 14px; }
-    .view-title {
-      font-family: var(--font-serif);
-      font-size: 22px;
-      font-weight: 500;
-      color: var(--ink);
-      margin-bottom: 6px;
-    }
-    .view-info-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      font-size: 12px;
+    .empty-msg {
+      text-align: center;
       color: var(--ink-faint);
+      font-size: 13px;
+      font-style: italic;
+      padding: 24px 0 8px;
     }
-    .lang-badge {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-      background: rgba(255,153,102,0.12);
-      color: var(--warm);
-      border: 1px solid rgba(255,153,102,0.25);
-      border-radius: var(--radius-pill);
-      padding: 1px 8px;
-    }
-    .info-sep   { color: var(--rule); }
-    .view-stat  { color: var(--ink-faint); }
-    .view-expires { color: var(--ink-faint); font-style: italic; }
-    .burn-badge { font-size: 11.5px; color: #e07070; }
 
-    /* ── Code block ──────────────────────────────────────────────────────── */
-    .code-wrap {
-      position: relative;
-      border: 1px solid var(--rule);
-      border-radius: var(--radius-lg);
+    /* ── Individual clip card ── */
+    .clip-entry {
       background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
       overflow: hidden;
     }
-    .code-actions {
+    .clip-entry-header {
       display: flex;
-      gap: 6px;
-      padding: 10px 12px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 12px 6px;
       border-bottom: 1px solid var(--rule);
-      background: var(--soft);
-      flex-wrap: wrap;
+      gap: 8px;
     }
-    .action-btn {
-      padding: 4px 12px;
+    .clip-entry-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11.5px;
+      color: var(--ink-faint);
+    }
+    .burn-badge {
+      font-size: 11px;
+      color: #e07070;
+      background: rgba(224, 112, 112, 0.1);
+      border: 1px solid rgba(224, 112, 112, 0.25);
       border-radius: var(--radius-pill);
-      border: 1px solid var(--rule);
-      background: var(--paper);
-      color: var(--ink-soft);
-      font-size: 12px;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-      line-height: 1.6;
+      padding: 1px 7px;
+      white-space: nowrap;
     }
-    .action-btn:hover { background: var(--rule); color: var(--ink); }
-    .action-btn-del { color: #e07070; border-color: rgba(224,112,112,0.25); }
-    .action-btn-del:hover { background: rgba(224,112,112,0.1); color: #e07070; }
-
-    .code-body { position: relative; }
-    .code-pre {
+    .clip-entry-content {
       margin: 0;
-      overflow-x: auto;
-      padding: 16px 18px 16px 56px;
-      font-size: 13px;
-      line-height: 1.65;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 220px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.15) transparent;
       tab-size: 2;
     }
-    .code-pre code { font-family: var(--font-mono); background: none; }
-    .line-nums {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 40px;
-      padding-top: 16px;
+    .clip-entry-actions {
       display: flex;
-      flex-direction: column;
-      text-align: right;
-      pointer-events: none;
-      user-select: none;
-    }
-    .line-nums span {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--ink-faint);
-      opacity: 0.4;
-      line-height: 1.65;
-      padding-right: 8px;
+      gap: 6px;
+      padding: 8px 12px;
+      border-top: 1px solid var(--rule);
     }
 
-    /* ── highlight.js theme ──────────────────────────────────────────────── */
-    .hljs                         { background: transparent; color: #c9bfe8; }
-    .hljs-comment, .hljs-meta     { color: var(--ink-faint); font-style: italic; }
-    .hljs-keyword, .hljs-built_in { color: #c792ea; }
-    .hljs-string, .hljs-attr      { color: #c3e88d; }
-    .hljs-number, .hljs-literal   { color: #f78c6c; }
-    .hljs-title, .hljs-name       { color: #82aaff; }
-    .hljs-type, .hljs-class       { color: #ffcb6b; }
-    .hljs-variable, .hljs-params  { color: #e2cff5; }
-    .hljs-operator, .hljs-punctuation { color: #89ddff; }
-    .hljs-deletion  { background: rgba(255,80,80,0.15); color: #ff8888; }
-    .hljs-addition  { background: rgba(100,200,120,0.12); color: #80c880; }
-
-    [data-theme="light"] .hljs            { color: #36304a; }
-    [data-theme="light"] .hljs-keyword    { color: #7c3aed; }
-    [data-theme="light"] .hljs-string     { color: #166534; }
-    [data-theme="light"] .hljs-number     { color: #c2410c; }
-    [data-theme="light"] .hljs-title      { color: #1d4ed8; }
-    [data-theme="light"] .hljs-type       { color: #854d0e; }
-    [data-theme="light"] .hljs-comment    { color: var(--ink-faint); }
-
-    /* ── QR code ─────────────────────────────────────────────────────────── */
-    .qr-wrap {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-      padding: 20px;
-      background: var(--paper);
-      border: 1px solid var(--rule);
-      border-radius: var(--radius-lg);
-    }
-    .qr-wrap.visible { display: flex; }
-    .qr-wrap canvas, .qr-wrap img {
-      border-radius: var(--radius-sm);
-      image-rendering: pixelated;
-    }
-    .qr-url { font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint); word-break: break-all; }
-    .qr-toggle-btn {
-      display: block;
-      margin: 14px auto 0;
-      padding: 4px 14px;
-      border: 1px solid var(--rule);
+    /* Small action buttons for clip entries */
+    .btn-clip {
+      padding: 4px 13px;
       border-radius: var(--radius-pill);
-      background: transparent;
-      color: var(--ink-faint);
-      font-size: 11px;
-      font-family: var(--font-mono);
+      border: 1px solid var(--rule);
+      background: var(--soft);
+      color: var(--ink-soft);
+      font-family: var(--font-sans);
+      font-size: 12px;
       font-weight: 600;
       cursor: pointer;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      line-height: 1.5;
     }
-    .qr-toggle-btn:hover { background: var(--soft); color: var(--ink-soft); }
+    .btn-clip:hover { background: rgba(255,255,255,0.07); color: var(--ink); }
+    .btn-clip-copy:hover { border-color: rgba(122, 191, 158, 0.5); color: var(--cool); }
+    .btn-clip-del  { color: var(--red); border-color: rgba(224,112,112,0.2); }
+    .btn-clip-del:hover { background: rgba(224,112,112,0.1); color: var(--red); border-color: rgba(224,112,112,0.45); }
+    .btn-clip-del.confirming { background: rgba(224,112,112,0.15); color: var(--red); border-color: rgba(224,112,112,0.6); }
 
-    /* ── Delete confirm ──────────────────────────────────────────────────── */
-    .delete-confirm {
-      margin-top: 14px;
-      padding: 14px;
-      border: 1px solid rgba(224,112,112,0.25);
-      border-radius: var(--radius-md);
-      background: rgba(224,112,112,0.06);
+    /* ── Footer note ── */
+    .clip-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 11.5px;
+      color: var(--ink-faint);
+      line-height: 1.6;
+      padding: 0 8px;
     }
-    .delete-confirm p { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 12px; }
-    .delete-confirm-row { display: flex; gap: 8px; }
-    .delete-error { color: #e07070; font-size: 13px; }
+    .clip-footer a { color: var(--warm); text-decoration: none; }
+    .clip-footer a:hover { text-decoration: underline; }
 
-    /* ── Responsive ──────────────────────────────────────────────────────── */
     @media (max-width: 480px) {
-      .clip-shell { padding: 16px 14px 60px; }
-      .hero-title { font-size: 36px; }
-      .clip-options { flex-direction: column; }
-      .submit-btn { align-self: stretch; }
+      .clip-shell { padding: 16px 12px 60px; }
+      .hero-title { font-size: 40px; }
+      .clip-card  { padding: 1.1rem 1rem 1rem; }
+      .drop-footer { flex-direction: column; align-items: flex-start; }
+      .btn-primary { align-self: stretch; text-align: center; }
     }
   </style>
 </head>
 <body>
-<div id="app"></div>
+<div class="clip-shell">
 
-<!-- highlight.js full build — all common languages included (~43 KB gzipped) -->
-<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<!-- QRCode.js -->
-<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <a href="/" class="back-link">← ajayraj.co</a>
+
+  <header class="clip-hero">
+    <h1 class="hero-title">clip<span class="hero-dot">.</span></h1>
+    <p class="hero-sub">cross-device clipboard — no link, just a keyword</p>
+  </header>
+
+  <div class="clip-card">
+
+    <!-- Password / keyword field -->
+    <div class="pw-row">
+      <input
+        type="text"
+        id="pw"
+        class="pw-input"
+        placeholder="keyword or password — anything you'll remember"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+
+    <!-- Mode tabs -->
+    <div class="mode-bar" role="tablist">
+      <button class="mode-tab active" data-mode="drop" role="tab" aria-selected="true">↓ drop</button>
+      <button class="mode-tab" data-mode="pickup" role="tab" aria-selected="false">↑ pick up</button>
+    </div>
+
+    <!-- Drop view -->
+    <div id="view-drop" class="view">
+      <textarea
+        id="drop-content"
+        class="clip-textarea"
+        placeholder="paste text, code, commands, anything…"
+        spellcheck="false"
+        rows="10"
+      ></textarea>
+      <div class="drop-footer">
+        <label class="burn-toggle">
+          <input type="checkbox" id="burn-check" />
+          <span class="burn-icon" aria-hidden="true">🔥</span>
+          burn after reading
+        </label>
+        <button id="drop-btn" class="btn-primary">drop ↓</button>
+      </div>
+      <div id="drop-error" class="msg-error" hidden></div>
+      <div id="drop-success" class="msg-success" hidden>
+        dropped ✓ — open clip on any device and enter the same keyword to pick it up
+      </div>
+    </div>
+
+    <!-- Pick up view -->
+    <div id="view-pickup" class="view" hidden>
+      <div class="pickup-header">
+        <p class="pickup-hint">clips stored for this keyword</p>
+        <button id="refresh-btn" class="btn-secondary">↺ refresh</button>
+      </div>
+      <div id="pickup-error" class="msg-error" hidden></div>
+      <div id="clip-list"></div>
+    </div>
+
+  </div>
+
+  <footer class="clip-footer">
+    <p>
+      your keyword is hashed in the browser before anything is sent —
+      the plaintext never leaves your device.
+      <a href="/" title="back to ajayraj.co">← home</a>
+    </p>
+  </footer>
+
+</div>
 
 <script is:inline>
 (function () {
 'use strict';
 
-/* ── Config ─────────────────────────────────────────────────────────────── */
-var API_BASE = window.location.hostname === 'localhost'
+/* ── Config ── */
+var API = (window.location.hostname === 'localhost'
   ? 'http://localhost:8787'
-  : 'https://ajayraj.co';
+  : '') + '/api/clip';
 
-var LANGUAGES = [
-  ['text',       'plaintext'],
-  ['javascript', 'javascript'],
-  ['typescript', 'typescript'],
-  ['python',     'python'],
-  ['go',         'go'],
-  ['rust',       'rust'],
-  ['bash',       'bash / shell'],
-  ['html',       'html'],
-  ['css',        'css'],
-  ['json',       'json'],
-  ['sql',        'sql'],
-  ['markdown',   'markdown'],
-  ['yaml',       'yaml'],
-  ['c',          'c / c++'],
-  ['java',       'java'],
-  ['diff',       'diff'],
-];
-
-/* ── State ──────────────────────────────────────────────────────────────── */
-var app = document.getElementById('app');
-var forkData = null;
-
-/* ── Theme ──────────────────────────────────────────────────────────────── */
-var THEME_KEY = 'clip-theme';
-function getTheme() { return localStorage.getItem(THEME_KEY) || 'dark'; }
-function saveTheme(t) { localStorage.setItem(THEME_KEY, t); }
-function applyTheme(t) { document.documentElement.dataset.theme = t; }
-function wireTheme(btn) {
-  if (!btn) return;
-  function upBtn(t) { btn.textContent = t === 'dark' ? '☀︎' : '☽'; }
-  upBtn(getTheme());
-  btn.addEventListener('click', function () {
-    var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    applyTheme(next); saveTheme(next); upBtn(next);
-  });
+/* ── SHA-256 hex (client-side, no plaintext sent) ── */
+async function sha256hex(str) {
+  var data = new TextEncoder().encode('clip:' + str);
+  var buf  = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf))
+    .map(function (b) { return b.toString(16).padStart(2, '0'); })
+    .join('');
 }
 
-/* ── Routing ────────────────────────────────────────────────────────────── */
-function route() {
-  applyTheme(getTheme());
-  var hash = window.location.hash.slice(1).trim();
-  if (hash) {
-    renderView(hash);
-  } else {
-    renderCreate(forkData);
-    forkData = null;
-  }
+/* ── Element refs ── */
+var pwInput      = document.getElementById('pw');
+var viewDrop     = document.getElementById('view-drop');
+var viewPickup   = document.getElementById('view-pickup');
+var dropContent  = document.getElementById('drop-content');
+var burnCheck    = document.getElementById('burn-check');
+var dropBtn      = document.getElementById('drop-btn');
+var dropError    = document.getElementById('drop-error');
+var dropSuccess  = document.getElementById('drop-success');
+var refreshBtn   = document.getElementById('refresh-btn');
+var pickupError  = document.getElementById('pickup-error');
+var clipList     = document.getElementById('clip-list');
+
+/* ── Helpers ── */
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.hidden = false;
 }
+function hideMsg(el) { el.hidden = true; }
 
-/** Navigate to create form, optionally pre-filled. */
-function goToNew(prefill) {
-  forkData = prefill || null;
-  history.replaceState(null, '', '/clip');
-  renderCreate(forkData);
-  forkData = null;
-}
-
-/* ── API ────────────────────────────────────────────────────────────────── */
-async function apiCreateClip(opts) {
-  try {
-    var r = await fetch(API_BASE + '/api/clip', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(opts),
-    });
-    if (!r.ok) {
-      var d = await r.json().catch(function () { return {}; });
-      return { ok: false, error: d.error || 'HTTP ' + r.status };
-    }
-    return { ok: true, data: await r.json() };
-  } catch (e) {
-    return { ok: false, error: 'Network error — is the API running?' };
-  }
-}
-
-async function apiGetClip(id) {
-  try {
-    var r = await fetch(API_BASE + '/api/clip/' + encodeURIComponent(id));
-    if (r.status === 404) return { ok: false, error: 'Clip not found.' };
-    if (r.status === 410) {
-      var d = await r.json().catch(function () { return {}; });
-      return { ok: false, error: d.error || 'Clip has expired or been burned.' };
-    }
-    if (!r.ok) return { ok: false, error: 'Server error (' + r.status + ')' };
-    return { ok: true, data: await r.json() };
-  } catch (e) {
-    return { ok: false, error: 'Network error.' };
-  }
-}
-
-async function apiDeleteClip(id) {
-  try {
-    var r = await fetch(API_BASE + '/api/clip/' + encodeURIComponent(id), {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    return r.ok;
-  } catch (e) { return false; }
-}
-
-/* ── Create page ────────────────────────────────────────────────────────── */
-function renderCreate(prefill) {
-  document.title = 'clip — ajayraj.co';
-
-  var langOpts = LANGUAGES.map(function (pair) {
-    var sel = ((prefill && prefill.language) || 'text') === pair[0] ? ' selected' : '';
-    return '<option value="' + pair[0] + '"' + sel + '>' + escHtml(pair[1]) + '</option>';
-  }).join('');
-
-  app.innerHTML =
-    '<div class="clip-shell">' +
-      '<header class="clip-header">' +
-        '<a href="/" class="back-link">← ajayraj.co</a>' +
-        '<button id="theme-btn" class="theme-btn" title="Toggle theme"></button>' +
-      '</header>' +
-      '<div class="clip-hero">' +
-        '<h1 class="hero-title">clip<span class="hero-dot">.</span></h1>' +
-        '<p class="hero-sub">paste it, share it.</p>' +
-      '</div>' +
-      '<form id="clip-form" class="clip-form" autocomplete="off">' +
-        '<input type="text" id="clip-title-input" class="clip-title-input"' +
-          ' placeholder="Title (optional)" maxlength="200"' +
-          ' value="' + (prefill && prefill.title ? escHtml(prefill.title) : '') + '" />' +
-        '<div class="editor-wrap">' +
-          '<textarea id="clip-content" class="clip-content"' +
-            ' placeholder="Paste your text or code here…"' +
-            ' spellcheck="false" rows="16">' +
-            (prefill && prefill.content ? escHtml(prefill.content) : '') +
-          '</textarea>' +
-          '<div class="editor-meta-bar">' +
-            '<span id="char-count">0 chars</span>' +
-            '<span id="line-count">0 lines</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="clip-options">' +
-          '<label class="opt-label">' +
-            '<span class="opt-label-text">Language</span>' +
-            '<select id="lang-select" class="opt-select">' + langOpts + '</select>' +
-          '</label>' +
-          '<label class="opt-label">' +
-            '<span class="opt-label-text">Expires</span>' +
-            '<select id="expiry-select" class="opt-select">' +
-              '<option value="1h">1 hour</option>' +
-              '<option value="24h">24 hours</option>' +
-              '<option value="7d" selected>7 days</option>' +
-              '<option value="30d">30 days</option>' +
-              '<option value="">never</option>' +
-            '</select>' +
-          '</label>' +
-          '<label class="opt-check" title="Clip is deleted after the first read">' +
-            '<input type="checkbox" id="burn-check" />' +
-            '<span class="burn-icon">🔥</span>' +
-            '<span>burn once</span>' +
-          '</label>' +
-        '</div>' +
-        '<div id="form-error" class="form-error" style="display:none"></div>' +
-        '<button type="submit" class="submit-btn" id="submit-btn">Create clip →</button>' +
-        '<p class="submit-hint">Cmd+Enter to submit</p>' +
-      '</form>' +
-      '<details class="api-hint">' +
-        '<summary>CLI usage</summary>' +
-        '<pre class="api-pre"><code id="api-example"></code></pre>' +
-      '</details>' +
-    '</div>';
-
-  wireTheme(document.getElementById('theme-btn'));
-
-  // CLI hint
-  var apiEx = document.getElementById('api-example');
-  if (apiEx) {
-    apiEx.textContent =
-      '# Create a clip from stdin\n' +
-      'echo "hello world" | curl -s -X POST ' + API_BASE + '/api/clip \\\n' +
-      '  -H \'Content-Type: application/json\' \\\n' +
-      '  -d "{\\"content\\":\\"$(cat)\\"}" | jq -r .url\n\n' +
-      '# Or pipe a file\n' +
-      'curl -s -X POST ' + API_BASE + '/api/clip \\\n' +
-      '  -H \'Content-Type: application/json\' \\\n' +
-      '  -d "{\\"content\\":\\"$(cat file.js)\\",\\"language\\":\\"javascript\\"}" | jq -r .url';
-  }
-
-  // Char/line counter
-  var ta     = document.getElementById('clip-content');
-  var charEl = document.getElementById('char-count');
-  var lineEl = document.getElementById('line-count');
-  function updateCounts() {
-    var v = ta.value;
-    charEl.textContent = v.length.toLocaleString() + ' chars';
-    var lines = v === '' ? 0 : v.split('\n').length;
-    lineEl.textContent = lines + ' ' + (lines === 1 ? 'line' : 'lines');
-  }
-  updateCounts();
-  ta.addEventListener('input', updateCounts);
-
-  // Cmd/Ctrl+Enter shortcut
-  ta.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-      e.preventDefault();
-      document.getElementById('clip-form').requestSubmit();
-    }
-  });
-
-  // Form submit
-  var form      = document.getElementById('clip-form');
-  var submitBtn = document.getElementById('submit-btn');
-  var errorEl   = document.getElementById('form-error');
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    errorEl.style.display = 'none';
-
-    var content = ta.value.trim();
-    if (!content) {
-      errorEl.textContent = 'Content is required.';
-      errorEl.style.display = 'block';
-      ta.focus();
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating…';
-
-    var result = await apiCreateClip({
-      content:    content,
-      title:      document.getElementById('clip-title-input').value.trim(),
-      language:   document.getElementById('lang-select').value,
-      expires_in: document.getElementById('expiry-select').value,
-      burn:       document.getElementById('burn-check').checked,
-    });
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Create clip →';
-
-    if (!result.ok) {
-      errorEl.textContent = result.error || 'Something went wrong.';
-      errorEl.style.display = 'block';
-      return;
-    }
-
-    // Navigate to view via hash — triggers hashchange → renderView
-    window.location.hash = result.data.id;
-  });
-}
-
-/* ── View page ──────────────────────────────────────────────────────────── */
-async function renderView(id) {
-  document.title = 'clip/' + id + ' — ajayraj.co';
-
-  app.innerHTML =
-    '<div class="clip-shell">' +
-      '<header class="clip-header">' +
-        '<a href="#" class="back-link" id="new-clip-link">+ new clip</a>' +
-        '<button id="theme-btn" class="theme-btn" title="Toggle theme"></button>' +
-      '</header>' +
-      '<div class="view-loading">Loading clip…</div>' +
-    '</div>';
-
-  wireTheme(document.getElementById('theme-btn'));
-  document.getElementById('new-clip-link').addEventListener('click', function (e) {
-    e.preventDefault();
-    goToNew(null);
-  });
-
-  var result = await apiGetClip(id);
-  var shell  = app.querySelector('.clip-shell');
-
-  if (!result.ok) {
-    var errDiv = document.createElement('div');
-    errDiv.className = 'view-error';
-    errDiv.innerHTML =
-      '<div class="view-error-icon">⊘</div>' +
-      '<p>' + escHtml(result.error) + '</p>';
-    var newBtn = document.createElement('button');
-    newBtn.className = 'new-clip-btn';
-    newBtn.textContent = 'Create a new clip';
-    newBtn.addEventListener('click', function () { goToNew(null); });
-    errDiv.appendChild(newBtn);
-    shell.appendChild(errDiv);
-    return;
-  }
-
-  var clip = result.data;
-  document.title = clip.title
-    ? clip.title + ' — clip'
-    : 'clip/' + id + ' — ajayraj.co';
-
-  // Syntax highlighting
-  var lang = 'text';
-  var highlighted;
-  if (window.hljs) {
-    lang        = window.hljs.getLanguage(clip.language) ? clip.language : 'text';
-    highlighted = window.hljs.highlight(clip.content, { language: lang, ignoreIllegals: true }).value;
-  } else {
-    highlighted = escHtml(clip.content);
-  }
-
-  var rawURL   = API_BASE + '/api/clip/' + id + '?raw=1';
-  var shareURL = clip.url || (window.location.origin + '/clip#' + id);
-
-  // Build view HTML
-  var metaHTML = '';
-  if (clip.title) metaHTML += '<h1 class="view-title">' + escHtml(clip.title) + '</h1>';
-  metaHTML += '<div class="view-info-row">' +
-    '<span class="lang-badge">' + escHtml(clip.language) + '</span>' +
-    '<span class="info-sep">&middot;</span>' +
-    '<span class="view-stat">' + clip.view_count + ' ' + (clip.view_count === 1 ? 'view' : 'views') + '</span>' +
-    '<span class="info-sep">&middot;</span>' +
-    '<span class="view-stat">' + relDate(clip.created_at) + '</span>';
-  if (clip.expires_at) {
-    metaHTML += '<span class="info-sep">&middot;</span>' +
-      '<span class="view-expires">expires ' + relDate(clip.expires_at) + '</span>';
-  }
-  if (clip.burn) {
-    metaHTML += '<span class="info-sep">&middot;</span>' +
-      '<span class="burn-badge">🔥 burned</span>';
-  }
-  metaHTML += '</div>';
-
-  shell.innerHTML =
-    '<header class="clip-header">' +
-      '<a href="#" class="back-link" id="new-clip-link">+ new clip</a>' +
-      '<button id="theme-btn" class="theme-btn" title="Toggle theme"></button>' +
-    '</header>' +
-    '<div class="view-meta">' + metaHTML + '</div>' +
-    '<div class="code-wrap">' +
-      '<div class="code-actions">' +
-        '<button class="action-btn" id="copy-url-btn">Copy URL</button>' +
-        '<button class="action-btn" id="copy-btn">Copy</button>' +
-        '<a class="action-btn" href="' + rawURL + '" target="_blank" rel="noopener">Raw</a>' +
-        '<button class="action-btn" id="fork-btn">Fork</button>' +
-        '<button class="action-btn action-btn-del" id="delete-btn">Delete</button>' +
-      '</div>' +
-      '<div class="code-body">' +
-        '<div class="line-nums" id="line-nums"></div>' +
-        '<pre class="code-pre"><code class="hljs language-' + escHtml(lang) + '">' + highlighted + '</code></pre>' +
-      '</div>' +
-    '</div>' +
-    '<button class="qr-toggle-btn" id="qr-btn">QR</button>' +
-    '<div id="qr-wrap" class="qr-wrap">' +
-      '<div id="qr-container"></div>' +
-      '<p class="qr-url">' + escHtml(shareURL) + '</p>' +
-    '</div>' +
-    '<div id="delete-confirm" class="delete-confirm" style="display:none">' +
-      '<p>Delete this clip permanently?</p>' +
-      '<div class="delete-confirm-row">' +
-        '<button class="action-btn action-btn-del" id="confirm-delete-btn">Yes, delete</button>' +
-        '<button class="action-btn" id="cancel-delete-btn">Cancel</button>' +
-      '</div>' +
-    '</div>';
-
-  wireTheme(document.getElementById('theme-btn'));
-  document.getElementById('new-clip-link').addEventListener('click', function (e) {
-    e.preventDefault();
-    goToNew(null);
-  });
-
-  // Copy URL
-  document.getElementById('copy-url-btn').addEventListener('click', function () {
-    navigator.clipboard.writeText(shareURL).catch(function () {});
-    flash('copy-url-btn', 'Copied!', 'Copy URL');
-  });
-
-  // Copy content
-  document.getElementById('copy-btn').addEventListener('click', function () {
-    navigator.clipboard.writeText(clip.content).catch(function () {});
-    flash('copy-btn', 'Copied!', 'Copy');
-  });
-
-  // Fork
-  document.getElementById('fork-btn').addEventListener('click', function () {
-    goToNew({
-      content:  clip.content,
-      title:    clip.title ? 'Fork of ' + clip.title : '',
-      language: clip.language,
-    });
-  });
-
-  // Delete
-  var confirmBox = document.getElementById('delete-confirm');
-  document.getElementById('delete-btn').addEventListener('click', function () {
-    confirmBox.style.display = 'block';
-  });
-  document.getElementById('cancel-delete-btn').addEventListener('click', function () {
-    confirmBox.style.display = 'none';
-  });
-  document.getElementById('confirm-delete-btn').addEventListener('click', async function () {
-    var ok = await apiDeleteClip(clip.id);
-    if (ok) {
-      goToNew(null);
-    } else {
-      confirmBox.innerHTML = '<p class="delete-error">Delete failed — are you logged in?</p>';
-    }
-  });
-
-  // Line numbers
-  var lineNums = document.getElementById('line-nums');
-  if (lineNums) {
-    var lineCount = clip.content.split('\n').length;
-    var nums = [];
-    for (var i = 1; i <= lineCount; i++) nums.push('<span>' + i + '</span>');
-    lineNums.innerHTML = nums.join('');
-  }
-
-  // QR code — generated lazily on first open
-  var qrBtn       = document.getElementById('qr-btn');
-  var qrWrap      = document.getElementById('qr-wrap');
-  var qrContainer = document.getElementById('qr-container');
-  var qrGenerated = false;
-
-  qrBtn.addEventListener('click', function () {
-    var isOpen = qrWrap.classList.contains('visible');
-    if (!isOpen) {
-      qrWrap.classList.add('visible');
-      if (!qrGenerated && window.QRCode) {
-        qrGenerated = true;
-        new window.QRCode(qrContainer, {
-          text:         shareURL,
-          width:        160,
-          height:       160,
-          colorDark:    '#ff9966',
-          colorLight:   document.documentElement.dataset.theme === 'light' ? '#fffdf9' : '#1a1128',
-          correctLevel: window.QRCode.CorrectLevel.M,
-        });
-      }
-    } else {
-      qrWrap.classList.remove('visible');
-    }
-  });
-}
-
-/* ── Helpers ────────────────────────────────────────────────────────────── */
 function escHtml(s) {
   return String(s || '')
     .replace(/&/g, '&amp;')
@@ -915,32 +499,235 @@ function escHtml(s) {
 function relDate(iso) {
   if (!iso) return '';
   var ms   = Date.now() - new Date(iso).getTime();
-  var abMs = Math.abs(ms);
-  var future = ms < 0;
-  var days = Math.floor(abMs / 86400000);
-  var hrs  = Math.floor(abMs / 3600000);
-  var mins = Math.floor(abMs / 60000);
-  var s;
-  if      (mins < 1)   s = 'just now';
-  else if (hrs  < 1)   s = mins + 'm ago';
-  else if (days < 1)   s = hrs + 'h ago';
-  else if (days < 7)   s = days + 'd ago';
-  else if (days < 30)  s = Math.floor(days / 7) + 'w ago';
-  else                 s = Math.floor(days / 30) + 'mo ago';
-  if (future) s = s.replace(' ago', '').replace('just now', 'in a moment');
-  return s;
+  var mins = Math.floor(ms / 60000);
+  var hrs  = Math.floor(ms / 3600000);
+  var days = Math.floor(ms / 86400000);
+  if (mins < 1)  return 'just now';
+  if (hrs  < 1)  return mins + 'm ago';
+  if (days < 1)  return hrs + 'h ago';
+  if (days < 7)  return days + 'd ago';
+  if (days < 30) return Math.floor(days / 7) + 'w ago';
+  return Math.floor(days / 30) + 'mo ago';
 }
 
-function flash(id, next, reset) {
-  var btn = document.getElementById(id);
-  if (!btn) return;
-  btn.textContent = next;
-  setTimeout(function () { btn.textContent = reset; }, 1600);
+/* ── Mode switching ── */
+var tabs = document.querySelectorAll('.mode-tab');
+tabs.forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    var mode = tab.dataset.mode;
+    tabs.forEach(function (t) {
+      t.classList.toggle('active', t === tab);
+      t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+    });
+    viewDrop.hidden   = mode !== 'drop';
+    viewPickup.hidden = mode !== 'pickup';
+    if (mode === 'pickup' && pwInput.value.trim()) {
+      fetchClips();
+    }
+  });
+});
+
+/* ── Drop ── */
+dropBtn.addEventListener('click', async function () {
+  hideMsg(dropError);
+  hideMsg(dropSuccess);
+
+  var pw      = pwInput.value.trim();
+  var content = dropContent.value; // preserve trailing newlines / indentation
+  if (content.endsWith('\n')) content = content.replace(/\n+$/, '');
+
+  if (!pw)      { showErr(dropError, 'enter a keyword first'); return; }
+  if (!content) { showErr(dropError, 'paste something first'); return; }
+
+  var key = await sha256hex(pw);
+  var burn = burnCheck.checked;
+
+  dropBtn.textContent = 'dropping…';
+  dropBtn.disabled    = true;
+
+  try {
+    var res = await fetch(API, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ key: key, content: content, burn: burn }),
+    });
+    if (!res.ok) {
+      var d = await res.json().catch(function () { return {}; });
+      showErr(dropError, d.error || 'something went wrong (HTTP ' + res.status + ')');
+      return;
+    }
+    dropContent.value = '';
+    burnCheck.checked = false;
+    dropSuccess.hidden = false;
+    setTimeout(function () { dropSuccess.hidden = true; }, 5000);
+  } catch (e) {
+    showErr(dropError, 'network error — is the API reachable?');
+  } finally {
+    dropBtn.textContent = 'drop ↓';
+    dropBtn.disabled    = false;
+  }
+});
+
+/* Allow Cmd/Ctrl+Enter in textarea to drop */
+dropContent.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    dropBtn.click();
+  }
+});
+
+/* ── Pick up ── */
+async function fetchClips() {
+  hideMsg(pickupError);
+  clipList.innerHTML = '';
+
+  var pw = pwInput.value.trim();
+  if (!pw) {
+    showErr(pickupError, 'enter a keyword to fetch clips');
+    return;
+  }
+
+  refreshBtn.textContent = '↺ fetching…';
+  refreshBtn.disabled    = true;
+
+  var key;
+  try {
+    key = await sha256hex(pw);
+    var res = await fetch(API + '?key=' + encodeURIComponent(key));
+    if (!res.ok) {
+      var d = await res.json().catch(function () { return {}; });
+      showErr(pickupError, d.error || 'fetch failed (HTTP ' + res.status + ')');
+      return;
+    }
+    var clips = await res.json();
+    renderClipList(clips, key);
+  } catch (e) {
+    showErr(pickupError, 'network error — is the API reachable?');
+  } finally {
+    refreshBtn.textContent = '↺ refresh';
+    refreshBtn.disabled    = false;
+  }
 }
 
-/* ── Boot ───────────────────────────────────────────────────────────────── */
-window.addEventListener('hashchange', route);
-route();
+refreshBtn.addEventListener('click', fetchClips);
+
+/* Allow Enter in password field to fetch when in pick-up mode */
+pwInput.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && !viewPickup.hidden) {
+    fetchClips();
+  }
+});
+
+/* ── Render clip list ── */
+function renderClipList(clips, key) {
+  if (!clips || clips.length === 0) {
+    clipList.innerHTML = '<p class="empty-msg">no clips for this keyword.</p>';
+    return;
+  }
+
+  var html = '';
+  clips.forEach(function (clip) {
+    html +=
+      '<div class="clip-entry" data-id="' + escHtml(clip.id) + '">' +
+        '<div class="clip-entry-header">' +
+          '<div class="clip-entry-meta">' +
+            '<span>' + relDate(clip.created_at) + '</span>' +
+            (clip.burn ? '<span class="burn-badge">🔥 burn once</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<pre class="clip-entry-content">' + escHtml(clip.content) + '</pre>' +
+        '<div class="clip-entry-actions">' +
+          '<button class="btn-clip btn-clip-copy" data-id="' + escHtml(clip.id) + '" data-burn="' + clip.burn + '">copy</button>' +
+          '<button class="btn-clip btn-clip-del"  data-id="' + escHtml(clip.id) + '">delete</button>' +
+        '</div>' +
+      '</div>';
+  });
+  clipList.innerHTML = html;
+
+  /* Wire copy buttons */
+  clipList.querySelectorAll('.btn-clip-copy').forEach(function (btn) {
+    btn.addEventListener('click', async function () {
+      var id      = btn.dataset.id;
+      var isBurn  = btn.dataset.burn === 'true';
+      var entry   = btn.closest('.clip-entry');
+      var content = entry.querySelector('.clip-entry-content').textContent;
+
+      try {
+        await navigator.clipboard.writeText(content);
+      } catch (e) {
+        /* Fallback for non-HTTPS or blocked clipboard */
+        var ta = document.createElement('textarea');
+        ta.value = content;
+        ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (_) {}
+        document.body.removeChild(ta);
+      }
+
+      btn.textContent = 'copied!';
+
+      if (isBurn) {
+        /* Burn: delete from server then remove from DOM */
+        try {
+          await fetch(API + '/' + encodeURIComponent(id) + '?key=' + encodeURIComponent(key), {
+            method: 'DELETE',
+          });
+        } catch (_) {}
+        entry.remove();
+        if (!clipList.querySelector('.clip-entry')) {
+          clipList.innerHTML = '<p class="empty-msg">all clips consumed.</p>';
+        }
+      } else {
+        setTimeout(function () { btn.textContent = 'copy'; }, 1600);
+      }
+    });
+  });
+
+  /* Wire delete buttons (two-click confirm) */
+  clipList.querySelectorAll('.btn-clip-del').forEach(function (btn) {
+    var confirmTimer = null;
+    btn.addEventListener('click', async function () {
+      if (!btn.classList.contains('confirming')) {
+        /* First click: arm confirmation */
+        btn.classList.add('confirming');
+        btn.textContent = 'sure?';
+        confirmTimer = setTimeout(function () {
+          btn.classList.remove('confirming');
+          btn.textContent = 'delete';
+        }, 3000);
+        return;
+      }
+      /* Second click: confirmed */
+      clearTimeout(confirmTimer);
+      btn.textContent = 'deleting…';
+      btn.disabled    = true;
+
+      var id    = btn.dataset.id;
+      var entry = btn.closest('.clip-entry');
+
+      try {
+        var res = await fetch(API + '/' + encodeURIComponent(id) + '?key=' + encodeURIComponent(key), {
+          method: 'DELETE',
+        });
+        if (res.ok) {
+          entry.remove();
+          if (!clipList.querySelector('.clip-entry')) {
+            clipList.innerHTML = '<p class="empty-msg">no clips for this keyword.</p>';
+          }
+        } else {
+          btn.classList.remove('confirming');
+          btn.textContent = 'delete';
+          btn.disabled    = false;
+        }
+      } catch (e) {
+        btn.classList.remove('confirming');
+        btn.textContent = 'delete';
+        btn.disabled    = false;
+      }
+    });
+  });
+}
 
 })();
 </script>

@@ -35,6 +35,12 @@ func Open(path string) (*DB, error) {
 }
 
 func (d *DB) migrate() error {
-	_, err := d.Exec(schema)
-	return err
+	if _, err := d.Exec(schema); err != nil {
+		return err
+	}
+	// Add password_hash column to existing databases that predate this column.
+	// ALTER TABLE fails silently when the column already exists — that's intentional.
+	d.Exec(`ALTER TABLE clips ADD COLUMN password_hash TEXT NOT NULL DEFAULT ''`)
+	d.Exec(`CREATE INDEX IF NOT EXISTS idx_clips_pw ON clips(password_hash)`)
+	return nil
 }
