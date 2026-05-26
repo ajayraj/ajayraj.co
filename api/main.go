@@ -58,10 +58,12 @@ func main() {
 // In production this should be locked to the exact domain.
 func cors(next http.Handler) http.Handler {
 	allowed := map[string]bool{
+		"http://localhost:4321":        true, // astro dev (main site)
 		"http://localhost:5173":        true, // vite dev (cs-anki)
 		"http://localhost:5174":        true, // vite dev (clip)
+		"https://ajayraj.co":          true, // production (clip is now /clip on main domain)
 		"https://cs-anki.ajayraj.co":  true, // production
-		"https://clip.ajayraj.co":     true, // production
+		"https://clip.ajayraj.co":     true, // kept for any future subdomain use
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
