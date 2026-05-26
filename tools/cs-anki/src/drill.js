@@ -122,7 +122,9 @@ async function updateQueueSummary() {
   const reviewCount_el = document.getElementById('drill-review-count');
   const newCount_el    = document.getElementById('drill-new-count');
   if (reviewCount_el) {
-    if (reviewCount === 0) {
+    const seenCount = serverSession?.seen_card_ids?.length ?? 0;
+    const trulyDone = reviewCount === 0 && seenCount > 0;
+    if (trulyDone) {
       reviewCount_el.textContent = '✓ all done';
       reviewCount_el.classList.add('drill-done-count');
     } else {

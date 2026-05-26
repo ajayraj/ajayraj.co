@@ -1583,7 +1583,7 @@ footer {
 }
 
 .auth-modal {
-  background: var(--card-bg);
+  background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: var(--radius-lg, 12px);
   padding: 28px 28px 24px;
