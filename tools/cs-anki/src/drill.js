@@ -89,7 +89,6 @@ async function updateQueueSummary() {
     serverSession = await apiGetSession();
     if (serverSession) {
       const seenSet = new Set(serverSession.seen_card_ids);
-      // Filter review cards to those in the current tier filter
       const poolIds = new Set(pool.map(c => c.id));
       reviewCount = serverSession.review_card_ids.filter(id => poolIds.has(id)).length;
       newCount    = pool.filter(c => !seenSet.has(c.id)).length;
@@ -98,13 +97,15 @@ async function updateQueueSummary() {
       newCount = pool.length;
     }
   } else {
-    const today = new Date().toISOString().slice(0, 10);
     reviewCount = pool.filter(c => isDue(c.id)).length;
     newCount    = pool.filter(c => isUnseen(c.id)).length;
   }
 
-  const cappedNew = Math.min(newCount, NEW_BUDGET);
-  const total     = Math.min(reviewCount + cappedNew, SESSION_SIZE);
+  // How many of today's new-card budget remain (server-tracked for accuracy)
+  const newDrilledToday = serverSession?.new_drilled_today ?? 0;
+  const budgetRemaining = Math.max(0, NEW_BUDGET - newDrilledToday);
+  const cappedNew       = Math.min(newCount, budgetRemaining);
+  const total           = Math.min(reviewCount + cappedNew, SESSION_SIZE);
 
   // Summary text
   const summaryEl = document.getElementById('drill-queue-summary');
@@ -112,25 +113,18 @@ async function updateQueueSummary() {
     summaryEl.innerHTML =
       `<strong>${total}</strong> cards ready — ` +
       `<span class="queue-reviews">${reviewCount} due for review</span>, ` +
-      `<span class="queue-new">${cappedNew} new</span>` +
+      `<span class="queue-new">${newDrilledToday}/${NEW_BUDGET} new today</span>` +
       (!isLoggedIn() ? ' <span class="queue-offline">(local)</span>' : '');
   }
 
   // Update button counts + enabled state
-  const reviewBtn   = document.getElementById('drill-btn-review');
-  const newBtn      = document.getElementById('drill-btn-new');
+  const reviewBtn      = document.getElementById('drill-btn-review');
+  const newBtn         = document.getElementById('drill-btn-new');
   const reviewCount_el = document.getElementById('drill-review-count');
   const newCount_el    = document.getElementById('drill-new-count');
   if (reviewCount_el) {
-    const seenCount = serverSession?.seen_card_ids?.length ?? 0;
-    const trulyDone = reviewCount === 0 && seenCount > 0;
-    if (trulyDone) {
-      reviewCount_el.textContent = '✓ all done';
-      reviewCount_el.classList.add('drill-done-count');
-    } else {
-      reviewCount_el.textContent = `${reviewCount} due`;
-      reviewCount_el.classList.remove('drill-done-count');
-    }
+    reviewCount_el.textContent = `${reviewCount} due`;
+    reviewCount_el.classList.remove('drill-done-count');
   }
   if (newCount_el) newCount_el.textContent = `${cappedNew} cards`;
   // Review button: always enabled — clicking with 0 due re-drills today's completed cards

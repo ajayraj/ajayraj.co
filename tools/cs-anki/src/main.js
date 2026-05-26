@@ -1,5 +1,5 @@
 import './style.css';
-import { getTheme, saveTheme, getMode, saveMode, isOnboarded, isLoggedIn, setServerProgress, getDailyNewDrilled } from './store.js';
+import { getTheme, saveTheme, getMode, saveMode, isOnboarded, isLoggedIn, setServerProgress } from './store.js';
 import { initCardPreview, showCardPreview } from './cardPreview.js';
 import { initBrowse, navigateToCard, refreshBrowse } from './browse.js';
 import { initCardLookup } from './render.js';
@@ -191,14 +191,14 @@ function renderDailyBanner(session, cards) {
     return;
   }
 
-  const reviewCount = session.review_card_ids?.length ?? 0;
-  const seenCount   = session.seen_card_ids?.length ?? 0;
-  const newBudget   = session.new_budget ?? 10;
-  const newDrilled  = getDailyNewDrilled();
-  const newCount    = Math.max(0, newBudget - newDrilled);
-  // "done" only if the user has actually reviewed cards before AND has nothing due.
-  // A brand-new account has reviewCount=0 too, but shouldn't show "All caught up".
-  const isDone      = reviewCount === 0 && seenCount > 0;
+  const reviewCount     = session.review_card_ids?.length ?? 0;
+  const seenCount       = session.seen_card_ids?.length ?? 0;
+  const newBudget       = session.new_budget ?? 10;
+  const newDrilledToday = session.new_drilled_today ?? 0;
+  const newCount        = Math.max(0, newBudget - newDrilledToday);
+  // "done" = no reviews due AND today's new-card budget is used up.
+  // Brand-new users have reviewCount=0 too, but newCount=10, so isDone stays false.
+  const isDone          = reviewCount === 0 && newCount === 0;
 
   if (isDone) {
     el.className = 'daily-banner daily-banner-done';

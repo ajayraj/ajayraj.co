@@ -70,10 +70,24 @@ func (h *Handler) GetSession(w http.ResponseWriter, r *http.Request) {
 		seenIDs = append(seenIDs, id)
 	}
 
+	// Count cards whose very first review ever was today.
+	// These are the "new" cards consumed from today's budget.
+	var newDrilledToday int
+	h.db.QueryRow(`
+		SELECT COUNT(*) FROM (
+			SELECT card_id
+			FROM card_reviews
+			WHERE user_id = ?
+			GROUP BY card_id
+			HAVING MIN(date(reviewed_at)) = ?
+		)
+	`, userID, today).Scan(&newDrilledToday)
+
 	jsonOK(w, map[string]any{
-		"review_card_ids": reviewCards,
-		"seen_card_ids":   seenIDs,
-		"new_budget":      newCardBudget,
+		"review_card_ids":  reviewCards,
+		"seen_card_ids":    seenIDs,
+		"new_budget":       newCardBudget,
+		"new_drilled_today": newDrilledToday,
 	})
 }
 
