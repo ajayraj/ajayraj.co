@@ -52,7 +52,7 @@ function renderSetup() {
 
       <div class="drill-start-row">
         <button class="drill-session-btn" id="drill-btn-review" disabled>
-          <span class="drill-btn-label">Today's cards</span>
+          <span class="drill-btn-label">Review cards</span>
           <span class="drill-btn-count" id="drill-review-count">—</span>
         </button>
         <button class="drill-session-btn" id="drill-btn-new" disabled>
@@ -101,19 +101,22 @@ async function updateQueueSummary() {
     newCount    = pool.filter(c => isUnseen(c.id)).length;
   }
 
-  // How many of today's new-card budget remain (server-tracked for accuracy)
+  // Daily new-card tracking (server-tracked) — used for banner only, not to gate the button
   const newDrilledToday = serverSession?.new_drilled_today ?? 0;
-  const budgetRemaining = Math.max(0, NEW_BUDGET - newDrilledToday);
-  const cappedNew       = Math.min(newCount, budgetRemaining);
-  const total           = Math.min(reviewCount + cappedNew, SESSION_SIZE);
+  // How many cards the New cards button will offer (always up to 10, independent of daily budget)
+  const availableNew    = Math.min(newCount, NEW_BUDGET);
+  const total           = Math.min(reviewCount + availableNew, SESSION_SIZE);
 
   // Summary text
   const summaryEl = document.getElementById('drill-queue-summary');
   if (summaryEl) {
+    const newTodayStr = isLoggedIn()
+      ? `<span class="queue-new">${newDrilledToday}/${NEW_BUDGET} new today</span>`
+      : `<span class="queue-new">${newCount} new</span>`;
     summaryEl.innerHTML =
       `<strong>${total}</strong> cards ready — ` +
       `<span class="queue-reviews">${reviewCount} due for review</span>, ` +
-      `<span class="queue-new">${newDrilledToday}/${NEW_BUDGET} new today</span>` +
+      newTodayStr +
       (!isLoggedIn() ? ' <span class="queue-offline">(local)</span>' : '');
   }
 
@@ -126,10 +129,11 @@ async function updateQueueSummary() {
     reviewCount_el.textContent = `${reviewCount} due`;
     reviewCount_el.classList.remove('drill-done-count');
   }
-  if (newCount_el) newCount_el.textContent = `${cappedNew} cards`;
+  if (newCount_el) newCount_el.textContent = `${availableNew} cards`;
   // Review button: always enabled — clicking with 0 due re-drills today's completed cards
   if (reviewBtn) reviewBtn.disabled = false;
-  if (newBtn)    newBtn.disabled    = cappedNew === 0;
+  // New cards button: disabled only when there are truly no unseen cards left
+  if (newBtn)    newBtn.disabled    = newCount === 0;
 }
 
 /* ── Session ──────────────────────────────────────────────────────────── */
